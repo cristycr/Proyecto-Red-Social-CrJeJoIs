@@ -11,3 +11,5 @@ usuarios que tengan ciertos permisos. Si un usuario no logueado quiere acceder a
 una vista que necesita autenticar al usuario, se redirigirá al usuario a la ventana de
 login o registro, una vez que se haya logueado o registrado se le redirigirá a donde
 el usuario quería en un inicio.*
+
+Tecnologías utilizadas:
