@@ -1,6 +1,6 @@
 # Proyecto-Red-Social-CrJeJoIs
 
-## Proyecto de ASGBD 2ASIR IES Miguel Romero Esteo 2025-2026
+## ASGBD 2ASIR IES Miguel Romero Esteo 2025-2026
 
 ### Práctica Conexión a Bases de Datos
 
