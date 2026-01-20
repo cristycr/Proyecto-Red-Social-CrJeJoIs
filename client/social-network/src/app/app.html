@@ -1,14 +1,20 @@
 <!-- NAV de las páginas -->
-<nav>
-  <ul>
-    <li><a routerLink="/feed">Feed</a></li>
-    <li><a routerLink="/login">Inicio/Registro</a></li>
-    <li><a routerLink="/about">Sobre nosotros</a></li>
-    <li><a routerLink="/admin">Panel admin</a></li>
-    <li><a routerLink="/profile">Perfil</a></li>
-  </ul>
-</nav>
+<header>
+  <!-- Logo -->
+  <a routerLink="/landing">TechIt!</a>
+  <nav>
+    <ul>
+      <li><a routerLink="/feed">Feed</a></li>
+      <li><a routerLink="/login">Iniciar sesión</a></li>
+      <li><a routerLink="/about">Nosotros</a></li>
+      <li><a routerLink="/admin">Panel admin</a></li>
+      <li><a routerLink="/profile">Perfil</a></li>
+    </ul>
+  </nav>
+</header>
+
 <main>
   <router-outlet></router-outlet>
 </main>
+
 <footer>TechIt© 2026</footer>
