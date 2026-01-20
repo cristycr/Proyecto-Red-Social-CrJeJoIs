@@ -11,7 +11,7 @@ public class User {
     public required string Name { get; set; }
     public required string Surname1 { get; set; }
     public required string Password { get; set; }
-    public required string role { get; set; } = "user";
+    public required string Role { get; set; } = "user";
     public string Surname2 { get; set; } = string.Empty;
     public string Avatar { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
