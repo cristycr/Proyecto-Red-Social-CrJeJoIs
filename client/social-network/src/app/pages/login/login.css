@@ -53,6 +53,18 @@ input {
     border: none;
 }
 
+.div-checkbox {
+    align-items: center;
+    display: flex;
+    gap: 5px;
+}
+
+input[type="checkbox"] {
+    width: 15px;
+    height: 15px;
+    accent-color: var(--secondary-color);
+}
+
 .btn {
     height: 35px;
     transition: .3s;
