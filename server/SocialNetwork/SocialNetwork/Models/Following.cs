@@ -1,11 +1,6 @@
-<<<<<<< HEAD
-﻿using System.ComponentModel.DataAnnotations.Schema;
-
-=======
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
->>>>>>> e9f37d4c9b7e62f25e920016c7b0bd44b26ea760
 
 namespace SocialNetwork.Models
 {
@@ -14,27 +9,13 @@ namespace SocialNetwork.Models
     [PrimaryKey(nameof(IdFollower), nameof(IdFollowed))]
     public class Following
     {
-<<<<<<< HEAD
-        public long Id { get; set; }
-        // --- RELACIÓN 1: El que sigue ---
-        public required long Follower { get; set; }
 
-        [ForeignKey("Follower")] // Le decimos: "El objeto de abajo se llena usando la clave de arriba 'Follower'"
-        public required User UserFollower { get; set; } // Objeto de navegación
-
-        // --- RELACIÓN 2: El seguido ---
-        public required long Followed { get; set; }
-
-        [ForeignKey("Followed")] 
-        public required User UserFollowed { get; set; } 
-=======
         public required long IdFollower { get; set; }
         public required long IdFollowed { get; set; }
 
         // Estas propiedades de navegación establecen la relación con la entidad User
         public User Follower { get; set; } = null!;
         public User Followed { get; set; } = null!;
->>>>>>> e9f37d4c9b7e62f25e920016c7b0bd44b26ea760
     }
 }
 
