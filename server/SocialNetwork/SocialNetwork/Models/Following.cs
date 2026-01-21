@@ -1,11 +1,16 @@
-﻿namespace SocialNetwork.Models
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace SocialNetwork.Models
 {
+    [PrimaryKey(nameof(IdFollower), nameof(IdFollowed))]
     public class Following
     {
-        public long Id { get; set; }
-        public required long Follower { get; set; }
-        public required User UserFollower { get; set; }
-        public required long Followed { get; set; }
-        public required User UserFollowed { get; set; }
+        public required long IdFollower { get; set; }
+        public required long IdFollowed { get; set; }
+
+        public User Follower { get; set; } = null!;
+        public User Followed { get; set; } = null!;
     }
 }

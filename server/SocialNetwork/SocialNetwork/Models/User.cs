@@ -12,11 +12,12 @@ public class User {
     public required string Surname1 { get; set; }
     public required string Password { get; set; }
     public required string Role { get; set; } = "user";
-    public string Surname2 { get; set; } = string.Empty;
-    public string Avatar { get; set; } = string.Empty;
-    public string Description { get; set; } = string.Empty;
+    public string? Surname2 { get; set; }
+    public string? AvatarPath { get; set; }
+    public string? Description { get; set; }
 
     public ICollection<Post> Posts { get; set; } = [];
-    public ICollection<Following> Followings { get; set; } = [];
+    public ICollection<Following> Following { get; set; } = [];
+    public ICollection<Following> Followers { get; set; } = [];
 
 }
