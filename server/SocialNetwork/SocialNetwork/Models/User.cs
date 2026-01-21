@@ -16,7 +16,9 @@ public class User {
     public string? AvatarPath { get; set; }
     public string? Description { get; set; }
 
+    // Estas colecciones representan las relaciones con otras entidades
     public ICollection<Post> Posts { get; set; } = [];
+    // Estas dos relaciones identifican los seguidos y los seguidores del un usuario
     public ICollection<Following> Following { get; set; } = [];
     public ICollection<Following> Followers { get; set; } = [];
 
