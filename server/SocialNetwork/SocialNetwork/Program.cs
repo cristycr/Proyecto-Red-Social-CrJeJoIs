@@ -12,15 +12,7 @@ public class Program
         // Add services to the container.
 
         builder.Services.AddControllers();
-
-        // Configuración del DbContext para usar SQLite
-        builder.Services.AddDbContext<SocialNetworkContext>(options =>
-        {
-            // Aquí indicamos SQLite y la ruta de la base de datos
-            string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-            options.UseSqlite($"DataSource={baseDir}socialnetwork.db");
-        });
-
+            
         builder.Services.AddOpenApi();
 
         // Añadimos el DbContext al servicio de inyección de dependencias
@@ -34,8 +26,10 @@ public class Program
         // tengamos configurado nuestro DbContext
         using (IServiceScope scope = app.Services.CreateScope())
         {
+            Console.WriteLine("Entrada al scope"); // ¿NOPROD?
             SocialNetworkContext dbContext = scope.ServiceProvider.GetRequiredService<SocialNetworkContext>();
             dbContext.Database.EnsureCreated();
+            Console.WriteLine($"Base de datos creada en: {AppDomain.CurrentDomain.BaseDirectory}{SocialNetworkContext.DATABASE_PATH}"); // ¿NOPROD?
         }
 
         // Configure the HTTP request pipeline.

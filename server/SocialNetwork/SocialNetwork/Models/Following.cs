@@ -17,18 +17,3 @@ namespace SocialNetwork.Models
         public User Followed { get; set; } = null!;
     }
 }
-
-// En el DbContext, dentro del OnModelCreating,
-// se debe configurar la relación con un código similar a este:
-// 
-//  modelBuilder.Entity<Following>()
-//      .HasOne(f => f.Follower) // La propiedad en Following que representa al seguidor
-//      .WithMany(u => u.Following) // La colección en User que representa a los seguidos
-//      .HasForeignKey(f => f.IdFollower) // La clave foránea en Following
-//      .OnDelete(DeleteBehavior.Restrict); // Evita eliminaciones en cascada
-//
-//  modelBuilder.Entity<Following>()
-//      .HasOne(f => f.Followed) // La propiedad en Following que representa al seguido
-//      .WithMany(u => u.Followers) // La colección en User que representa a los seguidores
-//      .HasForeignKey(f => f.IdFollowed) // La clave foránea en Following
-//      .OnDelete(DeleteBehavior.Restrict); // Evita eliminaciones en cascada
