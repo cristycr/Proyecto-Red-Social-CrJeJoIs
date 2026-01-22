@@ -31,9 +31,16 @@ public class SocialNetworkContext : DbContext // Tiene que heredar de DbContext
             .HasForeignKey(f => f.IdFollowed) // La clave foránea en Following
             .OnDelete(DeleteBehavior.Restrict); // Evita eliminaciones en cascada
 
-        modelBuilder.Entity<Post>()
+        modelBuilder.Entity<Post>() // ¿Mantener?
             .HasOne(p => p.User)
             .WithMany(u => u.Posts)
             .HasForeignKey(p => p.UserId);
+
+        modelBuilder.Entity<Following>() // Añadimos la restricción para evitar auto-follow
+            .ToTable(t => t.HasCheckConstraint(
+            "CK_Following_NoSelfFollow",
+            "IdFollower <> IdFollowed"
+    ));
+
     }
 }
