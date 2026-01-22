@@ -1,22 +1,18 @@
 using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
-namespace SocialNetwork.Models
-{
-    // Se puede usar una clave primaria compuesta para representar
-    // la relación de seguimiento entre usuarios
-    [PrimaryKey(nameof(IdFollower), nameof(IdFollowed))]
-    public class Following
-    {
+namespace SocialNetwork.Models.Database.Entities;
 
-        public required long IdFollower { get; set; }
-        public required long IdFollowed { get; set; }
+// Se puede usar una clave primaria compuesta para representar
+// la relación de seguimiento entre usuarios
+[PrimaryKey(nameof(IdFollower), nameof(IdFollowed))]
+public class Following {
 
-        // Estas propiedades de navegación establecen la relación con la entidad User
-        public User Follower { get; set; } = null!;
-        public User Followed { get; set; } = null!;
-    }
+    public required long IdFollower { get; set; }
+    public required long IdFollowed { get; set; }
+
+    // Estas propiedades de navegación establecen la relación con la entidad User
+    public User Follower { get; set; } = null!;
+    public User Followed { get; set; } = null!;
 }
 
 // En el DbContext, dentro del OnModelCreating,
