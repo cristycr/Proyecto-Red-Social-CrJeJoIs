@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SocialNetwork.Models; //por modificar
+using SocialNetwork.Models.Database.Entities; //por modificar
 
 namespace SocialNetwork.Controllers;
 
