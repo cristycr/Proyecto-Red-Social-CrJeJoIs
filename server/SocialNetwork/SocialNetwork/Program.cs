@@ -1,4 +1,3 @@
-
 namespace SocialNetwork;
 
 public class Program
@@ -8,9 +7,7 @@ public class Program
         var builder = WebApplication.CreateBuilder(args);
 
         // Add services to the container.
-
         builder.Services.AddControllers();
-        // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         builder.Services.AddOpenApi();
 
         var app = builder.Build();
@@ -23,16 +20,15 @@ public class Program
 
             app.UseCors(policy =>
                 policy.AllowAnyOrigin()
-                    .AllowAnyHeader()
-                    .AllowAnyMethod());
+                      .AllowAnyHeader()
+                      .AllowAnyMethod());
         }
 
-        app.UseHttpsRedirection();
+        app.UseHttpsRedirection();   // redirige HTTP a HTTPS
+        app.UseStaticFiles();        // permite servir archivos desde wwwroot
+        app.UseAuthorization();      // middleware de autorización
 
-        app.UseAuthorization();
-
-
-        app.MapControllers();
+        app.MapControllers();        // mapea los endpoints de los controladores
 
         app.Run();
     }
