@@ -54,13 +54,11 @@ public class UsersController : ControllerBase {
         User? oldUser = users.Find(x => x.Id == id);
 
         if (oldUser is not null) {
-            oldUser.Id = newUser.Id;
             oldUser.Email = newUser.Email;
-            oldUser.Nickname = newUser.Nickname;
             oldUser.Name = newUser.Name;
             oldUser.Surname1 = newUser.Surname1;
             oldUser.Password = newUser.Password;
-            oldUser.Role = newUser.Role;
+            oldUser.Role = newUser.Role; //Solo admin puede cambiar roles
             oldUser.Surname2 = newUser.Surname2;
             oldUser.AvatarPath = newUser.AvatarPath;
             oldUser.Description = newUser.Description;
