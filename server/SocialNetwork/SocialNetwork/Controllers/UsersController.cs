@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using SocialNetwork.Models; //por modificar
 
-namespace SocialNetwork.Controllers; 
+namespace SocialNetwork.Controllers;
+
 [Route("api/[controller]")]
 [ApiController]
 public class UsersController : ControllerBase {
@@ -11,15 +11,22 @@ public class UsersController : ControllerBase {
 
     //GET: api/users
     [HttpGet]
-    public IEnumerable<User> Get() {
+    public IEnumerable<User> GetAllUser() {
         return users;
     }
 
     // GET: api/users/{id}
     //buscar un usuario por id
     [HttpGet("{id}")]
-    public ActionResult<User> Get(int id) {
+    public ActionResult<User> GetUserById(int id) {
         User? user = users.Find(x => x.Id == id);
+
+        return user is null ? NotFound() : user;
+    }
+
+    [HttpGet("{nickname}")]
+    public ActionResult<User> GetUserByNickname(string nickname) {
+        User? user = users.Find(x => x.Nickname == nickname);
 
         return user is null ? NotFound() : user;
     }
@@ -27,7 +34,7 @@ public class UsersController : ControllerBase {
     // POST: api/users
     // Insertar un nuevo usuario
     [HttpPost]
-    public ActionResult<User> Post([FromBody] User user) {
+    public ActionResult<User> AddUser([FromBody] User user) {
         users.Add(user);
 
         return Created($"/users/{user.Id}", user);
@@ -36,12 +43,20 @@ public class UsersController : ControllerBase {
     // PUT: api/users/{id}
     // Actualizar un usuario existente
     [HttpPut("{id}")]
-    public ActionResult Put(int id, [FromBody] User newUser) {
+    public ActionResult UpdateUser(int id, [FromBody] User newUser) {
         User? oldUser = users.Find(x => x.Id == id);
 
         if (oldUser is not null) {
             oldUser.Id = newUser.Id;
-            //... actualizar el resto de propiedades
+            oldUser.Email = newUser.Email;
+            oldUser.Nickname = newUser.Nickname;
+            oldUser.Name = newUser.Name;
+            oldUser.Surname1 = newUser.Surname1;
+            oldUser.Password = newUser.Password;
+            oldUser.Role = newUser.Role;
+            oldUser.Surname2 = newUser.Surname2;
+            oldUser.AvatarPath = newUser.AvatarPath;
+            oldUser.Description = newUser.Description;
         }
 
         return NoContent();
@@ -50,4 +65,9 @@ public class UsersController : ControllerBase {
     // DELETE: api/users/{id}
     // Eliminar un usuario por id
     // por hacer
+
+    [HttpDelete("{id}")]
+    public void DeleteUser(int id) {
+        users.RemoveAll(x => x.Id == id);
+    }
 }
