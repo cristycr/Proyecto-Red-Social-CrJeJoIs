@@ -37,7 +37,7 @@ public class SocialNetworkContext : DbContext // Tiene que heredar de DbContext
             .WithMany(u => u.Posts)
             .HasForeignKey(p => p.UserId);
 
-        modelBuilder.Entity<Following>() // Añadimos la restricción para evitar auto-follow
+        modelBuilder.Entity<Following>() // Restricción para evitar auto-follow
             .ToTable(t => t.HasCheckConstraint(
             "CK_Following_NoSelfFollow",
             "IdFollower <> IdFollowed"

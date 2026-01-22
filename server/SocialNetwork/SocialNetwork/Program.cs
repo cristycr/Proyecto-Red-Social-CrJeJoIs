@@ -15,7 +15,7 @@ public class Program
             
         builder.Services.AddOpenApi();
 
-        // A�adimos el DbContext al servicio de inyecci�n de dependencias
+        // Añadimos el DbContext al servicio de inyecci�n de dependencias
         // Tiene que ser scoped para que cierre la conexi�n y limpie
         // los recursos tras cada petici�n
         builder.Services.AddScoped<SocialNetworkContext>();
@@ -26,10 +26,10 @@ public class Program
         // tengamos configurado nuestro DbContext
         using (IServiceScope scope = app.Services.CreateScope())
         {
-            Console.WriteLine("Entrada al scope"); // �NOPROD?
+            //Console.WriteLine("Entrada al scope"); // NOPROD
             SocialNetworkContext dbContext = scope.ServiceProvider.GetRequiredService<SocialNetworkContext>();
             dbContext.Database.EnsureCreated();
-            Console.WriteLine($"Base de datos creada en: {AppDomain.CurrentDomain.BaseDirectory}{SocialNetworkContext.DATABASE_PATH}"); // �NOPROD?
+            //Console.WriteLine($"Base de datos creada en: {AppDomain.CurrentDomain.BaseDirectory}{SocialNetworkContext.DATABASE_PATH}"); // NOPROD
         }
 
         // Configure the HTTP request pipeline.
