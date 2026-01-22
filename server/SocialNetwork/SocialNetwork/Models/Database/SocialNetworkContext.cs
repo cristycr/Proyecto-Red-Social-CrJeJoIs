@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-namespace SocialNetwork.Models.Database;
+using SocialNetwork.Models.DataBase.Entities;
+namespace SocialNetwork.Models.DataBase;
 
 public class SocialNetworkContext : DbContext // Tiene que heredar de DbContext
 {

@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using SocialNetwork.Models;
+using SocialNetwork.Models.DataBase;
 
 namespace SocialNetwork;
 
