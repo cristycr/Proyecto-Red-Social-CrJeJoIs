@@ -15,28 +15,28 @@ public class Program
             
         builder.Services.AddOpenApi();
 
-        // Añadimos el DbContext al servicio de inyección de dependencias
-        // Tiene que ser scoped para que cierre la conexión y limpie
-        // los recursos tras cada petición
+        // Aï¿½adimos el DbContext al servicio de inyecciï¿½n de dependencias
+        // Tiene que ser scoped para que cierre la conexiï¿½n y limpie
+        // los recursos tras cada peticiï¿½n
         builder.Services.AddScoped<SocialNetworkContext>();
 
         var app = builder.Build();
 
-        // Creamos un scope y nos aseguramos de que se crea la base de datos según
+        // Creamos un scope y nos aseguramos de que se crea la base de datos segï¿½n
         // tengamos configurado nuestro DbContext
         using (IServiceScope scope = app.Services.CreateScope())
         {
-            Console.WriteLine("Entrada al scope"); // ¿NOPROD?
+            Console.WriteLine("Entrada al scope"); // ï¿½NOPROD?
             SocialNetworkContext dbContext = scope.ServiceProvider.GetRequiredService<SocialNetworkContext>();
             dbContext.Database.EnsureCreated();
-            Console.WriteLine($"Base de datos creada en: {AppDomain.CurrentDomain.BaseDirectory}{SocialNetworkContext.DATABASE_PATH}"); // ¿NOPROD?
+            Console.WriteLine($"Base de datos creada en: {AppDomain.CurrentDomain.BaseDirectory}{SocialNetworkContext.DATABASE_PATH}"); // ï¿½NOPROD?
         }
 
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {
             app.MapOpenApi();
-
+            app.UseSwaggerUI(options => options.SwaggerEndpoint("/openapi/v1.json", "v1"));
             app.UseCors(policy =>
                 policy.AllowAnyOrigin()
                     .AllowAnyHeader()
