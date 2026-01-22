@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 // Hay que especificar el namespace de dónde se encuentra la entidad
-using SocialNetwork.Models.Database.Entities;
+using SocialNetwork.Models.DataBase.Entities;
 
 namespace SocialNetwork.Controllers;
 
