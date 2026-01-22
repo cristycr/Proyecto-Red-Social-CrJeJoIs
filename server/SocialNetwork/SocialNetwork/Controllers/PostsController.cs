@@ -14,13 +14,21 @@ public class PostsController : ControllerBase {
 
     // GET: api/posts
     [HttpGet]
-    public IEnumerable<Post> Get() {
+    public IEnumerable<Post> GetAllPost() {
         return posts;
+    }
+
+    // GET: ??
+    [HttpGet]
+    public List<Post> GetPostsByUserId(long userId) {
+        List<Post>? userPosts = posts.Where(x => x.UserId == userId).ToList();
+
+        return userPosts;
     }
 
     // GET: api/posts/
     [HttpGet("{id}")]
-    public ActionResult<Post> Get(long id) {
+    public ActionResult<Post> GetPostById(long id) {
         Post? post = posts.Find(x => x.Id == id);
 
         return post is null ? NotFound() : post;
@@ -28,13 +36,12 @@ public class PostsController : ControllerBase {
 
     [HttpPost]
     // Los parámetros son la Entidad (Post) y un objeto nuevo (post) que se crea apartir del JSON que devuelve la petición POST
-    public void Post([FromBody] Post post) {
+    public void AddPost([FromBody] Post post) {
         posts.Add(post);
     }
 
     [HttpPut("{id}")]
-
-    public ActionResult Put(int id, [FromBody] Post newPost) {
+    public ActionResult UpdatePost(int id, [FromBody] Post newPost) {
         Post? oldPost = posts.Find(x => x.Id == id);
 
         if (oldPost is not null) {
@@ -45,5 +52,10 @@ public class PostsController : ControllerBase {
         }
 
         return NoContent();
+    }
+
+    [HttpDelete("{id}")]
+    public void DeletePost(int id) {
+        posts.RemoveAll(x => x.Id == id);
     }
 }
