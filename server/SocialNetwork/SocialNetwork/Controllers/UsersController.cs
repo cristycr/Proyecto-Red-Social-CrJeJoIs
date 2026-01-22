@@ -31,6 +31,13 @@ public class UsersController : ControllerBase {
         return user is null ? NotFound() : user;
     }
 
+    [HttpGet("{email}")]
+    public ActionResult<User> GetUserByEmail(string email) {
+        User? user = users.Find(x => x.Email == email);
+
+        return user is null ? NotFound() : user;
+    }
+
     // POST: api/users
     // Insertar un nuevo usuario
     [HttpPost]
