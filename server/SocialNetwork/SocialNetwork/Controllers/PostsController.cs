@@ -10,14 +10,7 @@ public class PostsController : ControllerBase {
 
     // Simular una base de datos
     // Debe ser static para que los valores no se reinicien con cada petición
-    private static List<Post> posts = new List<Post>() {
-        new Post {
-            Id = 1,
-            UserId = 1,
-            Title = "Post uno",
-            User = // ???
-        }
-    };
+    private static List<Post> posts = new List<Post>();
 
     // GET: api/posts
     [HttpGet]
@@ -25,11 +18,32 @@ public class PostsController : ControllerBase {
         return posts;
     }
 
+    // GET: api/posts/
+    [HttpGet("{id}")]
+    public ActionResult<Post> Get(long id) {
+        Post? post = posts.Find(x => x.Id == id);
+
+        return post is null ? NotFound() : post;
+    }
+
     [HttpPost]
     // Los parámetros son la Entidad (Post) y un objeto nuevo (post) que se crea apartir del JSON que devuelve la petición POST
-    public ActionResult<Post> Post([FromBody] Post post) {
+    public void Post([FromBody] Post post) {
         posts.Add(post);
+    }
 
-        return Created($"/posts/{post.Id}", post);
+    [HttpPut("{id}")]
+
+    public ActionResult Put(int id, [FromBody] Post newPost) {
+        Post? oldPost = posts.Find(x => x.Id == id);
+
+        if (oldPost is not null) {
+            oldPost.Id = newPost.Id;
+            oldPost.Title = newPost.Title;
+            oldPost.Description = newPost.Description;
+            oldPost.PicturePath = newPost.PicturePath;
+        }
+
+        return NoContent();
     }
 }
