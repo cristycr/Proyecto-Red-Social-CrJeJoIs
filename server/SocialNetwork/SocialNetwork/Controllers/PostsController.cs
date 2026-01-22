@@ -19,7 +19,7 @@ public class PostsController : ControllerBase {
     }
 
     // GET: ??
-    [HttpGet]
+    [HttpGet("{userId}")]
     public List<Post> GetPostsByUserId(long userId) {
         List<Post>? userPosts = posts.Where(x => x.UserId == userId).ToList();
 
