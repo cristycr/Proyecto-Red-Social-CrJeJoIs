@@ -10,7 +10,7 @@ namespace SocialNetwork.Controllers
     [ApiController]
     [Route("[controller]")]
     [Authorize]
-    public class FollowingController : ControllersBase
+    public class FollowingController : ControllerBase
     {
         // CONEXIÓN CON EL SERVIDOR
         private readonly FollowingService _followingService;
@@ -22,8 +22,6 @@ namespace SocialNetwork.Controllers
         // ENDPOINT
         [HttpPost("{userId}")]
         public async Task<IActionResult> Follow(long userId)
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         {
             // Obtenemos el ID del usuario que está haciendo la petición (el que está logueado)
             var currentUserId = GetCurrentUserId();
@@ -31,8 +29,8 @@ namespace SocialNetwork.Controllers
             if (currentUserId == -1) 
                 return Unauthorized("No se pudo identificar al usuario.");
 
-    // Llamamos al servicio
-    var resultado = await _followingService.SeguirAsync(currentUserId, userId);
+            // Llamamos al servicio
+            var resultado = await _followingService.SeguirAsync(currentUserId, userId);
             // Llamamos al servicio
             var resultado = await _followingService.SeguirAsync(currentUserId, userId);
 
@@ -47,7 +45,6 @@ namespace SocialNetwork.Controllers
             }
         }
 
-        // 3. ENDPOINT PARA DEJAR DE SEGUIR (DELETE)
         // ENDPOINT PARA DEJAR DE SEGUIR (DELETE)
         // Se llamará como: DELETE api/following/{idUsuarioADejarDeSeguir}
         [HttpDelete("{userId}")]
