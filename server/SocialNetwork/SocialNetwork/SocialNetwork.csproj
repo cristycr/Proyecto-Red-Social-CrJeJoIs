@@ -15,6 +15,10 @@
     </PackageReference>
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.1.0" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\" />
+  </ItemGroup>
 	
 
 
