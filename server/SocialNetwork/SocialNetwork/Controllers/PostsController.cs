@@ -10,7 +10,14 @@ public class PostsController : ControllerBase {
 
     // Simular una base de datos
     // Debe ser static para que los valores no se reinicien con cada petición
-    private static List<Post> posts = new List<Post>();
+    private static List<Post> posts = new List<Post>() {
+        new Post {
+            Id = 1,
+            UserId = 1,
+            Title = "Post uno",
+            User = // ???
+        }
+    };
 
     // GET: api/posts
     [HttpGet]
