@@ -35,7 +35,8 @@ public class PostsController : ControllerBase {
     }
 
     [HttpPost]
-    // Los parámetros son la Entidad (Post) y un objeto nuevo (post) que se crea apartir del JSON que devuelve la petición POST
+    // Los parámetros son la Entidad (Post) y un objeto nuevo (post) que se crea
+    // apartir del JSON que devuelve la petición POST
     public void AddPost([FromBody] Post post) {
         posts.Add(post);
     }
