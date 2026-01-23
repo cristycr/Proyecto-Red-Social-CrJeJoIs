@@ -1,39 +1,50 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SocialNetwork.Models.Database;
 using SocialNetwork.Models.Database.Entities;
 
 namespace SocialNetwork.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class UsersController : ControllerBase {
-    //simular la base de datos con una lista en memoria
-    private static List<User> users = new List<User>();
+public class UsersController : ControllerBase
+{
+    // Inyección del DbContext
+    private readonly SocialNetworkContext _dbContext;
+
+    public UsersController(SocialNetworkContext dbContext)
+    {
+        _dbContext = dbContext;
+    }
 
     //GET: api/users
     [HttpGet]
-    public IEnumerable<User> GetAllUser() {
-        return users;
+    public IEnumerable<User> GetAllUser()
+    {
+        return _dbContext.User.ToList();
     }
 
     // GET: api/users/{id}
     //buscar un usuario por id
-    [HttpGet("{id}")]
-    public ActionResult<User> GetUserById(int id) {
-        User? user = users.Find(x => x.Id == id);
+    [HttpGet("{id:long}")]
+    public ActionResult<User> GetUserById(long id)
+    {
+        User? user = _dbContext.User.Find(id);
 
         return user is null ? NotFound() : user;
     }
 
-    [HttpGet("{nickname}")]
-    public ActionResult<User> GetUserByNickname(string nickname) {
-        User? user = users.Find(x => x.Nickname == nickname);
+    [HttpGet("{nickname:string}")]
+    public ActionResult<User> GetUserByNickname(string nickname)
+    {
+        User? user = _dbContext.User.Find(nickname);
 
         return user is null ? NotFound() : user;
     }
 
     [HttpGet("{email}")]
-    public ActionResult<User> GetUserByEmail(string email) {
-        User? user = users.Find(x => x.Email == email);
+    public ActionResult<User> GetUserByEmail(string email)
+    {
+        User? user = _dbContext.User.Find(email);
 
         return user is null ? NotFound() : user;
     }
@@ -41,8 +52,10 @@ public class UsersController : ControllerBase {
     // POST: api/users
     // Insertar un nuevo usuario
     [HttpPost]
-    public ActionResult<User> AddUser([FromBody] User user) {
-        users.Add(user);
+    public ActionResult<User> AddUser([FromBody] User user)
+    {
+        _dbContext.User.Add(user);
+        _dbContext.SaveChanges();
 
         return Created($"/users/{user.Id}", user);
     }
@@ -50,10 +63,12 @@ public class UsersController : ControllerBase {
     // PUT: api/users/{id}
     // Actualizar un usuario existente
     [HttpPut("{id}")]
-    public ActionResult UpdateUser(int id, [FromBody] User newUser) {
-        User? oldUser = users.Find(x => x.Id == id);
+    public ActionResult UpdateUser(long id, [FromBody] User newUser)
+    {
+        User? oldUser = _dbContext.User.Find(id);
 
-        if (oldUser is not null) {
+        if (oldUser is not null)
+        {
             oldUser.Email = newUser.Email;
             oldUser.Name = newUser.Name;
             oldUser.Surname1 = newUser.Surname1;
@@ -62,6 +77,8 @@ public class UsersController : ControllerBase {
             oldUser.Surname2 = newUser.Surname2;
             oldUser.AvatarPath = newUser.AvatarPath;
             oldUser.Description = newUser.Description;
+
+            _dbContext.SaveChanges();
         }
 
         return NoContent();
@@ -69,10 +86,14 @@ public class UsersController : ControllerBase {
 
     // DELETE: api/users/{id}
     // Eliminar un usuario por id
-    // por hacer
-
     [HttpDelete("{id}")]
-    public void DeleteUser(int id) {
-        users.RemoveAll(x => x.Id == id);
+    public void DeleteUser(long id)
+    {
+        User? user = _dbContext.User.Find(id);
+        if (user is not null)
+        {
+            _dbContext.User.Remove(user);
+            _dbContext.SaveChanges();
+        }
     }
 }

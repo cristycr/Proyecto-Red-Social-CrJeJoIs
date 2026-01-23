@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SocialNetwork.Models.Database;
+
 // Hay que especificar el namespace de dónde se encuentra la entidad
 using SocialNetwork.Models.Database.Entities;
 
@@ -8,20 +10,22 @@ namespace SocialNetwork.Controllers;
 [ApiController]
 public class PostsController : ControllerBase {
 
-    // Simular una base de datos
-    // Debe ser static para que los valores no se reinicien con cada petición
-    private static List<Post> posts = new List<Post>();
+    // Inyección del DbContext
+    private readonly SocialNetworkContext _dbContext;
+    public PostsController(SocialNetworkContext dbContext) {
+        _dbContext = dbContext;
+    }
 
     // GET: api/posts
     [HttpGet]
     public IEnumerable<Post> GetAllPost() {
-        return posts;
+        return _dbContext.Post.ToList();
     }
 
     // GET: ??
-    [HttpGet("{userId}")]
+    [HttpGet("{userId:long}")]
     public List<Post> GetPostsByUserId(long userId) {
-        List<Post>? userPosts = posts.Where(x => x.UserId == userId).ToList();
+        List<Post>? userPosts = _dbContext.Post.Where(x => x.UserId == userId).ToList();
 
         return userPosts;
     }
@@ -29,7 +33,7 @@ public class PostsController : ControllerBase {
     // GET: api/posts/
     [HttpGet("{id}")]
     public ActionResult<Post> GetPostById(long id) {
-        Post? post = posts.Find(x => x.Id == id);
+        Post? post = _dbContext.Post.Find(id);
 
         return post is null ? NotFound() : post;
     }
@@ -37,26 +41,35 @@ public class PostsController : ControllerBase {
     [HttpPost]
     // Los parámetros son la Entidad (Post) y un objeto nuevo (post) que se crea
     // apartir del JSON que devuelve la petición POST
-    public void AddPost([FromBody] Post post) {
-        posts.Add(post);
+    public ActionResult<Post> AddPost([FromBody] Post post) {
+        _dbContext.Post.Add(post);
+        _dbContext.SaveChanges();
+
+        return Created($"/posts/{post.Id}", post);
     }
 
     [HttpPut("{id}")]
-    public ActionResult UpdatePost(int id, [FromBody] Post newPost) {
-        Post? oldPost = posts.Find(x => x.Id == id);
+    public ActionResult UpdatePost(long id, [FromBody] Post newPost) {
+        Post? oldPost = _dbContext.Post.Find(id);
 
         if (oldPost is not null) {
-            oldPost.Id = newPost.Id;
             oldPost.Title = newPost.Title;
             oldPost.Description = newPost.Description;
             oldPost.PicturePath = newPost.PicturePath;
+
+            _dbContext.SaveChanges();
         }
 
         return NoContent();
     }
 
     [HttpDelete("{id}")]
-    public void DeletePost(int id) {
-        posts.RemoveAll(x => x.Id == id);
+    public void DeletePost(long id) {
+        Post? post = _dbContext.Post.Find(id);
+
+        if (post is not null) {
+            _dbContext.Post.Remove(post);
+            _dbContext.SaveChanges();
+        }
     }
 }
