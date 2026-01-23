@@ -12,4 +12,4 @@ una vista que necesita autenticar al usuario, se redirigirá al usuario a la ven
 login o registro, una vez que se haya logueado o registrado se le redirigirá a donde
 el usuario quería en un inicio.*
 
-Tecnologías utilizadas:
+Tecnologías utilizadas
