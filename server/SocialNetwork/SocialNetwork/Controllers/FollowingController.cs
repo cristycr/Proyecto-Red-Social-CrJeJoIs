@@ -19,7 +19,7 @@ namespace SocialNetwork.Controllers
         {                                                               //Cuando hay una petición, busca el FollowinService
             _followingService = followingService;
         }
-        // ENDPOINT
+        // ENDPOINT PARA SEGUIR (POST)
         [HttpPost("{userId}")]
         public async Task<IActionResult> Follow(long userId)
         {
@@ -31,9 +31,7 @@ namespace SocialNetwork.Controllers
 
             // Llamamos al servicio
             var resultado = await _followingService.SeguirAsync(currentUserId, userId);
-            // Llamamos al servicio
-            var resultado = await _followingService.SeguirAsync(currentUserId, userId);
-
+           
             if (resultado)
             {
                 return Ok(new { message = "Usuario seguido correctamente." });
@@ -52,25 +50,12 @@ namespace SocialNetwork.Controllers
         {
             var currentUserId = GetCurrentUserId();
 
-    if (currentUserId == -1)
-        return Unauthorized("No se pudo identificar al usuario.");
             if (currentUserId == -1)
                 return Unauthorized("No se pudo identificar al usuario.");
 
-    // Llamamos al servicio
-    var resultado = await _followingService.DejarDeSeguirAsync(currentUserId, userId);
             // Llamamos al servicio
             var resultado = await _followingService.DejarDeSeguirAsync(currentUserId, userId);
 
-    if (resultado)
-    {
-        return Ok(new { message = "Se ha dejado de seguir al usuario." });
-    }
-    else
-    {
-        return NotFound("No se encontró la relación de seguimiento o no se pudo eliminar.");
-    }
-}
             if (resultado)
             {
                 return Ok(new { message = "Se ha dejado de seguir al usuario." });
@@ -81,19 +66,9 @@ namespace SocialNetwork.Controllers
             }
         }
 
-// --- MÉTODO AUXILIAR PARA OBTENER EL ID DEL USUARIO ACTUAL ---
-private long GetCurrentUserId()
-{
-    // Buscamos el "Claim" que tiene el ID del usuario en el token
-    var identity = HttpContext.User.Identity as ClaimsIdentity;
-    if (identity != null)
-    {
-        var userClaim = identity.FindFirst(ClaimTypes.NameIdentifier); // O el nombre que uséis para el ID
-        if (userClaim != null && long.TryParse(userClaim.Value, out long id))
-        // --- MÉTODO AUXILIAR PARA OBTENER EL ID DEL USUARIO ACTUAL ---
+        // MÉTODO AUXILIAR PARA OBTENER EL ID DEL USUARIO ACTUAL
         private long GetCurrentUserId()
         {
-            return id;
             // Buscamos el "Claim" que tiene el ID del usuario en el token
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             if (identity != null)
@@ -106,8 +81,5 @@ private long GetCurrentUserId()
             }
             return -1; // Retornamos -1 si no encontramos al usuario
         }
-    }
-    return -1; // Retornamos -1 si no encontramos al usuario
-}
     }
 }
