@@ -15,7 +15,7 @@ public class Program
 
         // Repositorios
         builder.Services.AddScoped<PostRepository>();
-        //builder.Services.AddScoped<UserRepository>();
+        builder.Services.AddScoped<UserRepository>();
 
         // Añadimos el DbContext al servicio de inyeccion de dependencias
         // Tiene que ser scoped para que cierre la conexion y limpie
