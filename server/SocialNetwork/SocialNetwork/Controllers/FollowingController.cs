@@ -8,7 +8,7 @@ namespace SocialNetwork.Controllers
 {
     // CONFIGURACION
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     [Authorize]
     public class FollowingController : ControllerBase
     {
