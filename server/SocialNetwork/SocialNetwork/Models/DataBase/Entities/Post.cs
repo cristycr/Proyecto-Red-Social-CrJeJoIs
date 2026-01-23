@@ -1,4 +1,4 @@
-﻿namespace SocialNetwork.Models.DataBase.Entities;
+﻿namespace SocialNetwork.Models.Database.Entities;
 public class Post {
     public long Id { get; set; }
     public required long UserId { get; set; }

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SocialNetwork.Models.DataBase;
-using SocialNetwork.Models.DataBase.Entities;
+using SocialNetwork.Models.Database;
+using SocialNetwork.Models.Database.Entities;
 
 namespace SocialNetwork.Controllers;
 
@@ -17,6 +17,7 @@ public class UsersController : ControllerBase
     }
 
     //GET: api/users
+    [HttpGet]
     public IEnumerable<User> GetAllUser()
     {
         return _dbContext.User.ToList();

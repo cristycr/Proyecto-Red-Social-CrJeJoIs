@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace SocialNetwork.Models.DataBase.Entities
+namespace SocialNetwork.Models.Database.Entities
 {
     // Se puede usar una clave primaria compuesta para representar
     // la relación de seguimiento entre usuarios

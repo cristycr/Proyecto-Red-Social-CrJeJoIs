@@ -1,4 +1,4 @@
-﻿namespace SocialNetwork.Models.DataBase.Repositories;
+﻿namespace SocialNetwork.Models.Database.Repositories;
 
 // La interfaz simplemente representa los métodos que puede
 // realizar una entidad y no puede realizar más métodos

@@ -1,4 +1,4 @@
-﻿namespace SocialNetwork.Models.DataBase.Entities;
+﻿namespace SocialNetwork.Models.Database.Entities;
 
 using Microsoft.EntityFrameworkCore;
 
