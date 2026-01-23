@@ -1,4 +1,5 @@
 using SocialNetwork.Models.Database;
+using SocialNetwork.Models.DataBase.Repositories;
 
 namespace SocialNetwork;
 
@@ -11,6 +12,10 @@ public class Program
         // Add services to the container.
         builder.Services.AddControllers();
         builder.Services.AddOpenApi();
+
+        // Repositorios
+        builder.Services.AddScoped<PostRepository>();
+        //builder.Services.AddScoped<UserRepository>();
 
         // Añadimos el DbContext al servicio de inyeccion de dependencias
         // Tiene que ser scoped para que cierre la conexion y limpie
