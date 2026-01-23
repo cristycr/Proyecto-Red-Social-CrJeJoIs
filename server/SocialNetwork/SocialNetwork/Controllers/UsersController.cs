@@ -36,7 +36,8 @@ public class UsersController : ControllerBase
     [HttpGet("by-nickname/{nickname}")]
     public ActionResult<User> GetUserByNickname(string nickname)
     {
-        User? user = _dbContext.User.Find(nickname);
+        User? user = _dbContext.User
+            .FirstOrDefault(x => x.Nickname == nickname);
 
         return user is null ? NotFound() : user;
     }
@@ -44,7 +45,8 @@ public class UsersController : ControllerBase
     [HttpGet("by-email/{email}")]
     public ActionResult<User> GetUserByEmail(string email)
     {
-        User? user = _dbContext.User.Find(email);
+        User? user = _dbContext.User
+            .FirstOrDefault(x => x.Email == email);
 
         return user is null ? NotFound() : user;
     }
@@ -62,7 +64,7 @@ public class UsersController : ControllerBase
 
     // PUT: api/users/{id}
     // Actualizar un usuario existente
-    [HttpPut("{id}")]
+    [HttpPut("{id:long}")]
     public ActionResult UpdateUser(long id, [FromBody] User newUser)
     {
         User? oldUser = _dbContext.User.Find(id);
@@ -78,6 +80,7 @@ public class UsersController : ControllerBase
             oldUser.AvatarPath = newUser.AvatarPath;
             oldUser.Description = newUser.Description;
 
+            _dbContext.User.Update(newUser);
             _dbContext.SaveChanges();
         }
 

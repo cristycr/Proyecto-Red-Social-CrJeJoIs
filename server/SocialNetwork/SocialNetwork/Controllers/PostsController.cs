@@ -57,6 +57,7 @@ public class PostsController : ControllerBase {
             oldPost.Description = newPost.Description;
             oldPost.PicturePath = newPost.PicturePath;
 
+            _dbContext.Post.Update(newPost);
             _dbContext.SaveChanges();
         }
 
