@@ -1,3 +1,5 @@
+using SocialNetwork.Models.Database;
+
 namespace SocialNetwork;
 
 public class Program
