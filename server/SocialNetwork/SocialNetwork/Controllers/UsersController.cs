@@ -25,18 +25,18 @@ public class UsersController : ControllerBase
 
     // GET: api/users/{id}
     //buscar un usuario por id
-    [HttpGet("{id}")]
-    public ActionResult<User> GetUserById(int id)
+    [HttpGet("{id:long}")]
+    public ActionResult<User> GetUserById(long id)
     {
         User? user = _dbContext.User.Find(id);
 
         return user is null ? NotFound() : user;
     }
 
-    [HttpGet("{nickname}")]
+    [HttpGet("{nickname:string}")]
     public ActionResult<User> GetUserByNickname(string nickname)
     {
-        User? user = _dbContext.User.FirstOrDefault(u => u.Nickname == nickname);
+        User? user = _dbContext.User.Find(nickname);
 
         return user is null ? NotFound() : user;
     }
@@ -44,7 +44,7 @@ public class UsersController : ControllerBase
     [HttpGet("{email}")]
     public ActionResult<User> GetUserByEmail(string email)
     {
-        User? user = _dbContext.User.FirstOrDefault(u => u.Email == email);
+        User? user = _dbContext.User.Find(email);
 
         return user is null ? NotFound() : user;
     }
@@ -63,7 +63,7 @@ public class UsersController : ControllerBase
     // PUT: api/users/{id}
     // Actualizar un usuario existente
     [HttpPut("{id}")]
-    public ActionResult UpdateUser(int id, [FromBody] User newUser)
+    public ActionResult UpdateUser(long id, [FromBody] User newUser)
     {
         User? oldUser = _dbContext.User.Find(id);
 
@@ -87,9 +87,9 @@ public class UsersController : ControllerBase
     // DELETE: api/users/{id}
     // Eliminar un usuario por id
     [HttpDelete("{id}")]
-    public void DeleteUser(int id)
+    public void DeleteUser(long id)
     {
-        var user = _dbContext.User.Find(id);
+        User? user = _dbContext.User.Find(id);
         if (user is not null)
         {
             _dbContext.User.Remove(user);

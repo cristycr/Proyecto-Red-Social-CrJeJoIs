@@ -4,7 +4,7 @@ namespace SocialNetwork.Models.Database;
 
 public class SocialNetworkContext : DbContext // Tiene que heredar de DbContext
 {
-    public static readonly string DATABASE_PATH = "socialnetwork.db";
+    private const string DATABASE_PATH = "socialnetwork.db";
 
     //Tablas
     public DbSet<Following> Following { get; set; }
