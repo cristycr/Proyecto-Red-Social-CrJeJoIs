@@ -18,19 +18,19 @@ public class PostsController : ControllerBase {
 
     // GET: api/posts
     [HttpGet]
-    public IEnumerable<Post> GetAllPost() {
+    public IEnumerable<Post> GetAllPosts() {
         return _dbContext.Post.ToList();
     }
 
-    // GET: ??
-    [HttpGet("{userId:long}")]
+    // GET: api/posts/by-user/5
+    [HttpGet("by-user/{userId:long}")]
     public List<Post> GetPostsByUserId(long userId) {
         List<Post>? userPosts = _dbContext.Post.Where(x => x.UserId == userId).ToList();
 
         return userPosts;
     }
 
-    // GET: api/posts/
+    // GET: api/posts/5
     [HttpGet("{id}")]
     public ActionResult<Post> GetPostById(long id) {
         Post? post = _dbContext.Post.Find(id);

@@ -36,8 +36,8 @@ public class Program
             app.UseSwaggerUI(options => options.SwaggerEndpoint("/openapi/v1.json", "v1"));
             app.UseCors(policy =>
                 policy.AllowAnyOrigin()
-                      .AllowAnyHeader()
-                      .AllowAnyMethod());
+                    .AllowAnyHeader()
+                    .AllowAnyMethod());
         }
 
         app.UseHttpsRedirection();   // redirige HTTP a HTTPS

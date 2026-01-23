@@ -18,7 +18,7 @@ public class UsersController : ControllerBase
 
     //GET: api/users
     [HttpGet]
-    public IEnumerable<User> GetAllUser()
+    public IEnumerable<User> GetAllUsers()
     {
         return _dbContext.User.ToList();
     }
@@ -33,7 +33,7 @@ public class UsersController : ControllerBase
         return user is null ? NotFound() : user;
     }
 
-    [HttpGet("{nickname:string}")]
+    [HttpGet("by-nickname/{nickname}")]
     public ActionResult<User> GetUserByNickname(string nickname)
     {
         User? user = _dbContext.User.Find(nickname);
@@ -41,7 +41,7 @@ public class UsersController : ControllerBase
         return user is null ? NotFound() : user;
     }
 
-    [HttpGet("{email}")]
+    [HttpGet("by-email/{email}")]
     public ActionResult<User> GetUserByEmail(string email)
     {
         User? user = _dbContext.User.Find(email);
@@ -86,7 +86,7 @@ public class UsersController : ControllerBase
 
     // DELETE: api/users/{id}
     // Eliminar un usuario por id
-    [HttpDelete("{id}")]
+    [HttpDelete("{id:long}")]
     public void DeleteUser(long id)
     {
         User? user = _dbContext.User.Find(id);
