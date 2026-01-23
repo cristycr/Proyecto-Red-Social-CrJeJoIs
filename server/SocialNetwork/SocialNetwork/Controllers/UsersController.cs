@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SocialNetwork.Models.Database;
 using SocialNetwork.Models.Database.Entities;
+using SocialNetwork.Models.DataBase.Repositories;
 
 namespace SocialNetwork.Controllers;
 
@@ -8,95 +9,59 @@ namespace SocialNetwork.Controllers;
 [ApiController]
 public class UsersController : ControllerBase
 {
-    // Inyección del DbContext
-    private readonly SocialNetworkContext _dbContext;
+    // Inyección de UserRepository 
+    private readonly UserRepository _userRepository;
 
-    public UsersController(SocialNetworkContext dbContext)
+    public UsersController(UserRepository userRepository)
     {
-        _dbContext = dbContext;
+        _userRepository = userRepository;
     }
 
     //GET: api/users
     [HttpGet]
-    public IEnumerable<User> GetAllUsers()
-    {
-        return _dbContext.User.ToList();
+    public async Task<IEnumerable<User>> GetAllUsers(){
+        return await _userRepository.GetUserAsync();
     }
 
-    // GET: api/users/{id}
-    //buscar un usuario por id
+    // GET
     [HttpGet("{id:long}")]
-    public ActionResult<User> GetUserById(long id)
+    public async Task<User?> GetUserById(long id)
     {
-        User? user = _dbContext.User.Find(id);
-
-        return user is null ? NotFound() : user;
+        return await _userRepository.GetUserByIdAsync(id);
     }
 
+    // Get by nickname
     [HttpGet("by-nickname/{nickname}")]
-    public ActionResult<User> GetUserByNickname(string nickname)
+    public async Task<User?> GetUserByNickname(string nickname)
     {
-        User? user = _dbContext.User
-            .FirstOrDefault(x => x.Nickname == nickname);
-
-        return user is null ? NotFound() : user;
+        return await _userRepository.GetUserByNicknameAsync(nickname);
     }
 
+    // Get by email
     [HttpGet("by-email/{email}")]
-    public ActionResult<User> GetUserByEmail(string email)
+    public async Task<User?> GetUserByEmail(string email)
     {
-        User? user = _dbContext.User
-            .FirstOrDefault(x => x.Email == email);
-
-        return user is null ? NotFound() : user;
+        return await _userRepository.GetUserByEmailAsync(email);
     }
 
-    // POST: api/users
-    // Insertar un nuevo usuario
+    // POST
     [HttpPost]
-    public ActionResult<User> AddUser([FromBody] User user)
+    public async Task<bool> AddUser([FromBody] User user)
     {
-        _dbContext.User.Add(user);
-        _dbContext.SaveChanges();
-
-        return Created($"/users/{user.Id}", user);
+        return await _userRepository.AddUserAsync(user);
     }
 
-    // PUT: api/users/{id}
-    // Actualizar un usuario existente
-    [HttpPut("{id:long}")]
-    public ActionResult UpdateUser(long id, [FromBody] User newUser)
+    // PUT
+    [HttpPut]
+    public async Task<bool> UpdateUser([FromBody] User newUser)
     {
-        User? oldUser = _dbContext.User.Find(id);
-
-        if (oldUser is not null)
-        {
-            oldUser.Email = newUser.Email;
-            oldUser.Name = newUser.Name;
-            oldUser.Surname1 = newUser.Surname1;
-            oldUser.Password = newUser.Password;
-            oldUser.Role = newUser.Role; //Solo admin puede cambiar roles
-            oldUser.Surname2 = newUser.Surname2;
-            oldUser.AvatarPath = newUser.AvatarPath;
-            oldUser.Description = newUser.Description;
-
-            _dbContext.User.Update(newUser);
-            _dbContext.SaveChanges();
-        }
-
-        return NoContent();
+        return await _userRepository.UpdateUserAsync(newUser);
     }
 
-    // DELETE: api/users/{id}
-    // Eliminar un usuario por id
-    [HttpDelete("{id:long}")]
-    public void DeleteUser(long id)
+    // DELETE
+    [HttpDelete]
+    public async Task<bool> DeleteUser([FromBody] User user)
     {
-        User? user = _dbContext.User.Find(id);
-        if (user is not null)
-        {
-            _dbContext.User.Remove(user);
-            _dbContext.SaveChanges();
-        }
+        return await _userRepository.DeleteUserAsync(user);
     }
 }
