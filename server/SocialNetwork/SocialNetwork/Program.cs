@@ -1,5 +1,6 @@
 using SocialNetwork.Models.Database;
 using SocialNetwork.Models.DataBase.Repositories;
+using SocialNetwork.Models.DataBase.Seeder;
 
 namespace SocialNetwork;
 
@@ -50,6 +51,21 @@ public class Program
         app.UseAuthorization();      // middleware de autorizacion
 
         app.MapControllers();        // mapea los endpoints de los controladores
+
+        static void SeedDatabase(IServiceProvider serviceProvider)
+        {
+            using IServiceScope scope = serviceProvider.CreateScope();
+            SocialNetworkContext dbContext = scope.ServiceProvider.GetRequiredService<SocialNetworkContext>();
+
+            if (dbContext.Database.EnsureCreated()) // Esto crea la DB si no existe, redundante pero seguro
+            {
+                Seeder seeder = new Seeder(dbContext);
+                seeder.Seed();
+            }
+        }
+
+        // Llamar al método antes de ejecutar la app
+        SeedDatabase(app.Services);
 
         app.Run();
     }
