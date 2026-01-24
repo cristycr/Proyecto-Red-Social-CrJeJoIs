@@ -56,7 +56,7 @@ public class Program
         static void SeedDatabase(IServiceProvider serviceProvider)
         {
             using IServiceScope scope = serviceProvider.CreateScope();
-            SocialNetworkContext dbContext = scope.ServiceProvider.GetRequiredService<SocialNetworkContext>();
+            using SocialNetworkContext dbContext = scope.ServiceProvider.GetRequiredService<SocialNetworkContext>();
 
             if (dbContext.Database.EnsureCreated()) // Esto crea la DB si no existe
             {
@@ -67,7 +67,6 @@ public class Program
 
         // Llamar al método antes de ejecutar la app
         SeedDatabase(app.Services);
-
         app.Run();
     }
 }
