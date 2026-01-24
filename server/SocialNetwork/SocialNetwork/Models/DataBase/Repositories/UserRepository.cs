@@ -1,8 +1,8 @@
-﻿using SocialNetwork.Models.Database.Entities;
-using SocialNetwork.Models.Database;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using SocialNetwork.Models.Database.Entities;
 
-namespace SocialNetwork.Models.DataBase.Repositories; 
+namespace SocialNetwork.Models.Database.Repositories;
+
 public class UserRepository : BaseRepository<User, long> {
     public UserRepository(SocialNetworkContext context) : base(context) {
     }
@@ -25,7 +25,7 @@ public class UserRepository : BaseRepository<User, long> {
             .FirstOrDefaultAsync();
     }
 
- 
+
     public async Task<bool> AddUserAsync(User user) {
         await InsertAsync(user);
         return await SaveAsync();

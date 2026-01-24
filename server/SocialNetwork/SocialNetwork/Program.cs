@@ -1,6 +1,6 @@
 using SocialNetwork.Models.Database;
-using SocialNetwork.Models.DataBase.Repositories;
-using SocialNetwork.Models.DataBase.Seeder;
+using SocialNetwork.Models.Database.Repositories;
+using SocialNetwork.Models.Database.Seeder;
 
 namespace SocialNetwork;
 
@@ -22,6 +22,7 @@ public class Program
         // Tiene que ser scoped para que cierre la conexion y limpie
         // los recursos tras cada peticion
         builder.Services.AddScoped<SocialNetworkContext>();
+        builder.Services.AddScoped<UnitOfWork>();
       
         var app = builder.Build();
       
