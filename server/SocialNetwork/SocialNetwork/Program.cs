@@ -31,7 +31,7 @@ public class Program
         {
             //Console.WriteLine("Entrada al scope"); // NOPROD
             SocialNetworkContext dbContext = scope.ServiceProvider.GetRequiredService<SocialNetworkContext>();
-            dbContext.Database.EnsureCreated();
+            //dbContext.Database.EnsureCreated();
             //Console.WriteLine($"Base de datos creada en: {AppDomain.CurrentDomain.BaseDirectory}{SocialNetworkContext.DATABASE_PATH}"); // NOPROD
         }
       
@@ -57,7 +57,7 @@ public class Program
             using IServiceScope scope = serviceProvider.CreateScope();
             SocialNetworkContext dbContext = scope.ServiceProvider.GetRequiredService<SocialNetworkContext>();
 
-            if (dbContext.Database.EnsureCreated()) // Esto crea la DB si no existe, redundante pero seguro
+            if (dbContext.Database.EnsureCreated()) // Esto crea la DB si no existe
             {
                 Seeder seeder = new Seeder(dbContext);
                 seeder.Seed();
