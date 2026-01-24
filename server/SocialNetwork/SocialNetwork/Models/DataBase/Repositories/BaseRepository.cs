@@ -1,9 +1,8 @@
-﻿using SocialNetwork.Models.Database.Repositories;
-using SocialNetwork.Models.Database;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
-namespace SocialNetwork.Models.DataBase.Repositories; 
+namespace SocialNetwork.Models.Database.Repositories;
+
 public abstract class BaseRepository<TEntity, TId> : IRepository<TEntity, TId> where TEntity : class {
     protected SocialNetworkContext _dbContext { get; init; }
     public BaseRepository(SocialNetworkContext dbContext) {

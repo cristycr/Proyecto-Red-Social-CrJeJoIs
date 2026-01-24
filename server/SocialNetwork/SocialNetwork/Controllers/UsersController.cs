@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SocialNetwork.Models.Database;
 using SocialNetwork.Models.Database.Entities;
-using SocialNetwork.Models.DataBase.Repositories;
+using SocialNetwork.Models.Database.Repositories;
 
 namespace SocialNetwork.Controllers;
 
