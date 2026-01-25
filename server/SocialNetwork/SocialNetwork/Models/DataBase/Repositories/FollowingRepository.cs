@@ -22,7 +22,7 @@ public class FollowingRepository : BaseRepository<Following, long>
     }
     
     //LISTAR USUARIOS SEGUIDOS (GET)===========================================================
-    public async Task<List<User>> ObtenerSeguidos(long idUser)
+    public async Task<List<User>> GetFolloweds(long idUser)
     {
         return await _context.Following
             .Where(f => f.IdFollower == idUser) // FILTRO: El usuario logeado es el origen
@@ -31,7 +31,7 @@ public class FollowingRepository : BaseRepository<Following, long>
     }
 
     //LISTAR USUARIOS SEGUIDORES (GET)=========================================================
-    public async Task<List<User>> ObtenerSeguidores(long idUser)
+    public async Task<List<User>> GetFollowers(long idUser)
     {
         return await _context.Following
             .Where(f => f.IdFollowed == idUser) // FILTRO: El usuario logeado es el destino
@@ -40,14 +40,14 @@ public class FollowingRepository : BaseRepository<Following, long>
     }
 
     //SEGUIR (POST)============================================================================
-    public async Task<bool> CrearSeguimiento(long idFollower, long idFollowed)
+    public async Task<bool> CreateFolloging(long idFollower, long idFollowed)
     {
         if (idFollower == idFollowed) return false; //Un usuario no se puede seguir a sí mismo
 
-        bool yaExiste = await _context.Following
+        bool exists = await _context.Following
             .AnyAsync(f => f.IdFollower == idFollower && f.IdFollowed == idFollowed);
 
-        if (yaExiste) return false;
+        if (exists) return false;
 
         //Crear Seguimiento
         var newFollowing = new Following
@@ -62,7 +62,7 @@ public class FollowingRepository : BaseRepository<Following, long>
     }
 
     //DEJAR DE SEGUIR (DELETE)==================================================================
-    public async Task<bool> EliminarSeguimiento(long idFollower, long idFollowed)
+    public async Task<bool> DeleteFollowing(long idFollower, long idFollowed)
     {
         // Buscamos la fila exacta
         // FirstOrDefaultAsync: "Dame el primero que encuentres, o null si no hay ninguno"

@@ -21,10 +21,10 @@ namespace SocialNetwork.Controllers
 
         // PETICIÓN DE SEGUIDOS (GET) =========================================================================
         [HttpGet("seguidos/{userId}")]
-        public async Task<IActionResult> GetSeguidos(long userId)
+        public async Task<IActionResult> GetFolloweds(long userId)
         {
             // Se llama al método del repositorio
-            var lista = await _repository.ObtenerSeguidos(userId);
+            var lista = await _repository.GetFolloweds(userId);
 
             // Devuelve la lista (Código 200 OK)
             return Ok(lista);
@@ -32,9 +32,9 @@ namespace SocialNetwork.Controllers
 
         // PETICIÓN DE SEGUIDORES (GET) =======================================================================
         [HttpGet("seguidores/{userId}")]
-        public async Task<IActionResult> GetSeguidores(long userId)
+        public async Task<IActionResult> GetFollowers(long userId)
         {
-            var lista = await _repository.ObtenerSeguidores(userId);
+            var lista = await _repository.GetFollowers(userId);
             return Ok(lista);
         }
 
@@ -43,9 +43,9 @@ namespace SocialNetwork.Controllers
         public async Task<IActionResult> Follow([FromBody] FollowRequest request)
         {
             // Llamada a la lógica del repositorio
-            bool resultado = await _repository.CrearSeguimiento(request.IdFollower, request.IdFollowed);
+            bool result = await _repository.CreateFolloging(request.IdFollower, request.IdFollowed);
 
-            if (resultado)
+            if (result)
             {
                 return Ok("¡Seguimiento creado con éxito!");
             }
@@ -60,9 +60,9 @@ namespace SocialNetwork.Controllers
         [HttpDelete("{idFollower}/{idFollowed}")]
         public async Task<IActionResult> Unfollow(long idFollower, long idFollowed)
         {
-            bool resultado = await _repository.EliminarSeguimiento(idFollower, idFollowed);
+            bool result = await _repository.DeleteFollowing(idFollower, idFollowed);
 
-            if (resultado)
+            if (result)
             {
                 return Ok("Has dejado de seguir al usuario.");
             }
