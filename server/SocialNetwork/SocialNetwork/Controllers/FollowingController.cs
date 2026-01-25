@@ -1,86 +1,83 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using SocialNetwork.Models;                         // Para acceder a la clase User
-using SocialNetwork.Models.Database.Repositories;   // IMPORTANTE: Para acceder al Repositorio
-using System.Security.Claims;
+using SocialNetwork.Models.DataBase.Repositories;   // Para acceder a  Repositorio
 using System.Threading.Tasks;
 
 namespace SocialNetwork.Controllers
 {
-    // CONFIGURACION
-    [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
+    [ApiController]
     public class FollowingController : ControllerBase
     {
-        // CONEXIÓN CON EL SERVIDOR
-        private readonly FollowingService _followingService;
+        // Se pide el Repositorio.
+        private readonly FollowingRepository _repository;
 
-        public FollowingController(FollowingService followingService)   //CONSTRUCTOR
-        {                                                               //Cuando hay una petición, busca el FollowinService
-            _followingService = followingService;
-        }
-        // ENDPOINT PARA SEGUIR (POST)
-        [HttpPost("{userId}")]
-        public async Task<IActionResult> Follow(long userId)
+        // INYECCIÓN DE DEPENDENCIAS ==========================================================================
+        // Repositorio listo para usar al arrancar.
+        public FollowingController(FollowingRepository repository)
         {
-            // Obtenemos el ID del usuario que está haciendo la petición (el que está logueado)
-            var currentUserId = GetCurrentUserId();
+            _repository = repository;
+        }
 
-            if (currentUserId == -1)
-                return Unauthorized("No se pudo identificar al usuario.");
+        // PETICIÓN DE SEGUIDOS (GET) =========================================================================
+        [HttpGet("seguidos/{userId}")]
+        public async Task<IActionResult> GetSeguidos(long userId)
+        {
+            // Se llama al método del repositorio
+            var lista = await _repository.ObtenerSeguidos(userId);
 
-            // Llamamos al servicio
-            var resultado = await _followingService.SeguirAsync(currentUserId, userId);
+            // Devuelve la lista (Código 200 OK)
+            return Ok(lista);
+        }
+
+        // PETICIÓN DE SEGUIDORES (GET) =======================================================================
+        [HttpGet("seguidores/{userId}")]
+        public async Task<IActionResult> GetSeguidores(long userId)
+        {
+            var lista = await _repository.ObtenerSeguidores(userId);
+            return Ok(lista);
+        }
+
+        // PETICIÓN DE SEGUIMIENTO (POST) =====================================================================
+        [HttpPost]
+        public async Task<IActionResult> Follow([FromBody] FollowRequest request)
+        {
+            // Llamada a la lógica del repositorio
+            bool resultado = await _repository.CrearSeguimiento(request.IdFollower, request.IdFollowed);
 
             if (resultado)
             {
-                return Ok(new { message = "Usuario seguido correctamente." });
+                return Ok("¡Seguimiento creado con éxito!");
             }
             else
             {
-                // Si devuelve false, es porque ya lo seguía o hubo un error lógico
-                return BadRequest("No se pudo seguir al usuario (quizás ya lo sigues o intentas seguirte a ti mismo).");
+                return BadRequest("Error: No se pudo seguir (quizás ya lo sigues o es el mismo usuario).");
             }
         }
 
-        // ENDPOINT PARA DEJAR DE SEGUIR (DELETE)
-        // Se llamará como: DELETE api/following/{idUsuarioADejarDeSeguir}
-        [HttpDelete("{userId}")]
-        public async Task<IActionResult> Unfollow(long userId)
+        // PETICIÓN DE DEJAR DE SEGUIR (DELETE) ===============================================================
+        // Se pasan los datos por la URL porque es un DELETE
+        [HttpDelete("{idFollower}/{idFollowed}")]
+        public async Task<IActionResult> Unfollow(long idFollower, long idFollowed)
         {
-            var currentUserId = GetCurrentUserId();
-
-            if (currentUserId == -1)
-                return Unauthorized("No se pudo identificar al usuario.");
-
-            // Llamamos al servicio
-            var resultado = await _followingService.DejarDeSeguirAsync(currentUserId, userId);
+            bool resultado = await _repository.EliminarSeguimiento(idFollower, idFollowed);
 
             if (resultado)
             {
-                return Ok(new { message = "Se ha dejado de seguir al usuario." });
+                return Ok("Has dejado de seguir al usuario.");
             }
             else
             {
-                return NotFound("No se encontró la relación de seguimiento o no se pudo eliminar.");
+                return NotFound("No se encontró ese seguimiento.");
             }
         }
+    }
 
-        // MÉTODO AUXILIAR PARA OBTENER EL ID DEL USUARIO ACTUAL
-        private long GetCurrentUserId()
-        {
-            // Buscamos el "Claim" que tiene el ID del usuario en el token
-            var identity = HttpContext.User.Identity as ClaimsIdentity;
-            if (identity != null)
-            {
-                var userClaim = identity.FindFirst(ClaimTypes.NameIdentifier); // O el nombre que uséis para el ID
-                if (userClaim != null && long.TryParse(userClaim.Value, out long id))
-                {
-                    return id;
-                }
-            }
-            return -1; // Retornamos -1 si no encontramos al usuario
-        }
+    // CLASE AUXILIAR =========================================================================================
+    // Sirve solo para recibir los datos del JSON en el POST de forma limpia
+    public class FollowRequest
+    {
+        public long IdFollower { get; set; }
+        public long IdFollowed { get; set; }
     }
 }
