@@ -1,7 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;            //Herramientas de windows
+using SocialNetwork.Models;
 using SocialNetwork.Models.Database;
 using SocialNetwork.Models.Database.Entities;   //Los ingredientes de la BD
 using System.Threading.Tasks;                   //Otras herramientas: async, away...
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 
 namespace SocialNetwork.Models.DataBase.Repositories;
@@ -18,56 +21,57 @@ public class FollowingRepository : BaseRepository<Following, long>
         _context = context;
     }
     
-    //LISTAR USUARIOS SEGUIDOS (GET)
-    public async Task<List<User>> ObtenerSeguidos(long Id)
+    //LISTAR USUARIOS SEGUIDOS (GET)===========================================================
+    public async Task<List<User>> ObtenerSeguidos(long idUser)
     {
         return await _context.Following
-            .Where(f => f.Follower == Id) // FILTRO: El usuario logeado es el origen
-            .Select(f => f.UserFollowed)    // SELECCIÓN: Coge a la persona destino
-            .ToListAsync();                 // Ejecuta y saca en lista
+            .Where(f => f.IdFollower == idUser) // FILTRO: El usuario logeado es el origen
+            .Select(f => f.Followed)            // SELECCIÓN: Coge a la persona destino
+            .ToListAsync();                     // Ejecuta y saca en lista
     }
 
-    //LISTAR USUARIOS QUE SIGUEN (GET)
-    public async Task<List<User>> ObtenerSeguidores(long Id)
+    //LISTAR USUARIOS SEGUIDORES (GET)=========================================================
+    public async Task<List<User>> ObtenerSeguidores(long idUser)
     {
         return await _context.Following
-            .Where(f => f.Followed == Id) // FILTRO: El usuario logeado es el destino
-            .Select(f => f.UserFollower)    // SELECCIÓN: Coge a la persona destino
+            .Where(f => f.IdFollowed == idUser) // FILTRO: El usuario logeado es el destino
+            .Select(f => f.Follower)            // SELECCIÓN: Coge a la persona destino
             .ToListAsync();
     }
 
-    //SEGUIR (POST)
+    //SEGUIR (POST)============================================================================
     public async Task<bool> CrearSeguimiento(long idFollower, long idFollowed)
     {
         if (idFollower == idFollowed) return false; //Un usuario no se puede seguir a sí mismo
 
         bool yaExiste = await _context.Following
-            .AnyAsync(f => f.Follower == idFollower && f.Followed == idFollowed);
+            .AnyAsync(f => f.IdFollower == idFollower && f.IdFollowed == idFollowed);
 
         if (yaExiste) return false;
 
         //Crear Seguimiento
         var newFollowing = new Following
         {
-            Follower = idFollower,
-            Followed = idFollowed
-        }
-        _context.Followings.Add(nuevoFollowing); // Se pone en la bandeja de salida
-        await _context.SaveChangesAsync();       // Se envía a la DB
+            IdFollower = idFollower,
+            IdFollowed = idFollowed
+        };
+
+        _context.Following.Add(newFollowing); // Se pone en la bandeja de salida
+        await _context.SaveChangesAsync();    // Se envía a la DB
         return true;
     }
 
-    //DEJAR DE SEGUIR (DELETE)
+    //DEJAR DE SEGUIR (DELETE)==================================================================
     public async Task<bool> EliminarSeguimiento(long idFollower, long idFollowed)
     {
         // Buscamos la fila exacta
         // FirstOrDefaultAsync: "Dame el primero que encuentres, o null si no hay ninguno"
-        var conexion = await _context.Followings
-            .FirstOrDefaultAsync(f => f.Follower == idFollower && f.Followed == idFollowed);
+        var conexion = await _context.Following
+            .FirstOrDefaultAsync(f => f.IdFollower == idFollower && f.IdFollowed == idFollowed);
 
-        if (conexion == null) return false; // No existía
+        if (conexion == null) return false;   // No existía el seguimiento
 
-        _context.Followings.Remove(conexion); // Márcadolo para borrar
+        _context.Following.Remove(conexion);  // Marcado para borrar
         await _context.SaveChangesAsync();    // Ejecuta el borrado
         return true;
     }
