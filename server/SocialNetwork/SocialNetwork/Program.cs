@@ -21,7 +21,10 @@ public class Program
         // Tiene que ser scoped para que cierre la conexion y limpie
         // los recursos tras cada peticion
         builder.Services.AddScoped<SocialNetworkContext>();
-      
+
+        // Conectar el FollowinController con el FollowingRepository
+        builder.Services.AddScoped<FollowingRepository>();
+
         var app = builder.Build();
       
         // Creamos un scope y nos aseguramos de que se crea la base de datos segun
