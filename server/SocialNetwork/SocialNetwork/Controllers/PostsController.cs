@@ -3,7 +3,7 @@ using SocialNetwork.Models.Database;
 
 // Hay que especificar el namespace de dónde se encuentra la entidad
 using SocialNetwork.Models.Database.Entities;
-using SocialNetwork.Models.DataBase.Repositories;
+using SocialNetwork.Models.Database.Repositories;
 
 namespace SocialNetwork.Controllers;
 

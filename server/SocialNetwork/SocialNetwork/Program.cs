@@ -1,5 +1,6 @@
 using SocialNetwork.Models.Database;
-using SocialNetwork.Models.DataBase.Repositories;
+using SocialNetwork.Models.Database.Repositories;
+using SocialNetwork.Models.Database.Seeder;
 
 namespace SocialNetwork;
 
@@ -16,15 +17,14 @@ public class Program
         // Repositorios
         builder.Services.AddScoped<PostRepository>();
         builder.Services.AddScoped<UserRepository>();
+        builder.Services.AddScoped<FollowingRepository>();
 
         // Añadimos el DbContext al servicio de inyeccion de dependencias
         // Tiene que ser scoped para que cierre la conexion y limpie
         // los recursos tras cada peticion
         builder.Services.AddScoped<SocialNetworkContext>();
-
-        // Conectar el FollowinController con el FollowingRepository
-        builder.Services.AddScoped<FollowingRepository>();
-
+        builder.Services.AddScoped<UnitOfWork>();
+      
         var app = builder.Build();
       
         // Creamos un scope y nos aseguramos de que se crea la base de datos segun
@@ -33,7 +33,7 @@ public class Program
         {
             //Console.WriteLine("Entrada al scope"); // NOPROD
             SocialNetworkContext dbContext = scope.ServiceProvider.GetRequiredService<SocialNetworkContext>();
-            dbContext.Database.EnsureCreated();
+            //dbContext.Database.EnsureCreated();
             //Console.WriteLine($"Base de datos creada en: {AppDomain.CurrentDomain.BaseDirectory}{SocialNetworkContext.DATABASE_PATH}"); // NOPROD
         }
       
@@ -54,6 +54,20 @@ public class Program
 
         app.MapControllers();        // mapea los endpoints de los controladores
 
+        static void SeedDatabase(IServiceProvider serviceProvider)
+        {
+            using IServiceScope scope = serviceProvider.CreateScope();
+            using SocialNetworkContext dbContext = scope.ServiceProvider.GetRequiredService<SocialNetworkContext>();
+
+            if (dbContext.Database.EnsureCreated()) // Esto crea la DB si no existe
+            {
+                Seeder seeder = new Seeder(dbContext);
+                seeder.Seed();
+            }
+        }
+
+        // Llamar al método antes de ejecutar la app
+        SeedDatabase(app.Services);
         app.Run();
     }
 }

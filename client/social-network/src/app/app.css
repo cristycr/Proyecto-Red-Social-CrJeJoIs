@@ -1,0 +1,16 @@
+header {
+    background-color: var(--primary-color);
+    padding: 24px;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 40px;
+}
+
+ul {
+    list-style: none;
+    display: flex;
+    flex-direction: row;
+    justify-content: right;
+    padding: 0 40px;
+    gap: 40px;
+}

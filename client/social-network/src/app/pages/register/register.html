@@ -1,1 +1,44 @@
-<p>register works!</p>
+<div class="big-container">
+    <form action="">
+        <div class="container">
+            <div class="container-header">
+                <h1>¡Bienvenido a TechIt!</h1>
+                <span>Rellena los datos para crear tu cuenta.</span>
+            </div>
+            <div class="div-form">
+                <div class="div-input">
+                    <span>Nombre<span class="required">*</span></span>
+                    <input type="text" id="name" required>
+                </div>
+                <div class="div-input">
+                    <span>Primer apellido<span class="required">*</span></span>
+                    <input type="text" id="surname1" required>
+                </div>
+                <div class="div-input">
+                    <span>Segundo apellido</span>
+                    <input type="text" id="surname2">
+                </div>
+                <div class="div-input">
+                    <span>Nickname<span class="required">*</span></span>
+                    <input type="text" id="nickname" required>
+                </div>
+                <div class="div-input">
+                    <span>Correo electrónico<span class="required">*</span></span>
+                    <input type="text" id="input-email" required>
+                </div>
+                <div class="div-input">
+                    <span>Contraseña <span class="required">*</span></span>
+                    <input type="password" id="input-password" required>
+                </div>
+                <div class="div-input">
+                    <span>Confirmar contraseña <span class="required">*</span></span>
+                    <input type="password" id="input-password" required>
+                </div>
+                <div class="div-input">
+                    <input class="btn" type="submit" value="Registrarse">
+                    <span class="small-text">¿Ya tienes cuenta? <a routerLink="/login">¡Inicia sesión!</a></span>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
