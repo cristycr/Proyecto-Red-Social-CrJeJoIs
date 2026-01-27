@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 
 
-namespace SocialNetwork.Models.DataBase.Repositories;
+namespace SocialNetwork.Models.Database.Repositories;
 
 public class FollowingRepository : BaseRepository<Following, long>
 {
