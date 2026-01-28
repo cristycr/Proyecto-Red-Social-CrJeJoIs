@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SocialNetwork.Models;                         // Para acceder a la clase User
+using SocialNetwork.Models.Database;
 using SocialNetwork.Models.DataBase.Repositories;   // Para acceder a  Repositorio
 using System.Threading.Tasks;
 
@@ -11,6 +12,8 @@ namespace SocialNetwork.Controllers
     {
         // Se pide el Repositorio.
         private readonly FollowingRepository _repository;
+        //SUSTIRUTI LA LÍNEA DE ABAJO POR LA DE ARRIBA
+        //private readonly UnitOfWork _unitOfWork;
 
         // INYECCIÓN DE DEPENDENCIAS ==========================================================================
         // Repositorio listo para usar al arrancar.
@@ -20,7 +23,7 @@ namespace SocialNetwork.Controllers
         }
 
         // PETICIÓN DE SEGUIDOS (GET) =========================================================================
-        [HttpGet("seguidos/{userId}")]
+        [HttpGet("followeds/{userId}")]
         public async Task<IActionResult> GetFolloweds(long userId)
         {
             // Se llama al método del repositorio
@@ -31,7 +34,7 @@ namespace SocialNetwork.Controllers
         }
 
         // PETICIÓN DE SEGUIDORES (GET) =======================================================================
-        [HttpGet("seguidores/{userId}")]
+        [HttpGet("followers/{userId}")]
         public async Task<IActionResult> GetFollowers(long userId)
         {
             var lista = await _repository.GetFollowers(userId);
