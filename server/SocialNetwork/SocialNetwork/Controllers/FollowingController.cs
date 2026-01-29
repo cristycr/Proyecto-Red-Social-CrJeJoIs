@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SocialNetwork.Models;                         // Para acceder a la clase User
 using SocialNetwork.Models.Database;
-using SocialNetwork.Models.DataBase.Repositories;   // Para acceder a  Repositorio
 using System.Threading.Tasks;
 
 namespace SocialNetwork.Controllers
@@ -10,16 +9,14 @@ namespace SocialNetwork.Controllers
     [ApiController]
     public class FollowingController : ControllerBase
     {
-        // Se pide el Repositorio.
-        private readonly FollowingRepository _repository;
-        //SUSTIRUTI LA LÍNEA DE ABAJO POR LA DE ARRIBA
-        //private readonly UnitOfWork _unitOfWork;
+        // Se cambia la variable privada del repositorio a UnitOfWork
+        private readonly UnitOfWork _unitOfWork;
 
         // INYECCIÓN DE DEPENDENCIAS ==========================================================================
-        // Repositorio listo para usar al arrancar.
-        public FollowingController(FollowingRepository repository)
+        // Se cambia también el Constructor a UnitOfWork
+        public FollowingController(UnitOfWork unitOfWork)
         {
-            _repository = repository;
+            _unitOfWork = unitOfWork;
         }
 
         // PETICIÓN DE SEGUIDOS (GET) =========================================================================
@@ -27,7 +24,7 @@ namespace SocialNetwork.Controllers
         public async Task<IActionResult> GetFolloweds(long userId)
         {
             // Se llama al método del repositorio
-            var lista = await _repository.GetFolloweds(userId);
+            var lista = await _unitOfWork.FollowingRepository.GetFolloweds(userId);
 
             // Devuelve la lista (Código 200 OK)
             return Ok(lista);
@@ -37,7 +34,7 @@ namespace SocialNetwork.Controllers
         [HttpGet("followers/{userId}")]
         public async Task<IActionResult> GetFollowers(long userId)
         {
-            var lista = await _repository.GetFollowers(userId);
+            var lista = await _unitOfWork.FollowingRepository.GetFollowers(userId);
             return Ok(lista);
         }
 
@@ -45,17 +42,17 @@ namespace SocialNetwork.Controllers
         [HttpPost]
         public async Task<IActionResult> Follow([FromBody] FollowRequest request)
         {
-            // Llamada a la lógica del repositorio
-            bool result = await _repository.CreateFolloging(request.IdFollower, request.IdFollowed);
+            // Llamada a la lógica del repositorio pero a través del UOW
+            bool result = await _unitOfWork.FollowingRepository.CreateFolloging(request.IdFollower, request.IdFollowed);
 
-            if (result)
+            if (!result)
             {
-                return Ok("¡Seguimiento creado con éxito!");
+                return BadRequest("No se pudo crear el seguimiento.");
             }
-            else
-            {
-                return BadRequest("Error: No se pudo seguir (quizás ya lo sigues o es el mismo usuario).");
-            }
+
+            await _unitOfWork.SaveAsync();
+
+            return Ok("Seguimiento creado con éxito.");
         }
 
         // PETICIÓN DE DEJAR DE SEGUIR (DELETE) ===============================================================
@@ -63,17 +60,15 @@ namespace SocialNetwork.Controllers
         [HttpDelete("{idFollower}/{idFollowed}")]
         public async Task<IActionResult> Unfollow(long idFollower, long idFollowed)
         {
-            bool result = await _repository.DeleteFollowing(idFollower, idFollowed);
+            bool result = await _unitOfWork.FollowingRepository.DeleteFollowing(idFollower, idFollowed);
 
-            if (result)
-            {
-                return Ok("Has dejado de seguir al usuario.");
-            }
-            else
+            if (!result)
             {
                 return NotFound("No se encontró ese seguimiento.");
             }
-        }
+            await _unitOfWork.SaveAsync();
+
+            return Ok("Has dejado de seguir al usuario.");        
     }
 
     // CLASE AUXILIAR =========================================================================================
