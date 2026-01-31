@@ -57,7 +57,12 @@ public class FollowingRepository : BaseRepository<Following, long>
         };
 
         _context.Following.Add(newFollowing); // Se pone en la bandeja de salida
-        await _context.SaveChangesAsync();    // Se envía a la DB
+
+        //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+        //LINEA ELIMINADA AL CREAR UOF - BORRAR ANTES DE MERGEAR
+        //await _context.SaveChangesAsync();    // Se envía a la DB     
+        //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
         return true;
     }
 
@@ -72,7 +77,12 @@ public class FollowingRepository : BaseRepository<Following, long>
         if (conexion == null) return false;   // No existía el seguimiento
 
         _context.Following.Remove(conexion);  // Marcado para borrar
-        await _context.SaveChangesAsync();    // Ejecuta el borrado
+
+        //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+        //LINEA ELIMINADA AL CREAR UOF - BORRAR ANTES DE MERGEAR
+        //await _context.SaveChangesAsync();    // Ejecuta el borrado
+        //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
         return true;
     }
 }
