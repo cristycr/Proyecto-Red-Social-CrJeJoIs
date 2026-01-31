@@ -68,14 +68,15 @@ namespace SocialNetwork.Controllers
             }
             await _unitOfWork.SaveAsync();
 
-            return Ok("Has dejado de seguir al usuario.");        
-    }
+            return Ok("Has dejado de seguir al usuario.");
+        }
 
-    // CLASE AUXILIAR =========================================================================================
-    // Sirve solo para recibir los datos del JSON en el POST de forma limpia
-    public class FollowRequest
-    {
-        public long IdFollower { get; set; }
-        public long IdFollowed { get; set; }
+        // CLASE AUXILIAR =========================================================================================
+        // Sirve solo para recibir los datos del JSON en el POST de forma limpia
+        public class FollowRequest
+        {
+            public long IdFollower { get; set; }
+            public long IdFollowed { get; set; }
+        }
     }
 }
