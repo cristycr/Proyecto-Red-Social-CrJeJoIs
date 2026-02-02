@@ -2,6 +2,7 @@
 using SocialNetwork.Models.Database;
 using SocialNetwork.Models.Database.Entities;
 using SocialNetwork.Models.Database.Repositories;
+using SocialNetwork.Models.Dtos;
 
 namespace SocialNetwork.Controllers;
 
@@ -19,8 +20,16 @@ public class UsersController : ControllerBase
 
     //GET: api/users
     [HttpGet]
-    public async Task<IEnumerable<User>> GetAllUsers(){
-        return await _unitOfWork.UserRepository.GetUserAsync();
+    public async Task<IEnumerable<GetUserDto>> GetAllUsers(){
+        ICollection<User> users = await _unitOfWork.UserRepository.GetUserAsync();
+
+        IEnumerable<GetUserDto> getUsersDto = users.Select(user => new GetUserDto
+        {
+            Id = user.Id,
+            Nickname = user.Nickname,
+            Email = user.Email
+        });
+        return getUsersDto;
     }
 
     // GET
