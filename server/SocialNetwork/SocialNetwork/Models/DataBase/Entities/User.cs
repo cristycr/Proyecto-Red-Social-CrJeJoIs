@@ -11,9 +11,9 @@ public class User {
     public required string Name { get; set; }
     public required string Surname1 { get; set; }
     public required string Password { get; set; }
-    public required string Role { get; set; } = "user";
+    public string Role { get; set; } = "user";
     public string? Surname2 { get; set; }
-    public string? AvatarPath { get; set; }
+    public string AvatarPath { get; set; } = "/defaultAvatar.png"; //??
     public string? Description { get; set; }
 
     // Estas colecciones representan las relaciones con otras entidades
