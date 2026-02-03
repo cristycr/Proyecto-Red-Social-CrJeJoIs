@@ -4,6 +4,7 @@ using SocialNetwork.Models.Database;
 // Hay que especificar el namespace de dónde se encuentra la entidad
 using SocialNetwork.Models.Database.Entities;
 using SocialNetwork.Models.Database.Repositories;
+using SocialNetwork.Models.Dtos.Posts;
 
 namespace SocialNetwork.Controllers;
 
@@ -19,8 +20,20 @@ public class PostsController : ControllerBase {
 
     // GET: api/posts
     [HttpGet]
-    public async Task<IEnumerable<Post>> GetAllPosts() {
-        return await _unitOfWork.PostRepository.GetPostsAsync();
+    public async Task<IEnumerable<GetPostDto>> GetAllPosts() {
+        IEnumerable<Post> posts = await _unitOfWork.PostRepository.GetPostsAsync();
+
+        IEnumerable<GetPostDto> postsDto = posts.Select(post =>
+        new GetPostDto() {
+            Id = post.Id,
+            UserId = post.UserId,
+            CreationDate = post.CreationDate,
+            Title = post.Title,
+            Description = post.Description,
+            PicturePath = post.PicturePath
+        });
+
+        return postsDto;
     }
 
     // GET: api/posts/by-user/5
