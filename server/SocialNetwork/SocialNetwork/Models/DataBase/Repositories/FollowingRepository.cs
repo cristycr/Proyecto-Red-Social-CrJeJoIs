@@ -40,7 +40,7 @@ public class FollowingRepository : BaseRepository<Following, long>
     }
 
     //SEGUIR (POST)============================================================================
-    public async Task<bool> CreateFolloging(long idFollower, long idFollowed)
+    public async Task<bool> CreateFollowing(long idFollower, long idFollowed)
     {
         if (idFollower == idFollowed) return false; //Un usuario no se puede seguir a sí mismo
 
