@@ -1,6 +1,9 @@
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using SocialNetwork.Models.Database;
 using SocialNetwork.Models.Database.Repositories;
 using SocialNetwork.Models.Database.Seeder;
+using System.Text;
 
 namespace SocialNetwork;
 
@@ -24,7 +27,31 @@ public class Program
         // los recursos tras cada peticion
         builder.Services.AddScoped<SocialNetworkContext>();
         builder.Services.AddScoped<UnitOfWork>();
-      
+
+        // Autenticacion JWT
+        builder.Services.AddAuthentication()
+
+        .AddJwtBearer(options =>
+        {
+            // Por seguridad guardamos la clave privada en variables de entorno
+            // La clave debe tener más de 256 bits
+            string? key = Environment.GetEnvironmentVariable("JWT_KEY");
+
+            if (key is null)
+                throw new InvalidOperationException("La variable de entorno JWT_KEY no está definida.");
+
+            options.TokenValidationParameters = new TokenValidationParameters()
+            {
+                // Si no nos importa que se valide el emisor del token, lo desactivamos
+                ValidateIssuer = false,
+                // Si no nos importa que se valide para quién o
+                // para qué propósito está destinado el token, lo desactivamos
+                ValidateAudience = false,
+                // Indicamos la clave
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key))
+            };
+        });
+
         var app = builder.Build();
       
         // Creamos un scope y nos aseguramos de que se crea la base de datos segun
