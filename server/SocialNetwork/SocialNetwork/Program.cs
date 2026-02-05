@@ -50,6 +50,7 @@ public class Program
 
         app.UseHttpsRedirection();   // redirige HTTP a HTTPS
         app.UseStaticFiles();        // permite servir archivos desde wwwroot
+        app.UseAuthentication();     // middleware de autenticacion
         app.UseAuthorization();      // middleware de autorizacion
 
         app.MapControllers();        // mapea los endpoints de los controladores
