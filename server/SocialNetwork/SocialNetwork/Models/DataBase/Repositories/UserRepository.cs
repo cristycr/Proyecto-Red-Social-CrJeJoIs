@@ -26,15 +26,14 @@ public class UserRepository : BaseRepository<User, long> {
     }
 
 
-    public async Task<bool> AddUserAsync(User user) {
+    public async Task AddUserAsync(User user) {
         await InsertAsync(user);
-        return await SaveAsync();
     }
 
     public async Task<bool> UpdateUserAsync(User user) {
         if (await ExistAsync(user.Id)) {
             await UpdateAsync(user);
-            return await SaveAsync();
+            return true;
         } else {
             return false;
         }
@@ -43,7 +42,7 @@ public class UserRepository : BaseRepository<User, long> {
     public async Task<bool> DeleteUserAsync(User user) {
         if (await ExistAsync(user.Id)) {
             await DeleteAsync(user);
-            return await SaveAsync();
+            return true;
         } else {
             return false;
         }

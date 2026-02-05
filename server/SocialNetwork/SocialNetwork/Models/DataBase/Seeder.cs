@@ -11,11 +11,11 @@ public class Seeder {
 
     public void Seed() {
         // Crear usuarios
-        User admin = new User { Email = "admin@example.com", Nickname = "admin", Name = "Administrador", Surname1 = "Sistema", Password = "admin123", Role = "admin" };
+        User admin = new User { Email = "admin@example.com", Nickname = "admin", Name = "Administrador", Surname1 = "Sistema", Password = "admin123", Role = "admin", AvatarPath = "/defaultAvatar.png" };
 
-        User user1 = new User { Email = "user1@example.com", Nickname = "usuario1", Name = "Usuario", Surname1 = "Uno", Password = "1111", Role = "user" };
+        User user1 = new User { Email = "user1@example.com", Nickname = "usuario1", Name = "Usuario", Surname1 = "Uno", Password = "1111", Role = "user", AvatarPath = "/defaultAvatar.png" };
 
-        User user2 = new User { Email = "user2@example.com", Nickname = "usuario2", Name = "Usuario", Surname1 = "Dos", Password = "2222", Role = "user" };
+        User user2 = new User { Email = "user2@example.com", Nickname = "usuario2", Name = "Usuario", Surname1 = "Dos", Password = "2222", Role = "user", AvatarPath = "/defaultAvatar.png" };
 
         _context.User.AddRange(admin, user1, user2);
         _context.SaveChanges();
