@@ -31,10 +31,8 @@ public class Program
         // tengamos configurado nuestro DbContext
         using (IServiceScope scope = app.Services.CreateScope())
         {
-            //Console.WriteLine("Entrada al scope"); // NOPROD
             SocialNetworkContext dbContext = scope.ServiceProvider.GetRequiredService<SocialNetworkContext>();
             //dbContext.Database.EnsureCreated();
-            //Console.WriteLine($"Base de datos creada en: {AppDomain.CurrentDomain.BaseDirectory}{SocialNetworkContext.DATABASE_PATH}"); // NOPROD
         }
       
         // Configure the HTTP request pipeline.
@@ -51,7 +49,6 @@ public class Program
         app.UseHttpsRedirection();   // redirige HTTP a HTTPS
         app.UseStaticFiles();        // permite servir archivos desde wwwroot
         app.UseAuthorization();      // middleware de autorizacion
-
         app.MapControllers();        // mapea los endpoints de los controladores
 
         static void SeedDatabase(IServiceProvider serviceProvider)
