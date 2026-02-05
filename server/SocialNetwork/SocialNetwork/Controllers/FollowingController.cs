@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SocialNetwork.Models;                         // Para acceder a la clase User
 using SocialNetwork.Models.Database;
+using SocialNetwork.Models.Dtos;
 using System.Threading.Tasks;
 
 namespace SocialNetwork.Controllers
@@ -26,8 +27,17 @@ namespace SocialNetwork.Controllers
             // Se llama al método del repositorio
             var lista = await _unitOfWork.FollowingRepository.GetFolloweds(userId);
 
+            var dtoList = lista.Select(u => new FollowingDto
+            {
+                Id = u.Id,
+                Name = u.Name,
+                Nickname = u.Nickname,
+                Surname1 = u.Surname1,
+                AvatarPath = u.AvatarPath
+            }).ToList();
+
             // Devuelve la lista (Código 200 OK)
-            return Ok(lista);
+            return Ok(dtoList);
         }
 
         // PETICIÓN DE SEGUIDORES (GET) =======================================================================
@@ -35,15 +45,25 @@ namespace SocialNetwork.Controllers
         public async Task<IActionResult> GetFollowers(long userId)
         {
             var lista = await _unitOfWork.FollowingRepository.GetFollowers(userId);
-            return Ok(lista);
+
+            var dtoList = lista.Select(u => new FollowingDto
+            {
+                Id = u.Id,
+                Nickname = u.Nickname,
+                Name = u.Name,
+                Surname1 = u.Surname1,
+                AvatarPath = u.AvatarPath
+            }).ToList();
+
+            return Ok(dtoList);
         }
 
         // PETICIÓN DE SEGUIMIENTO (POST) =====================================================================
         [HttpPost]
-        public async Task<IActionResult> Follow([FromBody] FollowRequest request)
+        public async Task<IActionResult> Follow([FromBody] CreateFollowingDto request)
         {
             // Llamada a la lógica del repositorio pero a través del UOW
-            bool result = await _unitOfWork.FollowingRepository.CreateFolloging(request.IdFollower, request.IdFollowed);
+            bool result = await _unitOfWork.FollowingRepository.CreateFollowing(request.FollowerId, request.FollowedId);
 
             if (!result)
             {
@@ -71,12 +91,7 @@ namespace SocialNetwork.Controllers
             return Ok("Has dejado de seguir al usuario.");
         }
 
-        // CLASE AUXILIAR =========================================================================================
-        // Sirve solo para recibir los datos del JSON en el POST de forma limpia
-        public class FollowRequest
-        {
-            public long IdFollower { get; set; }
-            public long IdFollowed { get; set; }
-        }
+        // CLASE AUXILIAR eliminada, ya que se usa el DTO
+       
     }
 }
