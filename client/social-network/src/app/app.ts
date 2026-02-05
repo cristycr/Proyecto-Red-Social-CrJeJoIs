@@ -1,5 +1,7 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { RouterOutlet, RouterLinkWithHref } from '@angular/router';
+import { Post } from './models/post';
+import { ApiService } from './services/api';
 
 @Component({
   selector: 'app-root',

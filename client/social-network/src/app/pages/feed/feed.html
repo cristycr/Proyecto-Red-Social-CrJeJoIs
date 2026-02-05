@@ -1,1 +1,8 @@
-<p>feed works!</p>
+@for (post of posts(); track $index) {
+    <div class="post">
+        <h2>{{post.userId}}</h2>
+        <h3>{{post.title}}</h3>
+        <p>{{post.description}}</p>
+        <span>{{post.creationDate | date: 'dd/MM/yyyy HH:mm':'UTC'}}</span>
+    </div>
+}
