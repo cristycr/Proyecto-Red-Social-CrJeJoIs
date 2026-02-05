@@ -36,16 +36,45 @@ public class PostsController : ControllerBase {
         return postsDto;
     }
 
-    // GET: api/posts/by-user/5
+    // Este endpoint es para cuando un usuario entra en el perfil de otro
+    // entonces verá las publicaciones concretas de ese usuario.
+    // También para cuando entra en su propio perfil, para ver sus publicaciones.
     [HttpGet("by-user/{userId:long}")]
-    public async Task<IEnumerable<Post>> GetPostsByUserId(long userId) {
-        return await _unitOfWork.PostRepository.GetPostsByUserIdAsync(userId);
+    public async Task<IEnumerable<GetPostDto>> GetPostsByUserId(long userId) {
+        
+        IEnumerable<Post> posts = await _unitOfWork.PostRepository.GetPostsByUserIdAsync(userId);
+
+        IEnumerable<GetPostDto> postsDto = posts.Select(post =>
+        new GetPostDto() {
+            Id = post.Id,
+            UserId = post.UserId,
+            CreationDate = post.CreationDate,
+            Title = post.Title,
+            Description = post.Description,
+            PicturePath = post.PicturePath
+        });
+
+        return postsDto;
     }
 
     // GET: api/posts/5
     [HttpGet("{id}")]
-    public async Task<Post?> GetPostById(long id) {
-        return await _unitOfWork.PostRepository.GetPostByIdAsync(id);
+    public async Task<ActionResult<GetPostDto>> GetPostById(long id) {
+        Post? post = await _unitOfWork.PostRepository.GetPostByIdAsync(id);
+
+        if (post == null)
+            return NotFound();
+
+        GetPostDto postDto = new GetPostDto {
+            Id = post.Id,
+            UserId = post.UserId,
+            CreationDate = post.CreationDate,
+            Title = post.Title,
+            Description = post.Description,
+            PicturePath = post.PicturePath
+        };
+
+        return Ok(postDto);
     }
 
     [HttpPost]
