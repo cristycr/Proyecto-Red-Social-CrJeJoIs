@@ -53,8 +53,8 @@ public class UsersController : ControllerBase {
     //}
 
     [HttpPost]
-    public async Task<ActionResult<AddUserDto>> AddUser(AddUserDto dto) {
-        var user = new User {
+    public async Task<ActionResult<AddUserDto>> AddUser([FromBody] AddUserDto dto) {
+        User user = new User {
             Email = dto.Email,
             Nickname = dto.Nickname,
             AvatarPath = dto.AvatarPath,
@@ -64,10 +64,12 @@ public class UsersController : ControllerBase {
             Password = dto.Password
         };
 
-        var success = await _unitOfWork.UserRepository.AddUserAsync(user);
+        await _unitOfWork.UserRepository.AddUserAsync(user);
+        bool success = await _unitOfWork.SaveAsync();
 
-        if (!success)
+        if (!success) {
             return BadRequest();
+        }
 
         return Ok(dto);
     }
@@ -76,12 +78,14 @@ public class UsersController : ControllerBase {
     // PUT
     [HttpPut]
     public async Task<bool> UpdateUser([FromBody] User newUser) {
-        return await _unitOfWork.UserRepository.UpdateUserAsync(newUser);
+        await _unitOfWork.UserRepository.UpdateUserAsync(newUser);
+        return await _unitOfWork.SaveAsync();
     }
 
     // DELETE
     [HttpDelete]
     public async Task<bool> DeleteUser([FromBody] User user) {
-        return await _unitOfWork.UserRepository.DeleteUserAsync(user);
+        await _unitOfWork.UserRepository.DeleteUserAsync(user);
+        return await _unitOfWork.SaveAsync();
     }
 }
