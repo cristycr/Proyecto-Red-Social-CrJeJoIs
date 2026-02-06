@@ -20,21 +20,11 @@ public class Program
         builder.Services.AddScoped<FollowingRepository>();
 
         // Añadimos el DbContext al servicio de inyeccion de dependencias
-        // Tiene que ser scoped para que cierre la conexion y limpie
-        // los recursos tras cada peticion
         builder.Services.AddScoped<SocialNetworkContext>();
         builder.Services.AddScoped<UnitOfWork>();
       
         var app = builder.Build();
-      
-        // Creamos un scope y nos aseguramos de que se crea la base de datos segun
-        // tengamos configurado nuestro DbContext
-        using (IServiceScope scope = app.Services.CreateScope())
-        {
-            SocialNetworkContext dbContext = scope.ServiceProvider.GetRequiredService<SocialNetworkContext>();
-            //dbContext.Database.EnsureCreated();
-        }
-      
+        
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {
@@ -51,8 +41,12 @@ public class Program
         app.UseAuthorization();      // middleware de autorizacion
         app.MapControllers();        // mapea los endpoints de los controladores
 
-        static void SeedDatabase(IServiceProvider serviceProvider)
-        {
+        // Llamar al método antes de ejecutar la app
+        SeedDatabase(app.Services);
+        app.Run();
+
+        // Método del seeder y creación de la base de datos
+        static void SeedDatabase(IServiceProvider serviceProvider) {
             using IServiceScope scope = serviceProvider.CreateScope();
             using SocialNetworkContext dbContext = scope.ServiceProvider.GetRequiredService<SocialNetworkContext>();
 
@@ -62,9 +56,5 @@ public class Program
                 seeder.Seed();
             }
         }
-
-        // Llamar al método antes de ejecutar la app
-        SeedDatabase(app.Services);
-        app.Run();
     }
 }

@@ -42,6 +42,5 @@ public class SocialNetworkContext : DbContext // Tiene que heredar de DbContext
             "CK_Following_NoSelfFollow",
             "IdFollower <> IdFollowed"
     ));
-
     }
 }

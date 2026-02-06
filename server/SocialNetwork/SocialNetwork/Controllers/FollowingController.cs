@@ -20,7 +20,7 @@ namespace SocialNetwork.Controllers
         }
 
         // PETICIÓN DE SEGUIDOS (GET) =========================================================================
-        [HttpGet("followeds/{userId}")]
+        [HttpGet("followeds/{userId:long}")]
         public async Task<IActionResult> GetFolloweds(long userId)
         {
             // Se llama al método del repositorio
