@@ -1,10 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SocialNetwork.Models.Database;
-
-// Hay que especificar el namespace de dónde se encuentra la entidad
 using SocialNetwork.Models.Database.Entities;
-using SocialNetwork.Models.Database.Repositories;
 using SocialNetwork.Models.Dtos.Posts;
 
 namespace SocialNetwork.Controllers;
@@ -80,7 +77,7 @@ public class PostsController : ControllerBase {
     public async Task<Post> AddPost([FromBody] Post post) {
         return await _unitOfWork.PostRepository.InsertAsync(post);
     }
-    
+
     [HttpPut]
     public async Task<Post> UpdatePost([FromBody] Post newPost) {
         return await _unitOfWork.PostRepository.UpdateAsync(newPost);

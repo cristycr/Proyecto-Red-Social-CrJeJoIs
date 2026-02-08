@@ -61,7 +61,7 @@ namespace SocialNetwork.Controllers
                 SecurityToken token = tokenHandler.CreateToken(tokenDescriptor);
                 string stringToken = tokenHandler.WriteToken(token);
 
-                return Ok(stringToken);
+                return Ok(new { accessToken = stringToken });
             }
         }
     }
