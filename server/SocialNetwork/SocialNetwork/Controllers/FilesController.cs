@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System.IO;
 
 namespace SocialNetwork.Controllers;
 
+[Authorize]
 [Route("api/[controller]")]
 [ApiController]
 public class FilesController : ControllerBase
