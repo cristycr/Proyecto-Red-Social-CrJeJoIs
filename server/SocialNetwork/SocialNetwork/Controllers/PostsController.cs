@@ -85,7 +85,7 @@ public class PostsController : ControllerBase {
     }
 
     [HttpDelete]
-    public async Task<bool> DeletePost([FromBody] Post post) {
-        return await _unitOfWork.PostRepository.DeleteAsync(post);
+    public async Task DeletePost([FromBody] Post post) {
+        await _unitOfWork.PostRepository.DeleteAsync(post);
     }
 }
