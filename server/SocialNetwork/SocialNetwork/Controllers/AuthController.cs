@@ -45,6 +45,7 @@ namespace SocialNetwork.Controllers
                     Claims = new Dictionary<string, object>
                         {
                             { "id", user.Id.ToString() },
+                            { ClaimTypes.Name, user.Nickname },
                             { ClaimTypes.Role, user.Role }
                         },
                     // Aquí indicamos cuándo caduca el token
