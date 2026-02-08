@@ -8,5 +8,9 @@ namespace SocialNetwork.Helpers {
             byte[] inputHash = SHA256.HashData(inputBytes);
             return Encoding.UTF8.GetString(inputHash);
         }
+        public static bool Verify(string password, string hashedPassword)
+        {
+            return Hash(password) == hashedPassword;
+        }
     }
 }
