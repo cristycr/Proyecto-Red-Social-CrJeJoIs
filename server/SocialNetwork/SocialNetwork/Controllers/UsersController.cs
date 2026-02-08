@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SocialNetwork.Helpers;
 using SocialNetwork.Models.Database;
 using SocialNetwork.Models.Database.Entities;
 using SocialNetwork.Models.Dtos.Users;
@@ -56,7 +57,7 @@ public class UsersController : ControllerBase {
             Name = dto.Name,
             Surname1 = dto.Surname1,
             Surname2 = dto.Surname2,
-            Password = dto.Password
+            Password = PasswordHelper.Hash(dto.Password)
         };
 
         await _unitOfWork.UserRepository.InsertAsync(user);
