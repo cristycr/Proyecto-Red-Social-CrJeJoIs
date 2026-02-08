@@ -1,12 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using SocialNetwork.Models.Database;
 using SocialNetwork.Models.Database.Entities;
 using SocialNetwork.Models.Dtos.Posts;
 
 namespace SocialNetwork.Controllers;
 
-[Authorize]
 [Route("api/[controller]")]
 [ApiController]
 public class PostsController : ControllerBase {

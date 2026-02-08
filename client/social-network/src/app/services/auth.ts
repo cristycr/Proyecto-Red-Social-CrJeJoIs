@@ -17,6 +17,8 @@ export class AuthService {
 
     if (result.success) {
       this.api.jwt = result.data.accessToken;
+      // Se guarda el token en localStorage
+      localStorage.setItem('jwt', result.data.accessToken);
     }
 
     return result;

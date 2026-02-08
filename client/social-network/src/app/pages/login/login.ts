@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { RouterLink } from "@angular/router";
+import { RouterLink, Router, ActivatedRoute } from "@angular/router";
 import { AuthRequest } from '../../models/auth-request';
 import { AuthService } from '../../services/auth';
 import { FormsModule } from '@angular/forms';
@@ -18,8 +18,12 @@ export class Login implements OnInit, OnDestroy {
   password: string = '';
   jwt: string = '';
 
-  // Inyectamos el servicio de autenticación para el login
-  constructor(private authService: AuthService) {}
+  // Inyectamos los servicios necesarios
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    private route: ActivatedRoute
+  ) {}
 
   // Método del submit del formulario de login
   async submit() {
@@ -30,10 +34,12 @@ export class Login implements OnInit, OnDestroy {
 
     const result = await this.authService.login(authData);
 
-    // Si el login es correcto, se guarda el JWT en el servicio de autenticación
+    // Si el login es correcto, se guarda el JWT y redirige al feed
     if (result.success) {
       this.jwt = result.data.accessToken;
-      // TO DO: Redirigir a la página del feed
+      // Obtenemos el parámetro redirectTo si existe, si no vamos a feed
+      const redirectTo = this.route.snapshot.queryParams['redirectTo'] || '/feed';
+      this.router.navigateByUrl(redirectTo);
     } else {
       alert('El usuario o la contraseña son incorrectos');
     }
