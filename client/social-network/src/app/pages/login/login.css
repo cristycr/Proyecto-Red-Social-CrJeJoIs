@@ -87,3 +87,7 @@ input[type="checkbox"] {
 .required {
     color: var(--alert-color);
 }
+
+h4, p {
+    color: var(--primary-color);
+}
