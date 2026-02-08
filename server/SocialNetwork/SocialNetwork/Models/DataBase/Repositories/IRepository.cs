@@ -15,6 +15,5 @@ public interface IRepository<TEntity, TId> where TEntity : class {
     Task<TEntity> InsertAsync(TEntity entity); // Insert
     Task<TEntity> UpdateAsync(TEntity entity); // Update
     Task DeleteAsync(TEntity entity); // Delete
-    Task<bool> SaveAsync();
     Task<bool> ExistAsync(TId id); // Devuelve un bool que representa si existe o no la entidad con ese id
 }

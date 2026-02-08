@@ -1,29 +1,21 @@
 ﻿using Microsoft.EntityFrameworkCore;            //Herramientas de windows
-using SocialNetwork.Models;
-using SocialNetwork.Models.Database;
 using SocialNetwork.Models.Database.Entities;   //Los ingredientes de la BD
-using System.Threading.Tasks;                   //Otras herramientas: async, away...
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 
 namespace SocialNetwork.Models.Database.Repositories;
 
-public class FollowingRepository : BaseRepository<Following, long>
-{
+public class FollowingRepository : BaseRepository<Following, long> {
     //Variable para guardar la conexion con la BD (¿¿CAMBIAR NOMBRE??)
     private readonly SocialNetworkContext _context;
 
     //CONSTRUCTOR. Se ejecuta cuando se crear el repositorio
     //Recibe el context de Program y lo guarda en la variable
-    public FollowingRepository(SocialNetworkContext context) :base(context)
-    {
+    public FollowingRepository(SocialNetworkContext context) : base(context) {
         _context = context;
     }
-    
+
     //LISTAR USUARIOS SEGUIDOS (GET)===========================================================
-    public async Task<List<User>> GetFolloweds(long idUser)
-    {
+    public async Task<List<User>> GetFolloweds(long idUser) {
         return await _context.Following
             .Where(f => f.IdFollower == idUser) // FILTRO: El usuario logeado es el origen
             .Select(f => f.Followed)            // SELECCIÓN: Coge a la persona destino
@@ -31,8 +23,7 @@ public class FollowingRepository : BaseRepository<Following, long>
     }
 
     //LISTAR USUARIOS SEGUIDORES (GET)=========================================================
-    public async Task<List<User>> GetFollowers(long idUser)
-    {
+    public async Task<List<User>> GetFollowers(long idUser) {
         return await _context.Following
             .Where(f => f.IdFollowed == idUser) // FILTRO: El usuario logeado es el destino
             .Select(f => f.Follower)            // SELECCIÓN: Coge a la persona destino
@@ -40,8 +31,7 @@ public class FollowingRepository : BaseRepository<Following, long>
     }
 
     //SEGUIR (POST)============================================================================
-    public async Task<bool> CreateFollowing(long idFollower, long idFollowed)
-    {
+    public async Task<bool> CreateFollowing(long idFollower, long idFollowed) {
         if (idFollower == idFollowed) return false; //Un usuario no se puede seguir a sí mismo
 
         bool exists = await _context.Following
@@ -50,25 +40,18 @@ public class FollowingRepository : BaseRepository<Following, long>
         if (exists) return false;
 
         //Crear Seguimiento
-        var newFollowing = new Following
-        {
+        var newFollowing = new Following {
             IdFollower = idFollower,
             IdFollowed = idFollowed
         };
 
         _context.Following.Add(newFollowing); // Se pone en la bandeja de salida
 
-        //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-        //LINEA ELIMINADA AL CREAR UOF - BORRAR ANTES DE MERGEAR
-        //await _context.SaveChangesAsync();    // Se envía a la DB     
-        //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-
         return true;
     }
 
     //DEJAR DE SEGUIR (DELETE)==================================================================
-    public async Task<bool> DeleteFollowing(long idFollower, long idFollowed)
-    {
+    public async Task<bool> DeleteFollowing(long idFollower, long idFollowed) {
         // Buscamos la fila exacta
         // FirstOrDefaultAsync: "Dame el primero que encuentres, o null si no hay ninguno"
         var conexion = await _context.Following
@@ -77,11 +60,6 @@ public class FollowingRepository : BaseRepository<Following, long>
         if (conexion == null) return false;   // No existía el seguimiento
 
         _context.Following.Remove(conexion);  // Marcado para borrar
-
-        //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-        //LINEA ELIMINADA AL CREAR UOF - BORRAR ANTES DE MERGEAR
-        //await _context.SaveChangesAsync();    // Ejecuta el borrado
-        //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
         return true;
     }
