@@ -21,7 +21,7 @@ public class PostsController : ControllerBase {
     // GET: api/posts
     [HttpGet]
     public async Task<IEnumerable<GetPostDto>> GetAllPosts() {
-        IEnumerable<Post> posts = await _unitOfWork.PostRepository.GetPostsAsync();
+        IEnumerable<Post> posts = await _unitOfWork.PostRepository.GetAllAsync();
 
         IEnumerable<GetPostDto> postsDto = posts.Select(post =>
         new GetPostDto() {
@@ -29,8 +29,7 @@ public class PostsController : ControllerBase {
             UserId = post.UserId,
             CreationDate = post.CreationDate,
             Title = post.Title,
-            Description = post.Description,
-            PicturePath = post.PicturePath
+            Description = post.Description
         });
 
         return postsDto;
@@ -41,7 +40,6 @@ public class PostsController : ControllerBase {
     // También para cuando entra en su propio perfil, para ver sus publicaciones.
     [HttpGet("by-user/{userId:long}")]
     public async Task<IEnumerable<GetPostDto>> GetPostsByUserId(long userId) {
-        
         IEnumerable<Post> posts = await _unitOfWork.PostRepository.GetPostsByUserIdAsync(userId);
 
         IEnumerable<GetPostDto> postsDto = posts.Select(post =>
@@ -50,17 +48,15 @@ public class PostsController : ControllerBase {
             UserId = post.UserId,
             CreationDate = post.CreationDate,
             Title = post.Title,
-            Description = post.Description,
-            PicturePath = post.PicturePath
+            Description = post.Description
         });
-
         return postsDto;
     }
 
     // GET: api/posts/5
     [HttpGet("{id}")]
     public async Task<ActionResult<GetPostDto>> GetPostById(long id) {
-        Post? post = await _unitOfWork.PostRepository.GetPostByIdAsync(id);
+        Post? post = await _unitOfWork.PostRepository.GetByIdAsync(id);
 
         if (post == null)
             return NotFound();
@@ -70,8 +66,7 @@ public class PostsController : ControllerBase {
             UserId = post.UserId,
             CreationDate = post.CreationDate,
             Title = post.Title,
-            Description = post.Description,
-            PicturePath = post.PicturePath
+            Description = post.Description
         };
 
         return Ok(postDto);
@@ -80,17 +75,17 @@ public class PostsController : ControllerBase {
     [HttpPost]
     // Los parámetros son la Entidad (Post) y un objeto nuevo (post) que se crea
     // apartir del JSON que devuelve la petición POST
-    public async Task<bool> AddPost([FromBody] Post post) {
-        return await _unitOfWork.PostRepository.AddPostAsync(post);
+    public async Task<Post> AddPost([FromBody] Post post) {
+        return await _unitOfWork.PostRepository.InsertAsync(post);
     }
     
     [HttpPut]
-    public async Task<bool> UpdatePost([FromBody] Post newPost) {
-        return await _unitOfWork.PostRepository.UpdatePostAsync(newPost);
+    public async Task<Post> UpdatePost([FromBody] Post newPost) {
+        return await _unitOfWork.PostRepository.UpdateAsync(newPost);
     }
 
     [HttpDelete]
     public async Task<bool> DeletePost([FromBody] Post post) {
-        return await _unitOfWork.PostRepository.DeletePostAsync(post);
+        return await _unitOfWork.PostRepository.DeleteAsync(post);
     }
 }
