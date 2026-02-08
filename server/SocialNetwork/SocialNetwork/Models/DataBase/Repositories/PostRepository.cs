@@ -49,5 +49,4 @@ public class PostRepository : BaseRepository<Post, long> {
             return false;
         }
     }
-
 }

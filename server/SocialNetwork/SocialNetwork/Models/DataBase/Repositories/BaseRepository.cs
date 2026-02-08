@@ -8,7 +8,6 @@ public abstract class BaseRepository<TEntity, TId> : IRepository<TEntity, TId> w
     public BaseRepository(SocialNetworkContext dbContext) {
         _dbContext = dbContext;
     }
-
     public async Task<ICollection<TEntity>> GetAllAsync() {
         return await _dbContext.Set<TEntity>().ToArrayAsync();
     }
@@ -22,20 +21,14 @@ public abstract class BaseRepository<TEntity, TId> : IRepository<TEntity, TId> w
     }
     public async Task<TEntity> InsertAsync(TEntity entity) {
         EntityEntry<TEntity> entry = await _dbContext.Set<TEntity>().AddAsync(entity);
-        // await SaveAsync();
         return entry.Entity;
     }
     public async Task<TEntity> UpdateAsync(TEntity entity) {
         EntityEntry<TEntity> entry = _dbContext.Set<TEntity>().Update(entity);
-        //await SaveAsync();
         return entry.Entity;
     }
     public async Task DeleteAsync(TEntity entity) {
         _dbContext.Set<TEntity>().Remove(entity);
-        //await SaveAsync();
-    }
-    public async Task<bool> SaveAsync() {
-        return await _dbContext.SaveChangesAsync() > 0;
     }
     public async Task<bool> ExistAsync(TId id) {
         return await GetByIdAsync(id) is not null;

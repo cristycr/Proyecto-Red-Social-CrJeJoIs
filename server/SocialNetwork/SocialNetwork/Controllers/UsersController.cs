@@ -8,7 +8,7 @@ namespace SocialNetwork.Controllers;
 [Route("api/[controller]")]
 [ApiController]
 public class UsersController : ControllerBase {
-    // Inyección de UserRepository 
+    // InyecciÃ³n de UserRepository 
     private readonly UnitOfWork _unitOfWork;
 
     public UsersController(UnitOfWork unitOfWork) {
@@ -18,7 +18,7 @@ public class UsersController : ControllerBase {
     //GET: api/users
     [HttpGet]
     public async Task<IEnumerable<GetUserDto>> GetAllUsers() {
-        ICollection<User> users = await _unitOfWork.UserRepository.GetUserAsync();
+        ICollection<User> users = await _unitOfWork.UserRepository.GetAllAsync();
 
         IEnumerable<GetUserDto> getUsersDto = users.Select(user => new GetUserDto {
             Id = user.Id,
@@ -31,7 +31,7 @@ public class UsersController : ControllerBase {
     // GET
     [HttpGet("{id:long}")]
     public async Task<User?> GetUserById(long id) {
-        return await _unitOfWork.UserRepository.GetUserByIdAsync(id);
+        return await _unitOfWork.UserRepository.GetByIdAsync(id);
     }
 
     // Get by nickname
@@ -48,11 +48,6 @@ public class UsersController : ControllerBase {
 
     // POST
     [HttpPost]
-    //public async Task<bool> AddUser([FromBody] User user) {
-    //    return await _unitOfWork.UserRepository.AddUserAsync(user);
-    //}
-
-    [HttpPost]
     public async Task<ActionResult<AddUserDto>> AddUser([FromBody] AddUserDto dto) {
         User user = new User {
             Email = dto.Email,
@@ -64,7 +59,7 @@ public class UsersController : ControllerBase {
             Password = dto.Password
         };
 
-        await _unitOfWork.UserRepository.AddUserAsync(user);
+        await _unitOfWork.UserRepository.InsertAsync(user);
         bool success = await _unitOfWork.SaveAsync();
 
         if (!success) {
@@ -78,14 +73,14 @@ public class UsersController : ControllerBase {
     // PUT
     [HttpPut]
     public async Task<bool> UpdateUser([FromBody] User newUser) {
-        await _unitOfWork.UserRepository.UpdateUserAsync(newUser);
+        await _unitOfWork.UserRepository.UpdateAsync(newUser);
         return await _unitOfWork.SaveAsync();
     }
 
     // DELETE
     [HttpDelete]
     public async Task<bool> DeleteUser([FromBody] User user) {
-        await _unitOfWork.UserRepository.DeleteUserAsync(user);
+        await _unitOfWork.UserRepository.DeleteAsync(user);
         return await _unitOfWork.SaveAsync();
     }
 }
