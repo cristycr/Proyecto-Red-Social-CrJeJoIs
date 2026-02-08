@@ -23,8 +23,6 @@ public class Program
         builder.Services.AddScoped<FollowingRepository>();
 
         // Añadimos el DbContext al servicio de inyeccion de dependencias
-        // Tiene que ser scoped para que cierre la conexion y limpie
-        // los recursos tras cada peticion
         builder.Services.AddScoped<SocialNetworkContext>();
         builder.Services.AddScoped<UnitOfWork>();
 
@@ -53,17 +51,7 @@ public class Program
         });
 
         var app = builder.Build();
-      
-        // Creamos un scope y nos aseguramos de que se crea la base de datos segun
-        // tengamos configurado nuestro DbContext
-        using (IServiceScope scope = app.Services.CreateScope())
-        {
-            //Console.WriteLine("Entrada al scope"); // NOPROD
-            SocialNetworkContext dbContext = scope.ServiceProvider.GetRequiredService<SocialNetworkContext>();
-            //dbContext.Database.EnsureCreated();
-            //Console.WriteLine($"Base de datos creada en: {AppDomain.CurrentDomain.BaseDirectory}{SocialNetworkContext.DATABASE_PATH}"); // NOPROD
-        }
-      
+        
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {
@@ -79,11 +67,14 @@ public class Program
         app.UseStaticFiles();        // permite servir archivos desde wwwroot
         app.UseAuthentication();     // middleware de autenticacion
         app.UseAuthorization();      // middleware de autorizacion
-
         app.MapControllers();        // mapea los endpoints de los controladores
 
-        static void SeedDatabase(IServiceProvider serviceProvider)
-        {
+        // Llamar al método antes de ejecutar la app
+        SeedDatabase(app.Services);
+        app.Run();
+
+        // Método del seeder y creación de la base de datos
+        static void SeedDatabase(IServiceProvider serviceProvider) {
             using IServiceScope scope = serviceProvider.CreateScope();
             using SocialNetworkContext dbContext = scope.ServiceProvider.GetRequiredService<SocialNetworkContext>();
 
@@ -93,9 +84,5 @@ public class Program
                 seeder.Seed();
             }
         }
-
-        // Llamar al método antes de ejecutar la app
-        SeedDatabase(app.Services);
-        app.Run();
     }
 }
