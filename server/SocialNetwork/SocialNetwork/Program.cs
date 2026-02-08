@@ -3,6 +3,7 @@ using Microsoft.IdentityModel.Tokens;
 using SocialNetwork.Models.Database;
 using SocialNetwork.Models.Database.Repositories;
 using SocialNetwork.Models.Database.Seeder;
+using System.Security.Claims;
 using System.Text;
 
 namespace SocialNetwork;
@@ -47,6 +48,7 @@ public class Program
                 ValidateAudience = false,
                 // Indicamos la clave
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key))
+                RoleClaimType = ClaimTypes.Role // para [Authorize(Roles="...")]
             };
         });
 
