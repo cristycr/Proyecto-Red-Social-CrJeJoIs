@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using SocialNetwork.Models;                         // Para acceder a la clase User
 using SocialNetwork.Models.Database;
 using SocialNetwork.Models.Dtos;
+using SocialNetwork.Models.Dtos.Following;
 using System.Threading.Tasks;
 
 namespace SocialNetwork.Controllers

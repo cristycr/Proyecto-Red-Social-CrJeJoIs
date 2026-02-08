@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using SocialNetwork.Helpers;
 using SocialNetwork.Models.Database.Entities;
 using SocialNetwork.Models.Database.Repositories;
 using SocialNetwork.Models.Dtos.Auth;
@@ -35,7 +36,7 @@ namespace SocialNetwork.Controllers
             if (user is null)
                 return Unauthorized("Credenciales invalidas");
 
-            if (user.Password != model.Password)
+            if (!PasswordHelper.Verify(model.Password, user.Password))
                 return Unauthorized("Credenciales invalidas");
 
             {

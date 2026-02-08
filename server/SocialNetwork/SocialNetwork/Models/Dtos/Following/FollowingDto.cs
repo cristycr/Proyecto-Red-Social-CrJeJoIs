@@ -1,4 +1,4 @@
-﻿namespace SocialNetwork.Models.Dtos
+﻿namespace SocialNetwork.Models.Dtos.Following
 {
     public class FollowingDto
     {
