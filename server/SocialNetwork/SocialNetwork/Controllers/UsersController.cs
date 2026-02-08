@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SocialNetwork.Helpers;
 using SocialNetwork.Models.Database;
 using SocialNetwork.Models.Database.Entities;
@@ -6,6 +7,7 @@ using SocialNetwork.Models.Dtos.Users;
 
 namespace SocialNetwork.Controllers;
 
+[Authorize]
 [Route("api/[controller]")]
 [ApiController]
 public class UsersController : ControllerBase {
@@ -48,6 +50,7 @@ public class UsersController : ControllerBase {
     }
 
     // POST
+    [AllowAnonymous]
     [HttpPost]
     public async Task<ActionResult<AddUserDto>> AddUser([FromBody] AddUserDto dto) {
         User user = new User {
@@ -78,6 +81,7 @@ public class UsersController : ControllerBase {
     }
 
     // DELETE
+    [Authorize(Roles = "admin")]
     [HttpDelete]
     public async Task DeleteUser([FromBody] User user) {
         await _unitOfWork.UserRepository.DeleteAsync(user);

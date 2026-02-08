@@ -1,5 +1,5 @@
 <div class="big-container">
-    <form action="">
+    <form (submit)="submit()">
         <div class="container">
             <div class="container-header">
                 <h1>¡Hola de nuevo!</h1>
@@ -7,12 +7,12 @@
             </div>
             <div class="div-form">
                 <div class="div-input">
-                    <span>Correo electrónico o usuario <span class="required">*</span></span>
-                    <input type="text" id="input-email" required>
+                    <span>Nombre de usuario <span class="required">*</span></span>
+                    <input type="text" [(ngModel)]="nickname" [ngModelOptions]="{standalone: true}">
                 </div>
                 <div class="div-input">
                     <span>Contraseña <span class="required">*</span></span>
-                    <input type="password" id="input-password" required>
+                    <input type="password" [(ngModel)]="password" [ngModelOptions]="{standalone: true}">
                     <div class="div-checkbox">
                         <input type="checkbox" id="keep-logged-checkbox"><span class="small-text">Mantener la sesión iniciada</span>
                     </div>
@@ -25,3 +25,11 @@
         </div>
     </form>
 </div>
+
+    @if (jwt) {
+        <h4>El token de acceso es:</h4>
+        <p>{{jwt}}</p>
+    }
+    @else {
+        <h4>No estás autenticado</h4>
+    }
