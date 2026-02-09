@@ -47,7 +47,7 @@ public class Program
                 // para qué propósito está destinado el token, lo desactivamos
                 ValidateAudience = false,
                 // Indicamos la clave
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key))
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
                 RoleClaimType = ClaimTypes.Role // para [Authorize(Roles="...")]
             };
         });
