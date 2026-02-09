@@ -7,7 +7,6 @@ using SocialNetwork.Models.Dtos.Users;
 
 namespace SocialNetwork.Controllers;
 
-[Authorize]
 [Route("api/[controller]")]
 [ApiController]
 public class UsersController : ControllerBase {
@@ -31,6 +30,26 @@ public class UsersController : ControllerBase {
         return getUsersDto;
     }
 
+    //Get con todo para desarrollo
+    [HttpGet("All")]
+    public async Task<IEnumerable<GetAllUserDto>> GetAllOfUsers() {
+        ICollection<User> users = await _unitOfWork.UserRepository.GetAllAsync();
+
+        IEnumerable<GetAllUserDto> getAllUsersDto = users.Select(user => new GetAllUserDto {
+            Id = user.Id,
+            Email = user.Email,
+            Nickname = user.Nickname,
+            Name = user.Name,
+            Surname1 = user.Surname1,
+            Password = user.Password,
+            Role = user.Role,
+            Surname2 = user.Surname2,
+            AvatarPath = user.AvatarPath!,
+            Description = user.Description
+        });
+        return getAllUsersDto;
+    }
+
     // GET
     [HttpGet("{id:long}")]
     public async Task<User?> GetUserById(long id) {
@@ -50,7 +69,6 @@ public class UsersController : ControllerBase {
     }
 
     // POST
-    [AllowAnonymous]
     [HttpPost]
     public async Task<ActionResult<AddUserDto>> AddUser([FromBody] AddUserDto dto) {
         User user = new User {
@@ -75,6 +93,7 @@ public class UsersController : ControllerBase {
 
 
     // PUT
+    [Authorize]
     [HttpPut]
     public async Task<User> UpdateUser([FromBody] User newUser) {
         return await _unitOfWork.UserRepository.UpdateAsync(newUser);
@@ -82,7 +101,8 @@ public class UsersController : ControllerBase {
 
     // DELETE
     [Authorize(Roles = "admin")]
-    [HttpDelete]
+    [HttpDelete] //Este delete es para que el admin pueda borrar usuarios, no para que un usuario pueda borrar su cuenta
+                 //Para ese caso habria que hacer otro metodo
     public async Task DeleteUser([FromBody] User user) {
         await _unitOfWork.UserRepository.DeleteAsync(user);
     }

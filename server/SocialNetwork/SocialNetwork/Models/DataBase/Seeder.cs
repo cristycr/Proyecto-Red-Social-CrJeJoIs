@@ -1,4 +1,5 @@
-﻿using SocialNetwork.Models.Database.Entities;
+﻿using SocialNetwork.Helpers;
+using SocialNetwork.Models.Database.Entities;
 
 namespace SocialNetwork.Models.Database.Seeder;
 
@@ -10,11 +11,11 @@ public class Seeder {
     }
     public void Seed() {
         // Crear usuarios
-        User admin = new User { Email = "admin@example.com", Nickname = "admin", Name = "Administrador", Surname1 = "Sistema", Password = "admin123", Role = "admin", AvatarPath = "/defaultAvatar.png" };
+        User admin = new User { Email = "admin@example.com", Nickname = "admin", Name = "Administrador", Surname1 = "Sistema", Password = PasswordHelper.Hash("admin123"), Role = "admin", AvatarPath = "/defaultAvatar.png" };
 
-        User user1 = new User { Email = "user1@example.com", Nickname = "usuario1", Name = "Usuario", Surname1 = "Uno", Password = "1111", Role = "user", AvatarPath = "/defaultAvatar.png" };
+        User user1 = new User { Email = "user1@example.com", Nickname = "usuario1", Name = "Usuario", Surname1 = "Uno", Password = PasswordHelper.Hash("1111"), Role = "user", AvatarPath = "/defaultAvatar.png" };
 
-        User user2 = new User { Email = "user2@example.com", Nickname = "usuario2", Name = "Usuario", Surname1 = "Dos", Password = "2222", Role = "user", AvatarPath = "/defaultAvatar.png" };
+        User user2 = new User { Email = "user2@example.com", Nickname = "usuario2", Name = "Usuario", Surname1 = "Dos", Password = PasswordHelper.Hash("2222"), Role = "user", AvatarPath = "/defaultAvatar.png" };
 
         // Crear posts para cada usuario
         Post post1 = new Post { UserId = admin.Id, User = admin, Title = "Post admin 1", Description = "Contenido admin 1" };
@@ -25,15 +26,18 @@ public class Seeder {
 
         Post post5 = new Post { UserId = user2.Id, User = user2, Title = "Post user2 1", Description = "Contenido user2 1" };
         Post post6 = new Post { UserId = user2.Id, User = user2, Title = "Post user2 2", Description = "Contenido user2 2" };
+        
+        _context.Post.AddRange(post1, post2, post3, post4, post5, post6);
+        _context.User.AddRange(admin, user1, user2);
+        _context.SaveChanges();
 
+        //hay que arregñar los datos de Following
         // Crear relaciones Following
         Following f1 = new Following { IdFollower = user1.Id, IdFollowed = admin.Id };
         Following f2 = new Following { IdFollower = user2.Id, IdFollowed = admin.Id };
 
-        _context.Post.AddRange(post1, post2, post3, post4, post5, post6);
-        _context.User.AddRange(admin, user1, user2);
         _context.Following.AddRange(f1, f2);
 
-        _context.SaveChanges();
+        //_context.SaveChanges();
     }
 }
