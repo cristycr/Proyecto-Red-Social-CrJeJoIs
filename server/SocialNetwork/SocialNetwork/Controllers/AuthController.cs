@@ -47,7 +47,8 @@ namespace SocialNetwork.Controllers
                         {
                             { "id", user.Id.ToString() },
                             { ClaimTypes.Name, user.Nickname },
-                            { ClaimTypes.Role, user.Role }
+                            { ClaimTypes.Role, user.Role },
+                            { "AvatarPath", user.AvatarPath }
                         },
                     // Aquí indicamos cuándo caduca el token
                     Expires = DateTime.UtcNow.AddDays(5),
