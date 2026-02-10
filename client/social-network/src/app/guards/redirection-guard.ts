@@ -6,11 +6,8 @@ export const redirectionGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
   const authService = inject(AuthService);
 
-  // Obtenemos el token JWT de authService
-  const token = authService.getToken();
-
-  if (token) {
-    // Si hay token, permitimos acceso
+  // Verificamos si existe el token JWT en el servicio o en localStorage
+  if (authService.jwt) {
     return true;
   } else {
     // Si no hay token, redirigimos a login con queryParam para ir a feed después
