@@ -1,11 +1,13 @@
 import { CanActivateFn, Router } from '@angular/router';
 import { inject } from '@angular/core';
+import { AuthService } from '../services/auth';
 
 export const redirectionGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
+  const authService = inject(AuthService);
 
-  // Verificamos si existe el token JWT en localStorage
-  const token = localStorage.getItem('jwt');
+  // Obtenemos el token JWT de authService
+  const token = authService.getToken();
 
   if (token) {
     // Si hay token, permitimos acceso

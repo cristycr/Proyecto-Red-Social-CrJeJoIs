@@ -23,4 +23,9 @@ export class AuthService {
 
     return result;
   }
+
+  // Método para obtener el token JWT actual
+  getToken(): string | null {
+    return this.api.jwt;
+  }
 }
