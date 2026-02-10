@@ -16,7 +16,7 @@ export class Login implements OnInit, OnDestroy {
   // Variables del formulario de login
   nickname: string = '';
   password: string = '';
-  jwt: string = '';
+  rememberMeChecked: boolean = false;
 
   // Inyectamos los servicios necesarios
   constructor(
@@ -32,11 +32,10 @@ export class Login implements OnInit, OnDestroy {
       password: this.password
     };
 
-    const result = await this.authService.login(authData);
+    const result = await this.authService.login(authData, this.rememberMeChecked);
 
-    // Si el login es correcto, se guarda el JWT y redirige al feed
+    // Si el login es correcto, redirige al feed
     if (result.success) {
-      this.jwt = result.data.accessToken;
       // Obtenemos el parámetro redirectTo si existe, si no vamos a feed
       const redirectTo = this.route.snapshot.queryParams['redirectTo'] || '/feed';
       this.router.navigateByUrl(redirectTo);
