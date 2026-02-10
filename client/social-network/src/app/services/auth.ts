@@ -9,16 +9,29 @@ import { Result } from '../models/result';
   providedIn: 'root',
 })
 export class AuthService {
+  // JWT en memoria (muere al cerrar la página)
+  jwt: string | null = null;
   
   constructor(private api: ApiService) {}
 
-  async login(authData: AuthRequest): Promise<Result<AuthResponse>> {
+  // Establece el JWT que viene del localStorage
+  setJwt(jwt: string): void {
+    this.jwt = jwt;
+    this.api.jwt = jwt;
+  }
+
+  async login(authData: AuthRequest, rememberMe: boolean = false): Promise<Result<AuthResponse>> {
     const result = await this.api.post<AuthResponse>('auth/login', authData);
 
     if (result.success) {
-      this.api.jwt = result.data.accessToken;
-      // Se guarda el token en localStorage
-      localStorage.setItem('jwt', result.data.accessToken);
+      const token = result.data.accessToken;
+      this.jwt = token;
+      this.api.jwt = token;
+      
+      // Se guarda el token en localStorage solo si rememberMe es true
+      if (rememberMe) {
+        localStorage.setItem('jwt', token);
+      }
     }
 
     return result;
