@@ -1,8 +1,11 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi;
 using SocialNetwork.Models.Database;
 using SocialNetwork.Models.Database.Repositories;
 using SocialNetwork.Models.Database.Seeder;
+using Swashbuckle.AspNetCore.Filters;
 using System.Security.Claims;
 using System.Text;
 
@@ -16,7 +19,7 @@ public class Program
 
         // Add services to the container.
         builder.Services.AddControllers();
-        builder.Services.AddOpenApi();
+        
 
         // Repositorios
         builder.Services.AddScoped<PostRepository>();
@@ -29,7 +32,6 @@ public class Program
 
         // Autenticacion JWT
         builder.Services.AddAuthentication()
-
         .AddJwtBearer(options =>
         {
             // Por seguridad guardamos la clave privada en variables de entorno
@@ -52,13 +54,27 @@ public class Program
             };
         });
 
+        builder.Services.AddSwaggerGen(options =>
+        {
+            options.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme
+            {
+                BearerFormat = "JWT",
+                Name = "Authorization",
+                Description = "Escribe",
+                In = ParameterLocation.Header,
+                Type = SecuritySchemeType.Http,
+                Scheme = JwtBearerDefaults.AuthenticationScheme
+            });
+            options.OperationFilter<SecurityRequirementsOperationFilter>(true, JwtBearerDefaults.AuthenticationScheme);
+        });
+
         var app = builder.Build();
         
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {
-            app.MapOpenApi();
-            app.UseSwaggerUI(options => options.SwaggerEndpoint("/openapi/v1.json", "v1"));
+            app.UseSwagger();
+            app.UseSwaggerUI();
             app.UseCors(policy =>
                 policy.AllowAnyOrigin()
                     .AllowAnyHeader()
