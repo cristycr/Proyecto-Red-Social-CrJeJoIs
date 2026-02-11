@@ -1,14 +1,6 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
-using SocialNetwork.Helpers;
-using SocialNetwork.Models.Database.Entities;
-using SocialNetwork.Models.Database.Repositories;
+﻿using Microsoft.AspNetCore.Mvc;
 using SocialNetwork.Models.Dtos.Auth;
 using SocialNetwork.Services;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 
 namespace SocialNetwork.Controllers
 {
