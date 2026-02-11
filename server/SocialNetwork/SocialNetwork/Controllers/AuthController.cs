@@ -40,7 +40,7 @@ namespace SocialNetwork.Controllers
                 return Unauthorized("Credenciales invalidas");
 
             {
-                var tokenDescriptor = new SecurityTokenDescriptor
+                var tokenDescriptor = new SecurityTokenDescriptor // TODO: Pasar a un servicio de creación de token
                 {
                     // Aquí añadimos los datos que sirvan para autorizar al usuario
                     Claims = new Dictionary<string, object>
