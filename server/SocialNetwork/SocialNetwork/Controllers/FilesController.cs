@@ -18,7 +18,7 @@ public class FilesController : ControllerBase
 
     // POST: api/files/upload
     [HttpPost("upload")]
-    public IActionResult UploadFile([FromForm] IFormFile file)
+    public ActionResult UploadFile(IFormFile file)
     {
         if (file == null || file.Length == 0)
             return BadRequest("No se ha enviado ningún fichero.");
