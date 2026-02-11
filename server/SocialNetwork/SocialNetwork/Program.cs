@@ -5,6 +5,7 @@ using Microsoft.OpenApi;
 using SocialNetwork.Models.Database;
 using SocialNetwork.Models.Database.Repositories;
 using SocialNetwork.Models.Database.Seeder;
+using SocialNetwork.Services;
 using Swashbuckle.AspNetCore.Filters;
 using System.Security.Claims;
 using System.Text;
@@ -31,6 +32,8 @@ public class Program
         builder.Services.AddScoped<UnitOfWork>();
 
         // Autenticacion JWT
+        builder.Services.AddScoped<TokenService>();
+        builder.Services.AddScoped<AuthService>();
         builder.Services.AddAuthentication()
         .AddJwtBearer(options =>
         {
