@@ -44,7 +44,7 @@ public class UsersController : ControllerBase {
             Password = user.Password,
             Role = user.Role,
             Surname2 = user.Surname2,
-            AvatarPath = user.AvatarPath!,
+            AvatarPath = user.AvatarPath,
             Description = user.Description
         });
         return getAllUsersDto;
