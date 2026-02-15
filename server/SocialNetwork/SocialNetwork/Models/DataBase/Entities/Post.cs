@@ -8,5 +8,6 @@ public class Post {
     public string? Title { get; set; }
     public string? Description { get; set; }
     // Establece la relación con la entidad User
-    public required User User { get; set; }
+    public virtual User? User { get; set; }
+    //Se modifica de required a vitual más ? para "relajar" la regla en la Entidad
 }

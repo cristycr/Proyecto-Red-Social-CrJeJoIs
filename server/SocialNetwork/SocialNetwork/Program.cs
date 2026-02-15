@@ -33,6 +33,7 @@ public class Program
         // Autenticacion JWT
         builder.Services.AddScoped<TokenService>();
         builder.Services.AddScoped<AuthService>();
+        builder.Services.AddScoped<PostService>();
         builder.Services.AddAuthentication()
         .AddJwtBearer(options =>
         {
