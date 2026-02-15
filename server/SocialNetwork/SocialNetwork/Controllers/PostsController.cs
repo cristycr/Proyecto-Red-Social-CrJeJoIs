@@ -26,13 +26,14 @@ public class PostsController : ControllerBase {
     public async Task<IEnumerable<GetPostDto>> GetAllPosts() {
         IEnumerable<Post> posts = await _unitOfWork.PostRepository.GetAllAsync();
 
-        IEnumerable<GetPostDto> postsDto = posts.Select(post =>
-        new GetPostDto() {
-            Id = post.Id,
-            UserId = post.UserId,
-            CreationDate = post.CreationDate,
-            Title = post.Title,
-            Description = post.Description
+        IEnumerable<GetPostDto> postsDto = posts
+            .OrderBy(post  => post.CreationDate) //<-- Esto ordena por fecha y hora
+            .Select(post =>new GetPostDto() {
+                Id = post.Id,
+                UserId = post.UserId,
+                CreationDate = post.CreationDate,
+                Title = post.Title,
+                Description = post.Description
         });
 
         return postsDto;
