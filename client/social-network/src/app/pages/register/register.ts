@@ -39,6 +39,16 @@ export class Register implements OnInit, OnDestroy {
       return;
     }
 
+    // Validar duplicados
+    if (await this.api.getUserByNickname(this.nickname)) {
+      this.errorMessage.set('Ya existe un usuario con ese nickname.');
+      return;
+    }
+
+    if (await this.api.getUserByEmail(this.email)) {
+      this.errorMessage.set('Ese email ya está registrado.');
+      return;
+    }
 
     // Enviar propiedades con mayúscula inicial para .NET
     const user: any = {

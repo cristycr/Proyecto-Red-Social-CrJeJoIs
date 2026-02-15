@@ -71,6 +71,17 @@ public class UsersController : ControllerBase {
     // POST
     [HttpPost]
     public async Task<ActionResult<AddUserDto>> AddUser([FromBody] AddUserDto dto) {
+
+        if (await _unitOfWork.UserRepository.GetUserByNicknameAsync(dto.Nickname) != null)
+        {
+            return BadRequest(new { error = "El nickname ya está en uso." });
+        }
+
+        if (await _unitOfWork.UserRepository.GetUserByEmailAsync(dto.Email) != null)
+        {
+            return BadRequest(new { error = "El email ya está registrado." });
+        }
+
         User user = new User {
             Email = dto.Email,
             Nickname = dto.Nickname,
@@ -85,7 +96,7 @@ public class UsersController : ControllerBase {
         bool success = await _unitOfWork.SaveAsync();
 
         if (!success) {
-            return BadRequest();
+            return BadRequest(new { error = "No se pudo registrar el usuario." });
         }
 
         return Ok(dto);

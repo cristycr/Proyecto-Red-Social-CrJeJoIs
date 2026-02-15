@@ -54,4 +54,37 @@ export class ApiService {
 
     return response;
   }
+
+  // Comprueba si existe un usuario con el nickname dado
+async getUserByNickname(nickname: string): Promise<boolean> {
+  try {
+    const response = await lastValueFrom(
+      this.http.get(`${this.BASE_URL}users/nickname/${nickname}`, {
+        headers: this.getHeaders(),
+        observe: 'response'
+      })
+    );
+    return response.status === 200 && !!response.body; // true si existe
+  } catch (err: any) {
+    if (err.status === 404) return false; // no existe
+    throw err; // cualquier otro error
+  }
+}
+
+// Comprueba si existe un usuario con el email dado
+async getUserByEmail(email: string): Promise<boolean> {
+  try {
+    const response = await lastValueFrom(
+      this.http.get(`${this.BASE_URL}users/email/${email}`, {
+        headers: this.getHeaders(),
+        observe: 'response'
+      })
+    );
+    return response.status === 200 && !!response.body; // true si existe
+  } catch (err: any) {
+    if (err.status === 404) return false; // no existe
+    throw err; // cualquier otro error
+  }
+}
+
 }
