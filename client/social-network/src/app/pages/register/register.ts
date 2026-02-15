@@ -63,9 +63,10 @@ export class Register implements OnInit, OnDestroy {
 
     const result = await this.api.post<AddUserDto>('users', user);
     if (result.success) {
-      this.router.navigate(['/login']);
+    this.router.navigate(['/login']);
     } else {
-      this.errorMessage.set('Error al registrar usuario: ' + result.error);
+      
+      this.errorMessage.set(result.error || 'Error al registrar usuario');
     }
   }
 }

@@ -74,12 +74,12 @@ public class UsersController : ControllerBase {
 
         if (await _unitOfWork.UserRepository.GetUserByNicknameAsync(dto.Nickname) != null)
         {
-            return BadRequest(new { error = "El nickname ya está en uso." });
+            return BadRequest(new { error = "nickname", message = "Nickname ya en uso" });
         }
 
         if (await _unitOfWork.UserRepository.GetUserByEmailAsync(dto.Email) != null)
         {
-            return BadRequest(new { error = "El email ya está registrado." });
+            return BadRequest(new { error = "email", message = "Email ya en uso" });
         }
 
         User user = new User {
