@@ -1,5 +1,10 @@
 <div class="big-container">
-    <form>
+    <form (submit)="submit()">
+        @if (errorMessage()) {
+            <div style="color: red; margin-bottom: 1em; text-align: center;">
+                {{ errorMessage() }}
+            </div>
+        }
         <div class="container">
             <div class="container-header">
                 <h1>¡Bienvenido a TechIt!</h1>
@@ -8,31 +13,31 @@
             <div class="div-form">
                 <div class="div-input">
                     <span>Nombre<span class="required">*</span></span>
-                    <input type="text" id="name" required>
+                    <input type="text" id="name" required [(ngModel)]="name" name="name">
                 </div>
                 <div class="div-input">
                     <span>Primer apellido<span class="required">*</span></span>
-                    <input type="text" id="surname1" required>
+                    <input type="text" id="surname1" required [(ngModel)]="surname1" name="surname1">
                 </div>
                 <div class="div-input">
                     <span>Segundo apellido</span>
-                    <input type="text" id="surname2">
+                    <input type="text" id="surname2" [(ngModel)]="surname2" name="surname2">
                 </div>
                 <div class="div-input">
                     <span>Nickname<span class="required">*</span></span>
-                    <input type="text" id="nickname" required>
+                    <input type="text" id="nickname" required [(ngModel)]="nickname" name="nickname">
                 </div>
                 <div class="div-input">
                     <span>Correo electrónico<span class="required">*</span></span>
-                    <input type="text" id="input-email" required>
+                    <input type="text" id="input-email" required [(ngModel)]="email" name="email">
                 </div>
                 <div class="div-input">
                     <span>Contraseña <span class="required">*</span></span>
-                    <input type="password" id="input-password" required>
+                    <input type="password" id="input-password" required [(ngModel)]="password" name="password">
                 </div>
                 <div class="div-input">
                     <span>Confirmar contraseña <span class="required">*</span></span>
-                    <input type="password" id="input-password" required>
+                    <input type="password" id="input-password-confirm" required [(ngModel)]="confirmPassword" name="confirmPassword">
                 </div>
                 <div class="div-input">
                     <input class="btn" type="submit" value="Registrarse">

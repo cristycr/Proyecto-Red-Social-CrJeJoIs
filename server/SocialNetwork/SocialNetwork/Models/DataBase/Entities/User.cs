@@ -13,7 +13,7 @@ public class User {
     public required string Password { get; set; }
     public string Role { get; set; } = "user";
     public string? Surname2 { get; set; }
-    public string AvatarPath { get; set; } = "/defaultAvatar.png"; //??
+    public string? AvatarPath { get; set; } = null;
     public string? Description { get; set; }
 
     // Estas colecciones representan las relaciones con otras entidades
