@@ -2,6 +2,7 @@
     public class GetPostDto {
         public long Id { get; set; }
         public required long UserId { get; set; }
+        public string? UserName { get; set; } //Esta propiedad muestra el nombre del autor
         public DateTime CreationDate { get; set; }
         public string? Title { get; set; } = null;
         public string? Description { get; set; } = null;

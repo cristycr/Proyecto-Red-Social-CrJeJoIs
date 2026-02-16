@@ -10,6 +10,7 @@ public class PostRepository : BaseRepository<Post, long> {
     // METODO SELECT BY USER ID ================
     public async Task<ICollection<Post>> GetPostsByUserIdAsync(long userId) {
         return await GetQueryable()
+            .Include(post => post.User)     //<-- carga los datos del autor
             .Where(post => post.UserId == userId)
             .ToArrayAsync();
     }

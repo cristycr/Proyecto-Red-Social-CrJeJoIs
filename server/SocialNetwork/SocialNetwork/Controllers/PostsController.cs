@@ -10,7 +10,6 @@ namespace SocialNetwork.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-[Authorize] // Con esto sólo usuarios logueados pueden entrar aquí
 public class PostsController : ControllerBase {
 
     // Inyección del Repositorio
@@ -27,15 +26,15 @@ public class PostsController : ControllerBase {
         IEnumerable<Post> posts = await _unitOfWork.PostRepository.GetAllAsync();
 
         IEnumerable<GetPostDto> postsDto = posts
-            .OrderBy(post  => post.CreationDate) //<-- Esto ordena por fecha y hora
+            .OrderByDescending(post  => post.CreationDate) //<-- El más nuevo primero
             .Select(post =>new GetPostDto() {
                 Id = post.Id,
                 UserId = post.UserId,
+                UserName = post.User?.Nickname,
                 CreationDate = post.CreationDate,
                 Title = post.Title,
                 Description = post.Description
-        });
-
+            });
         return postsDto;
     }
 
@@ -46,15 +45,16 @@ public class PostsController : ControllerBase {
     public async Task<IEnumerable<GetPostDto>> GetPostsByUserId(long userId) {
         IEnumerable<Post> posts = await _unitOfWork.PostRepository.GetPostsByUserIdAsync(userId);
 
-        IEnumerable<GetPostDto> postsDto = posts.Select(post =>
-        new GetPostDto() {
-            Id = post.Id,
-            UserId = post.UserId,
-            CreationDate = post.CreationDate,
-            Title = post.Title,
-            Description = post.Description
-        });
-        return postsDto;
+        return posts
+            .OrderByDescending(post => post.CreationDate) //<-- Igual que antes 
+            .Select(post => new GetPostDto() {
+                Id = post.Id,
+                UserId = post.UserId,
+                UserName = post.User?.Nickname,
+                CreationDate = post.CreationDate,
+                Title = post.Title,
+                Description = post.Description
+            });
     }
 
     // GET: api/posts/5
@@ -62,20 +62,19 @@ public class PostsController : ControllerBase {
     public async Task<ActionResult<GetPostDto>> GetPostById(long id) {
         Post? post = await _unitOfWork.PostRepository.GetByIdAsync(id);
 
-        if (post == null)
-            return NotFound();
+        if (post == null) return NotFound();
 
-        GetPostDto postDto = new GetPostDto {
+        return Ok (new GetPostDto {     // <-- Aquí no es necesario ordenar
             Id = post.Id,
             UserId = post.UserId,
+            UserName = post.User?.Nickname,
             CreationDate = post.CreationDate,
             Title = post.Title,
             Description = post.Description
-        };
-
-        return Ok(postDto);
+        });
     }
 
+    [Authorize] // Con esto sólo usuarios logueados pueden entrar aquí
     [HttpPost]
     public async Task<IActionResult> CreatePost([FromBody] AddPostDto dto)
     {
@@ -112,11 +111,13 @@ public class PostsController : ControllerBase {
 
     }
 
+    [Authorize] // Con esto sólo usuarios logueados pueden entrar aquí
     [HttpPut]
     public async Task<Post> UpdatePost([FromBody] Post newPost) {
         return await _unitOfWork.PostRepository.UpdateAsync(newPost);
     }
 
+    [Authorize] // Con esto sólo usuarios logueados pueden entrar aquí
     [HttpDelete]
     public async Task DeletePost([FromBody] Post post) {
         await _unitOfWork.PostRepository.DeleteAsync(post);
