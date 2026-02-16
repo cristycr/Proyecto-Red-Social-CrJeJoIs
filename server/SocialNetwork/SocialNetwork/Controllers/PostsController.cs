@@ -18,16 +18,18 @@ public class PostsController : ControllerBase {
 
     // GET: api/posts
     [HttpGet]
-    public async Task<IEnumerable<GetPostDto>> GetAllPostsOrderBy() {
-        IEnumerable<Post> posts = await _unitOfWork.PostRepository.GetPostsByCreationDateAsync();
+    public async Task<IEnumerable<GetPostUserDto>> GetAllPostsOrderBy() {
+        IEnumerable<GetPostUserDto> posts = await _unitOfWork.PostRepository.GetPostsByCreationDateAsync();
 
-        IEnumerable<GetPostDto> postsDto = posts.Select(post =>
-        new GetPostDto() {
+        IEnumerable<GetPostUserDto> postsDto = posts.Select(post =>
+        new GetPostUserDto() {
             Id = post.Id,
             UserId = post.UserId,
             CreationDate = post.CreationDate,
             Title = post.Title,
-            Description = post.Description
+            Description = post.Description,
+            Nickname = post.Nickname,
+            AvatarPath = post.AvatarPath
         });
 
         return postsDto;
@@ -36,16 +38,18 @@ public class PostsController : ControllerBase {
     // GET: api/posts
     [Authorize]
     [HttpGet("login")]
-    public async Task<IEnumerable<GetPostDto>> GetAllPostsOrderByLogin(long userId) {
-        IEnumerable<Post> posts = await _unitOfWork.PostRepository.GetPostsByCreationDateLoginAsync(userId);
+    public async Task<IEnumerable<GetPostUserDto>> GetAllPostsOrderByLogin(long userId) {
+        IEnumerable<GetPostUserDto> posts = await _unitOfWork.PostRepository.GetPostsByCreationDateLoginAsync(userId);
 
-        IEnumerable<GetPostDto> postsDto = posts.Select(post =>
-        new GetPostDto() {
+        IEnumerable<GetPostUserDto> postsDto = posts.Select(post =>
+        new GetPostUserDto() {
             Id = post.Id,
             UserId = post.UserId,
             CreationDate = post.CreationDate,
             Title = post.Title,
-            Description = post.Description
+            Description = post.Description,
+            Nickname = post.Nickname,
+            AvatarPath = post.AvatarPath
         });
 
         return postsDto;

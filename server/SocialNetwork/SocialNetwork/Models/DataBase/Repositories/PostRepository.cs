@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SocialNetwork.Models.Database.Entities;
+using SocialNetwork.Models.Dtos.Posts;
 
 namespace SocialNetwork.Models.Database.Repositories;
 
@@ -15,14 +16,25 @@ public class PostRepository : BaseRepository<Post, long> {
     }
 
     // Metodo ordenado por fecha de creación DESCENDENTE
-    public async Task<ICollection<Post>> GetPostsByCreationDateAsync() {
+    public async Task<ICollection<GetPostUserDto>> GetPostsByCreationDateAsync() {
         return await GetQueryable()
+            .Include(post => post.User)
             .OrderByDescending(post => post.CreationDate)
+            .Select(post  => new GetPostUserDto {
+                Id = post.Id,
+                UserId = post.UserId,
+                CreationDate = post.CreationDate,
+                Title = post.Title,
+                Description = post.Description,
+                Nickname = post.User!.Nickname,
+                AvatarPath = post.User.AvatarPath
+            })
             .ToArrayAsync();
     }
 
-    public async Task<ICollection<Post>> GetPostsByCreationDateLoginAsync(long userId) {
+    public async Task<ICollection<GetPostUserDto>> GetPostsByCreationDateLoginAsync(long userId) {
         return await GetQueryable()
+            .Include(post => post.User)
             .Join(
                     _dbContext.Following,
                     post => post.UserId,
@@ -32,6 +44,15 @@ public class PostRepository : BaseRepository<Post, long> {
             .Where(x => x.f.FollowerId == userId)
             .Select(x => x.post)
             .OrderByDescending(p => p.CreationDate)
+            .Select(post => new GetPostUserDto {
+                Id = post.Id,
+                UserId = post.UserId,
+                CreationDate = post.CreationDate,
+                Title = post.Title,
+                Description = post.Description,
+                Nickname = post.User!.Nickname,
+                AvatarPath = post.User.AvatarPath
+            })
             .ToArrayAsync();
     }
 }
