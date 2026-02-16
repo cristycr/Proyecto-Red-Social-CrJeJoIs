@@ -17,8 +17,8 @@ public class PostsController : ControllerBase {
 
     // GET: api/posts
     [HttpGet]
-    public async Task<IEnumerable<GetPostDto>> GetAllPosts() {
-        IEnumerable<Post> posts = await _unitOfWork.PostRepository.GetAllAsync();
+    public async Task<IEnumerable<GetPostDto>> GetAllPostsOrderBy() {
+        IEnumerable<Post> posts = await _unitOfWork.PostRepository.GetPostsByCreationDateAsync();
 
         IEnumerable<GetPostDto> postsDto = posts.Select(post =>
         new GetPostDto() {

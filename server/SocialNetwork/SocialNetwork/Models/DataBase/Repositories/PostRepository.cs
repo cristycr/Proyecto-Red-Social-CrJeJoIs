@@ -13,4 +13,11 @@ public class PostRepository : BaseRepository<Post, long> {
             .Where(post => post.UserId == userId)
             .ToArrayAsync();
     }
+
+    // Metodo ordenado por fecha de creación DESCENDENTE
+    public async Task<ICollection<Post>> GetPostsByCreationDateAsync() {
+        return await GetQueryable()
+            .OrderByDescending(post => post.CreationDate)
+            .ToArrayAsync();
+    }
 }
