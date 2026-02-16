@@ -59,7 +59,7 @@ export class ApiService {
 async getUserByNickname(nickname: string): Promise<boolean> {
   try {
     const response = await lastValueFrom(
-      this.http.get(`${this.BASE_URL}users/nickname/${nickname}`, {
+      this.http.get(`${this.BASE_URL}users/by-nickname/${nickname}`, {
         headers: this.getHeaders(),
         observe: 'response'
       })
@@ -75,7 +75,7 @@ async getUserByNickname(nickname: string): Promise<boolean> {
 async getUserByEmail(email: string): Promise<boolean> {
   try {
     const response = await lastValueFrom(
-      this.http.get(`${this.BASE_URL}users/email/${email}`, {
+      this.http.get(`${this.BASE_URL}users/by-email/${email}`, {
         headers: this.getHeaders(),
         observe: 'response'
       })

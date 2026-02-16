@@ -72,6 +72,11 @@ public class UsersController : ControllerBase {
     [HttpPost]
     public async Task<ActionResult<AddUserDto>> AddUser([FromBody] AddUserDto dto) {
 
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(new { message = "Datos inválidos" });
+        }
+
         if (await _unitOfWork.UserRepository.GetUserByNicknameAsync(dto.Nickname) != null)
         {
             return BadRequest(new { error = "nickname", message = "Nickname ya en uso" });

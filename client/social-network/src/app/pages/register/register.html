@@ -1,5 +1,5 @@
 <div class="big-container">
-    <form (submit)="submit()">
+    <form #form="ngForm" (ngSubmit)="submit(form)">
         @if (errorMessage()) {
             <div style="color: red; margin-bottom: 1em; text-align: center;">
                 {{ errorMessage() }}
@@ -40,7 +40,7 @@
                     <input type="password" id="input-password-confirm" required [(ngModel)]="confirmPassword" name="confirmPassword">
                 </div>
                 <div class="div-input">
-                    <input class="btn" type="submit" value="Registrarse">
+                    <input class="btn" type="submit" value="Registrarse" [disabled]="form.invalid">
                     <span class="small-text">¿Ya tienes cuenta? <a routerLink="/login">¡Inicia sesión!</a></span>
                 </div>
             </div>
