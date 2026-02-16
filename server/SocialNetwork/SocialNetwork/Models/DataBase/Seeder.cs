@@ -11,11 +11,11 @@ public class Seeder {
     }
     public void Seed() {
         // Crear usuarios
-        User admin = new User { Email = "admin@example.com", Nickname = "admin", Name = "Administrador", Surname1 = "Sistema", Password = PasswordHelper.Hash("admin123"), Role = "admin", AvatarPath = "/defaultAvatar.png" };
+        User admin = new User { Email = "admin@example.com", Nickname = "admin", Name = "Administrador", Surname1 = "Sistema", Password = PasswordHelper.Hash("admin123"), Role = "admin" };
 
-        User user1 = new User { Email = "user1@example.com", Nickname = "usuario1", Name = "Usuario", Surname1 = "Uno", Password = PasswordHelper.Hash("1111"), Role = "user", AvatarPath = "/defaultAvatar.png" };
+        User user1 = new User { Email = "user1@example.com", Nickname = "usuario1", Name = "Usuario", Surname1 = "Uno", Password = PasswordHelper.Hash("1111"), Role = "user" };
 
-        User user2 = new User { Email = "user2@example.com", Nickname = "usuario2", Name = "Usuario", Surname1 = "Dos", Password = PasswordHelper.Hash("2222"), Role = "user", AvatarPath = "/defaultAvatar.png" };
+        User user2 = new User { Email = "user2@example.com", Nickname = "usuario2", Name = "Usuario", Surname1 = "Dos", Password = PasswordHelper.Hash("2222"), Role = "user" };
 
         // Crear posts para cada usuario
         Post post1 = new Post { UserId = admin.Id, User = admin, Title = "Post admin 1", Description = "Contenido admin 1" };
