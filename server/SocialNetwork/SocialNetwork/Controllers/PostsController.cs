@@ -18,16 +18,18 @@ public class PostsController : ControllerBase {
 
     // GET: api/posts
     [HttpGet]
-    public async Task<IEnumerable<GetPostDto>> GetAllPostsOrderBy() {
+    public async Task<IEnumerable<GetPostUserDto>> GetAllPostsOrderBy() {
         IEnumerable<Post> posts = await _unitOfWork.PostRepository.GetPostsByCreationDateAsync();
 
-        IEnumerable<GetPostDto> postsDto = posts.Select(post =>
-        new GetPostDto() {
+        IEnumerable<GetPostUserDto> postsDto = posts.Select(post =>
+        new GetPostUserDto() {
             Id = post.Id,
             UserId = post.UserId,
             CreationDate = post.CreationDate,
             Title = post.Title,
-            Description = post.Description
+            Description = post.Description,
+            //Nickname = post.User.Nickname,
+            AvatarPath = post.User.AvatarPath
         });
 
         return postsDto;
