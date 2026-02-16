@@ -30,7 +30,7 @@ public class PostsController : ControllerBase {
             .Select(post =>new GetPostDto() {
                 Id = post.Id,
                 UserId = post.UserId,
-                UserName = post.User?.Nickname,
+                Nickname = post.User?.Nickname,
                 CreationDate = post.CreationDate,
                 Title = post.Title,
                 Description = post.Description
@@ -45,16 +45,17 @@ public class PostsController : ControllerBase {
     public async Task<IEnumerable<GetPostDto>> GetPostsByUserId(long userId) {
         IEnumerable<Post> posts = await _unitOfWork.PostRepository.GetPostsByUserIdAsync(userId);
 
-        return posts
-            .OrderByDescending(post => post.CreationDate) //<-- Igual que antes 
+        IEnumerable<GetPostDto> postsDto = posts
+            .OrderByDescending(post => post.CreationDate)
             .Select(post => new GetPostDto() {
-                Id = post.Id,
-                UserId = post.UserId,
-                UserName = post.User?.Nickname,
-                CreationDate = post.CreationDate,
-                Title = post.Title,
-                Description = post.Description
+                    Id = post.Id,
+                    UserId = post.UserId,
+                    Nickname = post.User?.Nickname, // <-- Aquí verás si el repo de tus compis falla
+                    CreationDate = post.CreationDate,
+                    Title = post.Title,
+                    Description = post.Description
             });
+        return postsDto;
     }
 
     // GET: api/posts/5
@@ -67,7 +68,7 @@ public class PostsController : ControllerBase {
         return Ok (new GetPostDto {     // <-- Aquí no es necesario ordenar
             Id = post.Id,
             UserId = post.UserId,
-            UserName = post.User?.Nickname,
+            Nickname = post.User?.Nickname,
             CreationDate = post.CreationDate,
             Title = post.Title,
             Description = post.Description
@@ -121,5 +122,34 @@ public class PostsController : ControllerBase {
     [HttpDelete]
     public async Task DeletePost([FromBody] Post post) {
         await _unitOfWork.PostRepository.DeleteAsync(post);
+    }
+
+    //Endpoit para ver quien se sigue
+    [HttpGet("feed")]
+    [Authorize]
+    public async Task<ActionResult<IEnumerable<GetPostDto>>> GetFollowedFeed()
+    {
+        // Extraemos el ID del Token
+        var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                           ?? User.FindFirst("id")?.Value
+                           ?? User.FindFirst("sub")?.Value;
+
+        if (!long.TryParse(userIdString, out long currentUserId)) return Unauthorized();
+
+        // Se solicita al repositorio los posts de los seguidos
+        var posts = await _unitOfWork.PostRepository.GetFeedByFollowedUsersAsync(currentUserId);
+
+        // Se mapea a GetPostDto 
+        var result = posts.Select(p => new GetPostDto
+        {
+            Id = p.Id,
+            UserId = p.UserId,
+            Nickname = p.User.Nickname,
+            CreationDate = p.CreationDate,
+            Title = p.Title,
+            Description = p.Description
+        });
+
+        return Ok(result);
     }
 }
