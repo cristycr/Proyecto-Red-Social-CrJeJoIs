@@ -1,48 +1,95 @@
 <div class="big-container">
-    <form #form="ngForm" (ngSubmit)="submit(form)">
-        @if (errorMessage()) {
-            <div style="color: red; margin-bottom: 1em; text-align: center;">
-                {{ errorMessage() }}
-            </div>
-        }
+    <form [formGroup]="registerForm" (ngSubmit)="submit()">
+
+        <!-- Mensaje de error global -->
+        <div *ngIf="errorMessage()" style="color: red; margin-bottom: 1em; text-align: center;">
+            {{ errorMessage() }}
+        </div>
+
         <div class="container">
             <div class="container-header">
                 <h1>¡Bienvenido a TechIt!</h1>
                 <span>Rellena los datos para crear tu cuenta.</span>
             </div>
+
             <div class="div-form">
+
+                <!-- Nombre -->
                 <div class="div-input">
                     <span>Nombre<span class="required">*</span></span>
-                    <input type="text" id="name" required [(ngModel)]="name" name="name">
+                    <input type="text" formControlName="name" placeholder="Nombre">
+                    <div class="error" *ngIf="registerForm.get('name')?.touched && registerForm.get('name')?.invalid">
+                        Nombre obligatorio (mínimo 2 caracteres)
+                    </div>
+                    <div class="error" *ngIf="fieldErrors['name']">{{ fieldErrors['name'] }}</div>
                 </div>
+
+                <!-- Primer apellido -->
                 <div class="div-input">
                     <span>Primer apellido<span class="required">*</span></span>
-                    <input type="text" id="surname1" required [(ngModel)]="surname1" name="surname1">
+                    <input type="text" formControlName="surname1" placeholder="Primer Apellido">
+                    <div class="error"
+                        *ngIf="registerForm.get('surname1')?.touched && registerForm.get('surname1')?.invalid">
+                        Primer apellido obligatorio (mínimo 2 caracteres)
+                    </div>
+                    <div class="error" *ngIf="fieldErrors['surname1']">{{ fieldErrors['surname1'] }}</div>
                 </div>
+
+                <!-- Segundo apellido (opcional) -->
                 <div class="div-input">
                     <span>Segundo apellido</span>
-                    <input type="text" id="surname2" [(ngModel)]="surname2" name="surname2">
+                    <input type="text" formControlName="surname2" placeholder="Segundo Apellido">
+                    <div class="error" *ngIf="fieldErrors['surname2']">{{ fieldErrors['surname2'] }}</div>
                 </div>
+
+                <!-- Nickname -->
                 <div class="div-input">
                     <span>Nickname<span class="required">*</span></span>
-                    <input type="text" id="nickname" required [(ngModel)]="nickname" name="nickname">
+                    <input type="text" formControlName="nickname" placeholder="Nickname">
+                    <div class="error"
+                        *ngIf="registerForm.get('nickname')?.touched && registerForm.get('nickname')?.invalid">
+                        Nickname obligatorio (mínimo 3 caracteres)
+                    </div>
+                    <div class="error" *ngIf="fieldErrors['nickname']">{{ fieldErrors['nickname'] }}</div>
                 </div>
+
+                <!-- Email -->
                 <div class="div-input">
                     <span>Correo electrónico<span class="required">*</span></span>
-                    <input type="text" id="input-email" required [(ngModel)]="email" name="email">
+                    <input type="email" formControlName="email" placeholder="Correo electrónico">
+                    <div class="error" *ngIf="registerForm.get('email')?.touched && registerForm.get('email')?.invalid">
+                        Email inválido
+                    </div>
+                    <div class="error" *ngIf="fieldErrors['email']">{{ fieldErrors['email'] }}</div>
                 </div>
+
+                <!-- Contraseña -->
                 <div class="div-input">
                     <span>Contraseña <span class="required">*</span></span>
-                    <input type="password" id="input-password" required [(ngModel)]="password" name="password">
+                    <input type="password" formControlName="password" placeholder="Contraseña">
+                    <div class="error"
+                        *ngIf="registerForm.get('password')?.touched && registerForm.get('password')?.invalid">
+                        Contraseña obligatoria (mínimo 6 caracteres)
+                    </div>
+                    <div class="error" *ngIf="fieldErrors['password']">{{ fieldErrors['password'] }}</div>
                 </div>
+
+                <!-- Confirmar contraseña -->
                 <div class="div-input">
                     <span>Confirmar contraseña <span class="required">*</span></span>
-                    <input type="password" id="input-password-confirm" required [(ngModel)]="confirmPassword" name="confirmPassword">
+                    <input type="password" formControlName="confirmPassword" placeholder="Confirmar Contraseña">
+                    <div class="error"
+                        *ngIf="registerForm.errors?.['passwordsMismatch'] && registerForm.get('confirmPassword')?.touched">
+                        Las contraseñas no coinciden
+                    </div>
                 </div>
+
+                <!-- Botón de registro -->
                 <div class="div-input">
-                    <input class="btn" type="submit" value="Registrarse" [disabled]="form.invalid">
+                    <button type="submit" class="btn" [disabled]="registerForm.invalid">Registrarse</button>
                     <span class="small-text">¿Ya tienes cuenta? <a routerLink="/login">¡Inicia sesión!</a></span>
                 </div>
+
             </div>
         </div>
     </form>
