@@ -28,7 +28,7 @@ html, body {
 }
 
 body.login-background {
-    background-image: url("assets/images/login-background.jpg");
+    background-image: url("/assets/images/login-background.jpg");
     background-repeat: repeat;
     background-size: 512px 512px;
 }
