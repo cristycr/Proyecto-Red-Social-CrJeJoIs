@@ -6,8 +6,16 @@
     --primary-color-hover: #222223;
     --secondary-color: #816cba;
     --secondary-color-hover: #6e57ac;
+    --secondary-color-light: #9d8ec9;
+    --secondary-color-dark: #4a3d6f;
+    --secondary-color-transparent-light: rgba(129, 108, 186, 0.1);
+    --secondary-color-transparent-medium: rgba(129, 108, 186, 0.15);
+    --secondary-color-transparent-border: rgba(129, 108, 186, 0.3);
+    --secondary-color-transparent-shadow: rgba(129, 108, 186, 0.2);
     --text-color: #ffffff;
     --alert-color: #f98282;
+    --bg-dark-gradient-start: #1a1a2e;
+    --bg-dark-gradient-end: #16213e;
 }
 
 html, body {
