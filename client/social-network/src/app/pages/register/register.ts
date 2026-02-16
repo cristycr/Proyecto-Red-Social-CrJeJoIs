@@ -44,6 +44,35 @@ export class Register implements OnInit, OnDestroy {
     return password === confirm ? null : { passwordsMismatch: true };
   }
 
+  getLabel(field: string): string {
+    const labels: Record<string, string> = {
+      name: 'Nombre',
+      surname1: 'Primer apellido',
+      surname2: 'Segundo apellido',
+      nickname: 'Nickname',
+      email: 'Correo electrónico',
+      password: 'Contraseña',
+      confirmPassword: 'Confirmar contraseña'
+    };
+    return labels[field] ?? field;
+  }
+
+  isRequired(field: string): boolean {
+    return ['name', 'surname1', 'nickname', 'email', 'password', 'confirmPassword'].includes(field);
+  }
+
+  getAngularError(field: string): string {
+    const control = this.registerForm.get(field);
+    if (!control || !control.errors) return '';
+    if (control.errors['required']) return `${this.getLabel(field)} es obligatorio.`;
+    if (control.errors['minlength']) {
+      const min = control.errors['minlength'].requiredLength;
+      return `${this.getLabel(field)} debe tener mínimo ${min} caracteres.`;
+    }
+    if (control.errors['email']) return 'Correo electrónico inválido.';
+    return '';
+  }
+
   async submit() {
     // Reiniciamos errores
     this.errorMessage.set('');
@@ -82,18 +111,19 @@ export class Register implements OnInit, OnDestroy {
         return;
       }
 
-      // Procesamos errores del backend
-      if (result.error != null && typeof result.error === 'object') {
-        const backendErrors = result.error as { [key: string]: string | string[] }; // decimos que es objeto
-        for (const key of Object.keys(backendErrors)) {
-          const field = key.charAt(0).toLowerCase() + key.slice(1);
-          if (this.registerForm.controls[field]) {
-            const value = backendErrors[key];
-            this.fieldErrors[field] = Array.isArray(value) ? value[0] : String(value);
+      // Procesamos errores del backend por campo
+      if (result.error && typeof result.error === 'object') {
+        const errorObj = result.error as Record<string, string>; // <-- cast seguro
+        for (const key in errorObj) {
+          if (Object.prototype.hasOwnProperty.call(errorObj, key)) {
+            const field = key.toLowerCase();
+            if (this.registerForm.controls[field]) {
+              this.fieldErrors[field] = errorObj[key];
+            }
           }
         }
       } else {
-        // Si es string o null/undefined, lo mostramos como mensaje global
+        // Si es string o null/undefined, mostramos mensaje global
         this.errorMessage.set(result.error ?? 'Error al registrar usuario');
       }
 

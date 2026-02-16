@@ -1,8 +1,8 @@
 <div class="big-container">
     <form [formGroup]="registerForm" (ngSubmit)="submit()">
 
-        <!-- Mensaje de error global -->
-        <div *ngIf="errorMessage()" style="color: red; margin-bottom: 1em; text-align: center;">
+        <!-- Mensaje de error global: errores del backend o submit -->
+        <div *ngIf="errorMessage()" class="error-global">
             {{ errorMessage() }}
         </div>
 
@@ -14,75 +14,32 @@
 
             <div class="div-form">
 
-                <!-- Nombre -->
-                <div class="div-input">
-                    <span>Nombre<span class="required">*</span></span>
-                    <input type="text" formControlName="name" placeholder="Nombre">
-                    <div class="error" *ngIf="registerForm.get('name')?.touched && registerForm.get('name')?.invalid">
-                        Nombre obligatorio (mínimo 2 caracteres)
-                    </div>
-                    <div class="error" *ngIf="fieldErrors['name']">{{ fieldErrors['name'] }}</div>
-                </div>
+                <!-- Campos dinámicos -->
+                <ng-container
+                    *ngFor="let field of ['name','surname1','surname2','nickname','email','password','confirmPassword']">
 
-                <!-- Primer apellido -->
-                <div class="div-input">
-                    <span>Primer apellido<span class="required">*</span></span>
-                    <input type="text" formControlName="surname1" placeholder="Primer Apellido">
-                    <div class="error"
-                        *ngIf="registerForm.get('surname1')?.touched && registerForm.get('surname1')?.invalid">
-                        Primer apellido obligatorio (mínimo 2 caracteres)
-                    </div>
-                    <div class="error" *ngIf="fieldErrors['surname1']">{{ fieldErrors['surname1'] }}</div>
-                </div>
+                    <div class="div-input">
+                        <span>
+                            {{ getLabel(field) }}<span *ngIf="isRequired(field)" class="required">*</span>
+                        </span>
 
-                <!-- Segundo apellido (opcional) -->
-                <div class="div-input">
-                    <span>Segundo apellido</span>
-                    <input type="text" formControlName="surname2" placeholder="Segundo Apellido">
-                    <div class="error" *ngIf="fieldErrors['surname2']">{{ fieldErrors['surname2'] }}</div>
-                </div>
+                        <input [type]="field === 'password' || field === 'confirmPassword' ? 'password' : 'text'"
+                            [formControlName]="field" [placeholder]="getLabel(field)"
+                            [autocomplete]="field === 'password' || field === 'confirmPassword' ? 'new-password' : 'off'">
 
-                <!-- Nickname -->
-                <div class="div-input">
-                    <span>Nickname<span class="required">*</span></span>
-                    <input type="text" formControlName="nickname" placeholder="Nickname">
-                    <div class="error"
-                        *ngIf="registerForm.get('nickname')?.touched && registerForm.get('nickname')?.invalid">
-                        Nickname obligatorio (mínimo 3 caracteres)
-                    </div>
-                    <div class="error" *ngIf="fieldErrors['nickname']">{{ fieldErrors['nickname'] }}</div>
-                </div>
+                        <!-- Error de validación Angular debajo del input -->
+                        <div class="error" *ngIf="registerForm.get(field)?.touched && registerForm.get(field)?.invalid">
+                            {{ getAngularError(field) }}
+                        </div>
 
-                <!-- Email -->
-                <div class="div-input">
-                    <span>Correo electrónico<span class="required">*</span></span>
-                    <input type="email" formControlName="email" placeholder="Correo electrónico">
-                    <div class="error" *ngIf="registerForm.get('email')?.touched && registerForm.get('email')?.invalid">
-                        Email inválido
+                        <!-- Error de password mismatch -->
+                        <div class="error"
+                            *ngIf="field === 'confirmPassword' && registerForm.errors?.['passwordsMismatch'] && registerForm.get('confirmPassword')?.touched">
+                            Las contraseñas no coinciden
+                        </div>
                     </div>
-                    <div class="error" *ngIf="fieldErrors['email']">{{ fieldErrors['email'] }}</div>
-                </div>
 
-                <!-- Contraseña -->
-                <div class="div-input">
-                    <span>Contraseña <span class="required">*</span></span>
-                    <input type="password" formControlName="password" placeholder="Contraseña">
-                    <div class="error"
-                        *ngIf="registerForm.get('password')?.touched && registerForm.get('password')?.invalid">
-                        Contraseña obligatoria (mínimo 6 caracteres)
-                    </div>
-                    <div class="error" *ngIf="fieldErrors['password']">{{ fieldErrors['password'] }}</div>
-                </div>
-
-                <!-- Confirmar contraseña -->
-                <div class="div-input">
-                    <span>Confirmar contraseña <span class="required">*</span></span>
-                    <input type="password" formControlName="confirmPassword" placeholder="Confirmar Contraseña">
-                    <div class="error"
-                        *ngIf="registerForm.errors?.['passwordsMismatch'] && registerForm.get('confirmPassword')?.touched">
-                        Las contraseñas no coinciden
-                    </div>
-                </div>
+                </ng-container>
 
                 <!-- Botón de registro -->
                 <div class="div-input">
@@ -94,3 +51,24 @@
         </div>
     </form>
 </div>
+
+<style>
+    .error,
+    .error-global {
+        color: red;
+        font-size: 0.9em;
+        margin-top: 0.2em;
+    }
+
+    /* Mensaje global más grande y centrado */
+    .error-global {
+        font-size: 1.2em;
+        font-weight: bold;
+        text-align: center;
+        margin-bottom: 1em;
+    }
+
+    .required {
+        color: red;
+    }
+</style>
