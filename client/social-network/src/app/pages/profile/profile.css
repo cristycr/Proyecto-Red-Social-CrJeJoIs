@@ -1,9 +1,9 @@
 /* Contenedor principal del perfil */
 .container {
-	width: 100%;
-	border-radius: 16px;
+	width: 95%;
 	box-shadow: 0 2px 12px var(--secondary-color-transparent-shadow);
-	padding: 32px 24px 24px 24px;
+    padding: 24px;
+    margin: auto;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
@@ -65,4 +65,20 @@
 p {
     max-width: 50ch;
     color: var(--primary-color);
+}
+
+button {
+    background-color: rgb(178, 84, 84);
+    color: var(--text-color);
+    border: none;
+    padding: 10px 20px;
+    margin-top: 24px;
+    border-radius: 10px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: rgba(187, 21, 21, 0.8);
 }
