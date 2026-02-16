@@ -27,8 +27,25 @@ export class ApiService {
       return Result.success(response.status, response.body as T);
 
     } catch (error: any) {
-      const status = error instanceof HttpErrorResponse ? error.status : 500;
-      const message = error instanceof HttpErrorResponse ? (error.error?.message || error.message || error.statusText) : error.message || 'Unknown error';
+
+      let message = 'Error desconocido';
+      let status = 500;
+
+      if (error instanceof HttpErrorResponse) {
+        status = error.status;
+
+        if (error.error?.message) {
+          message = error.error.message;
+        }
+        else if (error.error?.errors) {
+          const firstKey = Object.keys(error.error.errors)[0];
+          message = error.error.errors[firstKey][0];
+        }
+        else {
+          message = error.message || error.statusText;
+        }
+      }
+
       return Result.error(status, message);
     }
   }
@@ -56,35 +73,34 @@ export class ApiService {
   }
 
   // Comprueba si existe un usuario con el nickname dado
-async getUserByNickname(nickname: string): Promise<boolean> {
-  try {
-    const response = await lastValueFrom(
-      this.http.get(`${this.BASE_URL}users/nickname/${nickname}`, {
-        headers: this.getHeaders(),
-        observe: 'response'
-      })
-    );
-    return response.status === 200 && !!response.body; // true si existe
-  } catch (err: any) {
-    if (err.status === 404) return false; // no existe
-    throw err; // cualquier otro error
+  async getUserByNickname(nickname: string): Promise<boolean> {
+    try {
+      const response = await lastValueFrom(
+        this.http.get(`${this.BASE_URL}users/by-nickname/${nickname}`, {
+          headers: this.getHeaders(),
+          observe: 'response'
+        })
+      );
+      return response.status === 200 && !!response.body; // true si existe
+    } catch (err: any) {
+      if (err.status === 404) return false; // no existe
+      throw err; // cualquier otro error
+    }
   }
-}
 
-// Comprueba si existe un usuario con el email dado
-async getUserByEmail(email: string): Promise<boolean> {
-  try {
-    const response = await lastValueFrom(
-      this.http.get(`${this.BASE_URL}users/email/${email}`, {
-        headers: this.getHeaders(),
-        observe: 'response'
-      })
-    );
-    return response.status === 200 && !!response.body; // true si existe
-  } catch (err: any) {
-    if (err.status === 404) return false; // no existe
-    throw err; // cualquier otro error
+  // Comprueba si existe un usuario con el email dado
+  async getUserByEmail(email: string): Promise<boolean> {
+    try {
+      const response = await lastValueFrom(
+        this.http.get(`${this.BASE_URL}users/by-email/${email}`, {
+          headers: this.getHeaders(),
+          observe: 'response'
+        })
+      );
+      return response.status === 200 && !!response.body; // true si existe
+    } catch (err: any) {
+      if (err.status === 404) return false; // no existe
+      throw err; // cualquier otro error
+    }
   }
-}
-
 }

@@ -1,49 +1,74 @@
 <div class="big-container">
-    <form (submit)="submit()">
-        @if (errorMessage()) {
-            <div style="color: red; margin-bottom: 1em; text-align: center;">
-                {{ errorMessage() }}
-            </div>
-        }
+    <form [formGroup]="registerForm" (ngSubmit)="submit()">
+
+        <!-- Mensaje de error global: errores del backend o submit -->
+        <div *ngIf="errorMessage()" class="error-global">
+            {{ errorMessage() }}
+        </div>
+
         <div class="container">
             <div class="container-header">
                 <h1>¡Bienvenido a TechIt!</h1>
                 <span>Rellena los datos para crear tu cuenta.</span>
             </div>
+
             <div class="div-form">
+
+                <!-- Campos dinámicos -->
+                <ng-container
+                    *ngFor="let field of ['name','surname1','surname2','nickname','email','password','confirmPassword']">
+
+                    <div class="div-input">
+                        <span>
+                            {{ getLabel(field) }}<span *ngIf="isRequired(field)" class="required">*</span>
+                        </span>
+
+                        <input [type]="field === 'password' || field === 'confirmPassword' ? 'password' : 'text'"
+                            [formControlName]="field" [placeholder]="getLabel(field)"
+                            [autocomplete]="field === 'password' || field === 'confirmPassword' ? 'new-password' : 'off'">
+
+                        <!-- Error de validación Angular debajo del input -->
+                        <div class="error" *ngIf="registerForm.get(field)?.touched && registerForm.get(field)?.invalid">
+                            {{ getAngularError(field) }}
+                        </div>
+
+                        <!-- Error de password mismatch -->
+                        <div class="error"
+                            *ngIf="field === 'confirmPassword' && registerForm.errors?.['passwordsMismatch'] && registerForm.get('confirmPassword')?.touched">
+                            Las contraseñas no coinciden
+                        </div>
+                    </div>
+
+                </ng-container>
+
+                <!-- Botón de registro -->
                 <div class="div-input">
-                    <span>Nombre<span class="required">*</span></span>
-                    <input type="text" id="name" required [(ngModel)]="name" name="name">
-                </div>
-                <div class="div-input">
-                    <span>Primer apellido<span class="required">*</span></span>
-                    <input type="text" id="surname1" required [(ngModel)]="surname1" name="surname1">
-                </div>
-                <div class="div-input">
-                    <span>Segundo apellido</span>
-                    <input type="text" id="surname2" [(ngModel)]="surname2" name="surname2">
-                </div>
-                <div class="div-input">
-                    <span>Nickname<span class="required">*</span></span>
-                    <input type="text" id="nickname" required [(ngModel)]="nickname" name="nickname">
-                </div>
-                <div class="div-input">
-                    <span>Correo electrónico<span class="required">*</span></span>
-                    <input type="text" id="input-email" required [(ngModel)]="email" name="email">
-                </div>
-                <div class="div-input">
-                    <span>Contraseña <span class="required">*</span></span>
-                    <input type="password" id="input-password" required [(ngModel)]="password" name="password">
-                </div>
-                <div class="div-input">
-                    <span>Confirmar contraseña <span class="required">*</span></span>
-                    <input type="password" id="input-password-confirm" required [(ngModel)]="confirmPassword" name="confirmPassword">
-                </div>
-                <div class="div-input">
-                    <input class="btn" type="submit" value="Registrarse">
+                    <button type="submit" class="btn" [disabled]="registerForm.invalid">Registrarse</button>
                     <span class="small-text">¿Ya tienes cuenta? <a routerLink="/login">¡Inicia sesión!</a></span>
                 </div>
+
             </div>
         </div>
     </form>
 </div>
+
+<style>
+    .error,
+    .error-global {
+        color: red;
+        font-size: 0.9em;
+        margin-top: 0.2em;
+    }
+
+    /* Mensaje global más grande y centrado */
+    .error-global {
+        font-size: 1.2em;
+        font-weight: bold;
+        text-align: center;
+        margin-bottom: 1em;
+    }
+
+    .required {
+        color: red;
+    }
+</style>

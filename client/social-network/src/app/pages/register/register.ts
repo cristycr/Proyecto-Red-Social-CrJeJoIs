@@ -1,27 +1,34 @@
 import { Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { RouterLink, Router } from '@angular/router';
-import { AddUserDto } from '../../models/add-user-dto';
+import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angular/forms';
+import { CommonModule, NgIf } from '@angular/common';
 import { ApiService } from '../../services/api';
-import { FormsModule } from '@angular/forms';
+import { AddUserDto } from '../../models/add-user-dto';
 
 @Component({
   selector: 'app-register',
-  imports: [RouterLink, FormsModule],
+  standalone: true,
+  imports: [RouterLink, ReactiveFormsModule, NgIf, CommonModule],
   templateUrl: './register.html',
-  styleUrl: './register.css',
+  styleUrls: ['./register.css'],
 })
 export class Register implements OnInit, OnDestroy {
-  name: string = '';
-  surname1: string = '';
-  surname2: string = '';
-  nickname: string = '';
-  email: string = '';
-  password: string = '';
-  confirmPassword: string = '';
-  avatarPath: string | null = null;
-  errorMessage = signal('');
 
-  constructor(private api: ApiService, private router: Router) {}
+  registerForm: FormGroup;
+  errorMessage = signal('');
+  fieldErrors: { [key: string]: string } = {}; // errores por campo
+
+  constructor(private fb: FormBuilder, private api: ApiService, private router: Router) {
+    this.registerForm = this.fb.group({
+      name: ['', [Validators.required, Validators.minLength(2)]],
+      surname1: ['', [Validators.required, Validators.minLength(2)]],
+      surname2: [''],
+      nickname: ['', [Validators.required, Validators.minLength(3)]],
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      confirmPassword: ['', Validators.required]
+    }, { validators: this.passwordMatchValidator });
+  }
 
   ngOnInit() {
     document.body.classList.add('login-background');
@@ -31,42 +38,97 @@ export class Register implements OnInit, OnDestroy {
     document.body.classList.remove('login-background');
   }
 
-  async submit() {
-    // Validación básica de contraseñas
-    this.errorMessage.set('');
-    if (this.password !== this.confirmPassword) {
-      this.errorMessage.set('Las contraseñas no coinciden.');
-      return;
-    }
+  passwordMatchValidator(form: FormGroup) {
+    const password = form.get('password')?.value;
+    const confirm = form.get('confirmPassword')?.value;
+    return password === confirm ? null : { passwordsMismatch: true };
+  }
 
-    // Validar duplicados
-    if (await this.api.getUserByNickname(this.nickname)) {
-      this.errorMessage.set('Ya existe un usuario con ese nickname.');
-      return;
-    }
-
-    if (await this.api.getUserByEmail(this.email)) {
-      this.errorMessage.set('Ese email ya está registrado.');
-      return;
-    }
-
-    // Enviar propiedades con mayúscula inicial para .NET
-    const user: any = {
-      Name: this.name,
-      Surname1: this.surname1,
-      Nickname: this.nickname,
-      Email: this.email,
-      Password: this.password
+  getLabel(field: string): string {
+    const labels: Record<string, string> = {
+      name: 'Nombre',
+      surname1: 'Primer apellido',
+      surname2: 'Segundo apellido',
+      nickname: 'Nickname',
+      email: 'Correo electrónico',
+      password: 'Contraseña',
+      confirmPassword: 'Confirmar contraseña'
     };
-    if (this.surname2) user.Surname2 = this.surname2;
-    if (this.avatarPath) user.AvatarPath = this.avatarPath;
+    return labels[field] ?? field;
+  }
 
-    const result = await this.api.post<AddUserDto>('users', user);
-    if (result.success) {
-    this.router.navigate(['/login']);
-    } else {
-      
-      this.errorMessage.set(result.error || 'Error al registrar usuario');
+  isRequired(field: string): boolean {
+    return ['name', 'surname1', 'nickname', 'email', 'password', 'confirmPassword'].includes(field);
+  }
+
+  getAngularError(field: string): string {
+    const control = this.registerForm.get(field);
+    if (!control || !control.errors) return '';
+    if (control.errors['required']) return `${this.getLabel(field)} es obligatorio.`;
+    if (control.errors['minlength']) {
+      const min = control.errors['minlength'].requiredLength;
+      return `${this.getLabel(field)} debe tener mínimo ${min} caracteres.`;
+    }
+    if (control.errors['email']) return 'Correo electrónico inválido.';
+    return '';
+  }
+
+  async submit() {
+    // Reiniciamos errores
+    this.errorMessage.set('');
+    this.fieldErrors = {};
+
+    if (this.registerForm.invalid) {
+      this.errorMessage.set('Revisa los campos obligatorios o errores.');
+      return;
+    }
+
+    const formValue = this.registerForm.value;
+    const user: any = {
+      Name: formValue.name,
+      Surname1: formValue.surname1,
+      Surname2: formValue.surname2 || undefined,
+      Nickname: formValue.nickname,
+      Email: formValue.email,
+      Password: formValue.password
+    };
+
+    try {
+      // Validar duplicados
+      if (await this.api.getUserByNickname(user.Nickname)) {
+        this.fieldErrors['nickname'] = 'Nickname ya en uso.';
+        return;
+      }
+      if (await this.api.getUserByEmail(user.Email)) {
+        this.fieldErrors['email'] = 'Email ya en uso.';
+        return;
+      }
+
+      const result = await this.api.post<AddUserDto>('users', user);
+
+      if (result.success) {
+        this.router.navigate(['/login']);
+        return;
+      }
+
+      // Procesamos errores del backend por campo
+      if (result.error && typeof result.error === 'object') {
+        const errorObj = result.error as Record<string, string>; // <-- cast seguro
+        for (const key in errorObj) {
+          if (Object.prototype.hasOwnProperty.call(errorObj, key)) {
+            const field = key.toLowerCase();
+            if (this.registerForm.controls[field]) {
+              this.fieldErrors[field] = errorObj[key];
+            }
+          }
+        }
+      } else {
+        // Si es string o null/undefined, mostramos mensaje global
+        this.errorMessage.set(result.error ?? 'Error al registrar usuario');
+      }
+
+    } catch {
+      this.errorMessage.set('Error de conexión con el servidor.');
     }
   }
 }
