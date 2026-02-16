@@ -32,13 +32,3 @@ body.login-background {
     background-repeat: repeat;
     background-size: 512px 512px;
 }
-
-a {
-    text-decoration: none;
-    color: var(--secondary-color);
-}
-
-a:hover {
-    cursor: pointer;
-    text-decoration: underline;
-}

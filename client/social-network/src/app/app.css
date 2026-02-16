@@ -1,6 +1,14 @@
+/* Header logo style (igual que footer-logo) */
+.header-logo {
+    color: var(--text-color);
+    font-size: 1.6rem;
+    font-weight: bold;
+    text-decoration: none;
+    letter-spacing: 2px;
+}
+
 header {
     background: linear-gradient(135deg, var(--bg-dark-gradient-start) 0%, var(--bg-dark-gradient-end) 100%);
-    color: var(--text-color);
     padding: 24px;
     display: flex;
     justify-content: space-between;
@@ -17,6 +25,17 @@ ul {
     justify-content: right;
     padding: 0 40px;
     gap: 40px;
+}
+
+a {
+    text-decoration: none;
+    color: var(--text-color);
+    transition: color 0.2s, text-shadow 0.2s;
+}
+
+a:hover {
+    color: var(--secondary-color-hover);
+    text-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
 
 /* Footer style */
@@ -59,7 +78,7 @@ footer .footer-links a {
 }
 
 footer .footer-links a:hover {
-    color: #fff;
+    color: white;
 }
 
 footer .footer-social {

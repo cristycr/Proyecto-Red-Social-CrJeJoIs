@@ -4,7 +4,7 @@
     justify-content: center;
     width: 784px;
     background-color: var(--primary-color);
-    margin: auto;
+    margin: 60px auto;
     border-radius: 10px;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
 }
@@ -90,4 +90,15 @@ input[type="checkbox"] {
 
 h4, p {
     color: var(--primary-color);
+}
+
+span a {
+    color: var(--secondary-color);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+span a:hover {
+    color: var(--secondary-color-hover);
+    text-decoration: underline;
 }
