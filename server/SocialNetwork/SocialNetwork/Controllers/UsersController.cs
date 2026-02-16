@@ -58,18 +58,30 @@ public class UsersController : ControllerBase {
 
     // Get by nickname
     [HttpGet("by-nickname/{nickname}")]
-    public async Task<User?> GetUserByNickname(string nickname) {
-        return await _unitOfWork.UserRepository.GetUserByNicknameAsync(nickname);
+    public async Task<ActionResult<GetUserDto>> GetUserByNickname(string nickname)
+    {
+        var user = await _unitOfWork.UserRepository.GetUserByNicknameAsync(nickname);
+
+        if (user == null)
+            return NoContent();
+
+        return Ok();
     }
 
     // Get by email
     [HttpGet("by-email/{email}")]
-    public async Task<User?> GetUserByEmail(string email) {
-        return await _unitOfWork.UserRepository.GetUserByEmailAsync(email);
+    public async Task<ActionResult<GetUserDto>> GetUserByEmail(string email)
+    {
+        var user = await _unitOfWork.UserRepository.GetUserByEmailAsync(email);
+
+        if (user == null)
+            return NoContent();
+
+        return Ok();
     }
 
-    // POST
-    [HttpPost]
+        // POST
+        [HttpPost]
     public async Task<ActionResult<AddUserDto>> AddUser([FromBody] AddUserDto dto) {
 
         if (!ModelState.IsValid)
