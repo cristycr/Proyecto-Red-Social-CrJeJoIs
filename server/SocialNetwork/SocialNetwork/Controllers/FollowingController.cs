@@ -8,16 +8,14 @@ namespace SocialNetwork.Controllers {
     [Route("api/[controller]")]
     [ApiController]
     public class FollowingController : ControllerBase {
-        // Se cambia la variable privada del repositorio a UnitOfWork
         private readonly UnitOfWork _unitOfWork;
 
-        // INYECCIÓN DE DEPENDENCIAS ==========================================================================
-        // Se cambia también el Constructor a UnitOfWork
+        // INYECCIÓN DE DEPENDENCIAS
         public FollowingController(UnitOfWork unitOfWork) {
             _unitOfWork = unitOfWork;
         }
 
-        // PETICIÓN DE SEGUIDOS (GET) =========================================================================
+        // PETICIÓN DE SEGUIDOS (GET)
         [HttpGet]
         public async Task<IEnumerable<GetFollowingDto>> GetAllFollowing() {
             ICollection<Following> following = await _unitOfWork.FollowingRepository.GetAllAsync();
