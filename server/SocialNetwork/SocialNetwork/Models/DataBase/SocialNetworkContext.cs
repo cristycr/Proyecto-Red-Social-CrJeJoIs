@@ -23,13 +23,13 @@ public class SocialNetworkContext : DbContext // Tiene que heredar de DbContext
         modelBuilder.Entity<Following>()
             .HasOne(f => f.Follower) // La propiedad en Following que representa al seguidor
             .WithMany(u => u.Following) // La colección en User que representa a los seguidos
-            .HasForeignKey(f => f.IdFollower) // La clave foránea en Following
+            .HasForeignKey(f => f.FollowerId) // La clave foránea en Following
             .OnDelete(DeleteBehavior.Restrict); // Evita eliminaciones en cascada
 
         modelBuilder.Entity<Following>()
             .HasOne(f => f.Followed) // La propiedad en Following que representa al seguido
             .WithMany(u => u.Followers) // La colección en User que representa a los seguidores
-            .HasForeignKey(f => f.IdFollowed) // La clave foránea en Following
+            .HasForeignKey(f => f.FollowedId) // La clave foránea en Following
             .OnDelete(DeleteBehavior.Restrict); // Evita eliminaciones en cascada
 
         modelBuilder.Entity<Post>() // ¿Mantener?
@@ -40,7 +40,7 @@ public class SocialNetworkContext : DbContext // Tiene que heredar de DbContext
         modelBuilder.Entity<Following>() // Restricción para evitar auto-follow
             .ToTable(t => t.HasCheckConstraint(
             "CK_Following_NoSelfFollow",
-            "IdFollower <> IdFollowed"
+            "FollowerId <> FollowedId"
     ));
     }
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SocialNetwork.Models.Database;
 using SocialNetwork.Models.Database.Entities;
 using SocialNetwork.Models.Dtos.Posts;
@@ -17,8 +18,26 @@ public class PostsController : ControllerBase {
 
     // GET: api/posts
     [HttpGet]
-    public async Task<IEnumerable<GetPostDto>> GetAllPosts() {
-        IEnumerable<Post> posts = await _unitOfWork.PostRepository.GetAllAsync();
+    public async Task<IEnumerable<GetPostDto>> GetAllPostsOrderBy() {
+        IEnumerable<Post> posts = await _unitOfWork.PostRepository.GetPostsByCreationDateAsync();
+
+        IEnumerable<GetPostDto> postsDto = posts.Select(post =>
+        new GetPostDto() {
+            Id = post.Id,
+            UserId = post.UserId,
+            CreationDate = post.CreationDate,
+            Title = post.Title,
+            Description = post.Description
+        });
+
+        return postsDto;
+    }
+
+    // GET: api/posts
+    [Authorize]
+    [HttpGet("login")]
+    public async Task<IEnumerable<GetPostDto>> GetAllPostsOrderByLogin(long userId) {
+        IEnumerable<Post> posts = await _unitOfWork.PostRepository.GetPostsByCreationDateLoginAsync(userId);
 
         IEnumerable<GetPostDto> postsDto = posts.Select(post =>
         new GetPostDto() {

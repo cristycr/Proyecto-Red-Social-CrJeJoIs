@@ -33,10 +33,11 @@ public class Seeder {
 
         //hay que arregñar los datos de Following
         // Crear relaciones Following
-        Following f1 = new Following { IdFollower = user1.Id, IdFollowed = admin.Id };
-        Following f2 = new Following { IdFollower = user2.Id, IdFollowed = admin.Id };
+        Following f1 = new Following { FollowerId = user1.Id, FollowedId = admin.Id };
+        Following f2 = new Following { FollowerId = user2.Id, FollowedId = admin.Id };
 
         _context.Following.AddRange(f1, f2);
+        _context.SaveChanges();
 
         //_context.SaveChanges();
     }
