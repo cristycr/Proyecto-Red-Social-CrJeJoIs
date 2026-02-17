@@ -45,7 +45,7 @@ public class UsersController : ControllerBase {
             Role = user.Role,
             Surname2 = user.Surname2,
             AvatarPath = user.AvatarPath!,
-            Description = user.Description
+            Biography = user.Biography
         });
         return getAllUsersDto;
     }

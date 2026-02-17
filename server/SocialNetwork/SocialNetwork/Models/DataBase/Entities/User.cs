@@ -14,7 +14,7 @@ public class User {
     public string Role { get; set; } = "user";
     public string? Surname2 { get; set; }
     public string? AvatarPath { get; set; } = null;
-    public string? Description { get; set; }
+    public string? Biography { get; set; }
 
     // Estas colecciones representan las relaciones con otras entidades
     public ICollection<Post> Posts { get; set; } = [];
