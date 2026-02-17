@@ -7,7 +7,7 @@ import { AuthResponse } from '../models/auth-response';
 import { Result } from '../models/result';
 
 type JwtPayload = {
-  id?: number;
+  id?: string | number;
   role?: string;
   unique_name?: string;
   AvatarPath?: string | null;
@@ -33,6 +33,15 @@ export class AuthService {
   });
 
   readonly isAuthenticated = computed(() => !!this.jwtSignal());
+  readonly currentUserId = computed(() => {
+    const decoded = this.decodedPayload();
+    if (!decoded || decoded.id === undefined || decoded.id === null) {
+      return null;
+    }
+
+    const userId = Number(decoded.id);
+    return Number.isNaN(userId) ? null : userId;
+  });
   readonly isAdmin = computed(() => {
     const decoded = this.decodedPayload();
     return decoded?.role?.toLowerCase() === 'admin';
