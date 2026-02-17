@@ -4,7 +4,7 @@
     font-size: 1.6rem;
     font-weight: bold;
     text-decoration: none;
-    letter-spacing: 2px;
+    letter-spacing: 3px;
 }
 
 header {
@@ -63,7 +63,7 @@ footer .footer-logo a {
     font-size: 1.6rem;
     font-weight: bold;
     text-decoration: none;
-    letter-spacing: 2px;
+    letter-spacing: 3px;
 }
 
 footer .footer-links {
@@ -89,11 +89,11 @@ footer .footer-social {
 
 footer .footer-social a img {
     filter: brightness(0) invert(1);
-    transition: opacity 0.2s, filter 0.2s;
+    transition: 0.2s;
 }
 
 footer .footer-social a:hover img {
-    opacity: 0.8;
+    translate: 0 -3px;
 }
 
 footer .footer-bottom {

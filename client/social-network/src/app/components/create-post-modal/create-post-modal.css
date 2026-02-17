@@ -1,0 +1,79 @@
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--secondary-color-transparent-shadow);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+}
+
+.modal-content {
+    width: min(90vw, 500px);
+    background: var(--text-color);
+    color: var(--primary-color);
+    border: 1px solid var(--secondary-color-transparent-border);
+    border-radius: 12px;
+    box-shadow: 0 8px 24px var(--secondary-color-transparent-shadow);
+    padding: 20px;
+}
+
+h2 {
+    margin: 0 0 16px;
+    color: var(--secondary-color);
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+label {
+    font-weight: 500;
+}
+
+input, textarea {
+    border: 1px solid var(--secondary-color-transparent-border);
+    border-radius: 8px;
+    padding: 10px;
+    font-family: inherit;
+    font-size: 1rem;
+    color: var(--primary-color);
+}
+
+textarea {
+    resize: vertical;
+}
+
+.actions {
+    margin-top: 8px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.actions button {
+    border: none;
+    border-radius: 8px;
+    padding: 10px 14px;
+    cursor: pointer;
+}
+
+.actions .primary {
+    background: var(--secondary-color);
+    color: var(--text-color);
+}
+
+.actions .primary:hover {
+    background: var(--secondary-color-hover);
+}
+
+.actions .secondary {
+    background: var(--secondary-color-transparent-light);
+    color: var(--secondary-color-dark);
+}
+
+.actions .secondary:hover {
+    background: var(--secondary-color-transparent-medium);
+}

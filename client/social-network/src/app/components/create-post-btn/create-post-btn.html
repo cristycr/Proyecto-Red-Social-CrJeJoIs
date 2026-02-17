@@ -1,0 +1,11 @@
+
+<button type="button" aria-label="Crear publicación" (click)="openModal()">
+	<img src="/assets/icons/agregar.svg" alt="Crear publicación">
+</button>
+
+@if (isModalOpen()) {
+	<app-create-post-modal
+		(closeModal)="closeModal()"
+		(submitPost)="onSubmitPost($event)"
+	></app-create-post-modal>
+}
