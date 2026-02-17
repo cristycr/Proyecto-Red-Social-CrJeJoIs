@@ -1,14 +1,14 @@
 import { Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { RouterLink, Router } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angular/forms';
-import { CommonModule, NgIf } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { ApiService } from '../../services/api';
 import { AddUserDto } from '../../models/add-user-dto';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [RouterLink, ReactiveFormsModule, NgIf, CommonModule],
+  imports: [RouterLink, ReactiveFormsModule, CommonModule],
   templateUrl: './register.html',
   styleUrls: ['./register.css'],
 })
@@ -113,7 +113,7 @@ export class Register implements OnInit, OnDestroy {
 
       // Procesamos errores del backend por campo
       if (result.error && typeof result.error === 'object') {
-        const errorObj = result.error as Record<string, string>; // <-- cast seguro
+        const errorObj = result.error as Record<string, string>;
         for (const key in errorObj) {
           if (Object.prototype.hasOwnProperty.call(errorObj, key)) {
             const field = key.toLowerCase();
