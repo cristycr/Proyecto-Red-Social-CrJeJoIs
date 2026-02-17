@@ -77,8 +77,6 @@ public class PostsController : ControllerBase {
 
     [Authorize]
     [HttpPost]
-    // Los parámetros son la Entidad (Post) y un objeto nuevo (post) que se crea
-    // apartir del JSON que devuelve la petición POST
     public async Task<ActionResult<AddPostDto>> AddPost([FromBody] AddPostDto dto) {
 
         Post post = new Post {

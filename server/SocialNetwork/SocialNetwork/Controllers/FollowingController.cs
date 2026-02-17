@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using SocialNetwork.Models.Database;
 using SocialNetwork.Models.Database.Entities;
 using SocialNetwork.Models.Dtos.Following;
+using SocialNetwork.Models.Dtos.Posts;
 
 namespace SocialNetwork.Controllers {
     [Route("api/[controller]")]
@@ -25,6 +26,25 @@ namespace SocialNetwork.Controllers {
                 FollowedId = following.FollowedId
             });
             return getFollowingDtos;
+        }
+
+        [Authorize]
+        [HttpPost]
+        public async Task<ActionResult<FollowingDto>> AddPost([FromBody] FollowingDto dto) {
+
+            Following following = new Following {
+                FollowerId = dto.FollowerId,
+                FollowedId = dto.FollowedId
+            };
+
+            await _unitOfWork.FollowingRepository.InsertAsync(following);
+            bool success = await _unitOfWork.SaveAsync();
+
+            if (!success) {
+                return BadRequest(new { error = "No se pudo Seguir." });
+            }
+
+            return Ok(dto);
         }
 
     }
