@@ -5,4 +5,6 @@ export interface Post {
     title: string | null;
     description: string | null;
     picturePath: string | null;
+    nickname: string;
+    avatarPath: string | null;
 }

@@ -64,11 +64,19 @@ export class ApiService {
     return new HttpHeaders(headers);
   }
 
-  // Método para obtener las publicaciones
+  // Método para obtener las publicaciones para el invitado
   async getPosts(): Promise<Post[]> {
     const request = this.http.get<Post[]>(`${this.BASE_URL}posts`);
     const response = await lastValueFrom(request);
+    return response;
+  }
 
+  // Método para obtener las publicaciones del feed del usuario logueado
+  async getPostsByLogin(userId: number): Promise<Post[]> {
+    const request = this.http.get<Post[]>(`${this.BASE_URL}posts/login?userId=${userId}`, {
+      headers: this.getHeaders()
+    });
+    const response = await lastValueFrom(request);
     return response;
   }
 
