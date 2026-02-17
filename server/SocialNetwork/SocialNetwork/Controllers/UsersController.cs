@@ -50,23 +50,6 @@ public class UsersController : ControllerBase {
         return getAllUsersDto;
     }
 
-    // GET
-    [HttpGet("{id:long}")]
-    public async Task<User?> GetUserById(long id) {
-        return await _unitOfWork.UserRepository.GetByIdAsync(id);
-    }
-
-    // Get by nickname
-    [HttpGet("by-nickname/{nickname}")]
-    public async Task<ActionResult<GetUserDto>> GetUserByNickname(string nickname)
-    {
-        var user = await _unitOfWork.UserRepository.GetUserByNicknameAsync(nickname);
-
-        if (user == null)
-            return NoContent();
-
-        return Ok();
-    }
 
     // POST
     [HttpPost]
