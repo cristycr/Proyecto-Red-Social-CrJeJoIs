@@ -73,25 +73,6 @@ public class PostsController : ControllerBase {
         return postsDto;
     }
 
-    // GET: api/posts/5
-    [HttpGet("{id}")]
-    public async Task<ActionResult<GetPostDto>> GetPostById(long id) {
-        Post? post = await _unitOfWork.PostRepository.GetByIdAsync(id);
-
-        if (post == null)
-            return NotFound();
-
-        GetPostDto postDto = new GetPostDto {
-            Id = post.Id,
-            UserId = post.UserId,
-            CreationDate = post.CreationDate,
-            Title = post.Title,
-            Description = post.Description
-        };
-
-        return Ok(postDto);
-    }
-
     [HttpPost]
     // Los parámetros son la Entidad (Post) y un objeto nuevo (post) que se crea
     // apartir del JSON que devuelve la petición POST

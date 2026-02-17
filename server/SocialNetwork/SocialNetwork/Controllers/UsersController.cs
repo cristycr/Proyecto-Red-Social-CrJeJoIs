@@ -44,7 +44,7 @@ public class UsersController : ControllerBase {
             Password = user.Password,
             Role = user.Role,
             Surname2 = user.Surname2,
-            AvatarPath = user.AvatarPath,
+            AvatarPath = user.AvatarPath!,
             Description = user.Description
         });
         return getAllUsersDto;
@@ -60,12 +60,6 @@ public class UsersController : ControllerBase {
     [HttpGet("by-nickname/{nickname}")]
     public async Task<User?> GetUserByNickname(string nickname) {
         return await _unitOfWork.UserRepository.GetUserByNicknameAsync(nickname);
-    }
-
-    // Get by email
-    [HttpGet("by-email/{email}")]
-    public async Task<User?> GetUserByEmail(string email) {
-        return await _unitOfWork.UserRepository.GetUserByEmailAsync(email);
     }
 
     // POST
