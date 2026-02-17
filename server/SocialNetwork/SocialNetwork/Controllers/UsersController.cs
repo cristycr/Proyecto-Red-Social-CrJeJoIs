@@ -10,7 +10,7 @@ namespace SocialNetwork.Controllers;
 [Route("api/[controller]")]
 [ApiController]
 public class UsersController : ControllerBase {
-    // InyecciÃ³n de UserRepository 
+    // Inyeccion de UserRepository 
     private readonly UnitOfWork _unitOfWork;
 
     public UsersController(UnitOfWork unitOfWork) {
@@ -50,23 +50,33 @@ public class UsersController : ControllerBase {
         return getAllUsersDto;
     }
 
-    // GET
-    [HttpGet("{id:long}")]
-    public async Task<User?> GetUserById(long id) {
-        return await _unitOfWork.UserRepository.GetByIdAsync(id);
+    // Get de los usuarios seguidos y seguidores de un usuario
+    [Authorize]
+    [HttpGet("Followeds")]
+    public async Task<IEnumerable<GetUserDto>> GetFollowedUsers(long userId) {
+        ICollection<GetUserDto> users = await _unitOfWork.UserRepository.GetFollowedUsersAsync(userId);
+
+        IEnumerable<GetUserDto> getUsersDto = users.Select(user => new GetUserDto {
+            Id = user.Id,
+            Nickname = user.Nickname,
+            AvatarPath = user.AvatarPath!
+        });
+        return getUsersDto;
     }
 
-    // Get by nickname
-    [HttpGet("by-nickname/{nickname}")]
-    public async Task<ActionResult<GetUserDto>> GetUserByNickname(string nickname)
-    {
-        var user = await _unitOfWork.UserRepository.GetUserByNicknameAsync(nickname);
+    [Authorize]
+    [HttpGet("Followers")]
+    public async Task<IEnumerable<GetUserDto>> GetFollowerUsers(long userId) {
+        ICollection<GetUserDto> users = await _unitOfWork.UserRepository.GetFollowerUsersAsync(userId);
 
-        if (user == null)
-            return NoContent();
-
-        return Ok();
+        IEnumerable<GetUserDto> getUsersDto = users.Select(user => new GetUserDto {
+            Id = user.Id,
+            Nickname = user.Nickname,
+            AvatarPath = user.AvatarPath!
+        });
+        return getUsersDto;
     }
+
 
     // POST
     [HttpPost]

@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SocialNetwork.Helpers;
 using SocialNetwork.Models.Database;
 using SocialNetwork.Models.Database.Entities;
 using SocialNetwork.Models.Dtos.Posts;
+using SocialNetwork.Models.Dtos.Users;
 
 namespace SocialNetwork.Controllers;
 
@@ -67,26 +69,54 @@ public class PostsController : ControllerBase {
             Id = post.Id,
             UserId = post.UserId,
             CreationDate = post.CreationDate,
-            Title = post.Title,
-            Description = post.Description
+            Title = post.Title!,
+            Description = post.Description!
         });
         return postsDto;
     }
 
+    [Authorize]
     [HttpPost]
-    // Los parámetros son la Entidad (Post) y un objeto nuevo (post) que se crea
-    // apartir del JSON que devuelve la petición POST
-    public async Task<Post> AddPost([FromBody] Post post) {
-        return await _unitOfWork.PostRepository.InsertAsync(post);
+    public async Task<ActionResult<AddPostDto>> AddPost([FromBody] AddPostDto dto) {
+
+        Post post = new Post {
+            UserId = dto.UserId,
+            Title = dto.Title,
+            Description = dto.Description
+        };
+
+        await _unitOfWork.PostRepository.InsertAsync(post);
+        bool success = await _unitOfWork.SaveAsync();
+
+        if (!success) {
+            return BadRequest(new { error = "No se pudo subir post." });
+        }
+
+        return Ok(dto);
     }
 
+    /*
     [HttpPut]
     public async Task<Post> UpdatePost([FromBody] Post newPost) {
         return await _unitOfWork.PostRepository.UpdateAsync(newPost);
     }
+    */
 
+    [Authorize]
     [HttpDelete]
-    public async Task DeletePost([FromBody] Post post) {
+    public async Task<ActionResult<DeletePostDto>> DeletePost([FromBody] DeletePostDto dto) {
+
+        Post post = new Post {
+            Id = dto.Id
+        };
+
         await _unitOfWork.PostRepository.DeleteAsync(post);
+        bool success = await _unitOfWork.SaveAsync();
+
+        if (!success) {
+            return BadRequest(new { error = "No se pudo borrar post." });
+        }
+
+        return Ok(dto);
     }
 }
