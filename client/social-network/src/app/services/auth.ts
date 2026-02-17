@@ -19,7 +19,27 @@ type JwtPayload = {
 })
 export class AuthService {
   private readonly jwtSignal = signal<string | null>(null);
-  private readonly decodedPayload = computed<JwtPayload | null>(() => {
+  readonly isAuthenticated = computed(() => !!this.jwtSignal());
+  readonly currentUserId = computed(() => {
+    const token = this.jwtSignal();
+    if (!token) {
+      return null;
+    }
+
+    try {
+      const decoded = jwtDecode<JwtPayload>(token);
+      if (decoded.id === undefined || decoded.id === null) {
+        return null;
+      }
+
+      const userId = Number(decoded.id);
+      return Number.isNaN(userId) ? null : userId;
+    } catch {
+      return null;
+    }
+  });
+
+  readonly isAdmin = computed(() => {
     const token = this.jwtSignal();
     if (!token) {
       return null;

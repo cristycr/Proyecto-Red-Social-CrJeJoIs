@@ -1,5 +1,8 @@
 import { Component, signal } from '@angular/core';
 import { CreatePostModal } from '../create-post-modal/create-post-modal';
+import { ApiService } from '../../services/api';
+import { AuthService } from '../../services/auth';
+import { AddPostDto } from '../../models/add-post-dto';
 
 @Component({
   selector: 'app-create-post-btn',
@@ -11,6 +14,11 @@ import { CreatePostModal } from '../create-post-modal/create-post-modal';
 export class CreatePostBtn {
   protected readonly isModalOpen = signal(false);
 
+  constructor(
+    private apiService: ApiService,
+    private authService: AuthService
+  ) {}
+
   openModal() {
     this.isModalOpen.set(true);
   }
@@ -19,8 +27,27 @@ export class CreatePostBtn {
     this.isModalOpen.set(false);
   }
 
-  onSubmitPost(postData: { title: string; description: string }) {
-    console.log('Nueva publicación:', postData);
+  async onSubmitPost(postData: { title: string; description: string }) {
+    const userId = this.authService.currentUserId();
+
+    if (!userId) {
+      alert('Debes iniciar sesión para publicar.');
+      return;
+    }
+
+    const dto: AddPostDto = {
+      userId,
+      title: postData.title,
+      description: postData.description,
+    };
+
+    const result = await this.apiService.post<AddPostDto>('posts', dto);
+
+    if (!result.success) {
+      alert(result.error || 'No se pudo crear la publicación.');
+      return;
+    }
+
     this.closeModal();
   }
 }
