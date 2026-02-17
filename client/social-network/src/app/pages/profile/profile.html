@@ -1,9 +1,11 @@
 <div class="container">
 	<div class="profile-header">
-		<img src="/assets/images/avatar-default.png" alt="Avatar" class="avatar">
+		<img [src]="profileImage()" alt="Avatar" class="avatar">
         <div class="biografy">
-            <span class="nickname">Nickname</span>
-            <p>Aquí puedes añadir una pequeña biografía para que la gente sepa sobre ti y te conozca. ¡Habla sobre tus gustos y lo que disfrutas hacer!</p>
+			<span class="nickname">{{ nickname() }}</span>
+			@if (biografy()) {
+				<p>{{ biografy() }}</p>
+			}
         </div>
 	</div>
 	<div class="profile-stats">

@@ -9,6 +9,9 @@ import { Result } from '../models/result';
 type JwtPayload = {
   id?: string | number;
   role?: string;
+  unique_name?: string;
+  AvatarPath?: string | null;
+  biografy?: string | null;
 };
 
 @Injectable({
@@ -39,15 +42,44 @@ export class AuthService {
   readonly isAdmin = computed(() => {
     const token = this.jwtSignal();
     if (!token) {
-      return false;
+      return null;
     }
 
     try {
-      const decoded = jwtDecode<JwtPayload>(token);
-      return decoded.role?.toLowerCase() === 'admin';
+      return jwtDecode<JwtPayload>(token);
     } catch {
-      return false;
+      return null;
     }
+  });
+
+  readonly isAuthenticated = computed(() => !!this.jwtSignal());
+  readonly currentUserId = computed(() => {
+    const decoded = this.decodedPayload();
+    if (!decoded || decoded.id === undefined || decoded.id === null) {
+      return null;
+    }
+
+    const userId = Number(decoded.id);
+    return Number.isNaN(userId) ? null : userId;
+  });
+  readonly isAdmin = computed(() => {
+    const decoded = this.decodedPayload();
+    return decoded?.role?.toLowerCase() === 'admin';
+  });
+  readonly nickname = computed(() => {
+    const decoded = this.decodedPayload();
+    const nickname = decoded?.unique_name?.trim();
+    return nickname && nickname.length > 0 ? nickname : 'Usuario';
+  });
+  readonly profileImage = computed(() => {
+    const decoded = this.decodedPayload();
+    const avatarPath = decoded?.AvatarPath?.trim();
+    return avatarPath && avatarPath.length > 0 ? avatarPath : '/assets/images/avatar-default.png';
+  });
+  readonly biografy = computed(() => {
+    const decoded = this.decodedPayload();
+    const biografy = decoded?.biografy?.trim();
+    return biografy && biografy.length > 0 ? biografy : '';
   });
 
   // Mantiene compatibilidad con el código existente
@@ -59,7 +91,7 @@ export class AuthService {
     this.jwtSignal.set(value);
     this.api.jwt = value;
   }
-  
+
   constructor(private api: ApiService) {}
 
   // Establece el JWT que viene del localStorage
