@@ -69,8 +69,8 @@ public class PostsController : ControllerBase {
             Id = post.Id,
             UserId = post.UserId,
             CreationDate = post.CreationDate,
-            Title = post.Title,
-            Description = post.Description
+            Title = post.Title!,
+            Description = post.Description!
         });
         return postsDto;
     }
@@ -95,13 +95,28 @@ public class PostsController : ControllerBase {
         return Ok(dto);
     }
 
+    /*
     [HttpPut]
     public async Task<Post> UpdatePost([FromBody] Post newPost) {
         return await _unitOfWork.PostRepository.UpdateAsync(newPost);
     }
+    */
 
+    [Authorize]
     [HttpDelete]
-    public async Task DeletePost([FromBody] Post post) {
+    public async Task<ActionResult<DeletePostDto>> DeletePost([FromBody] DeletePostDto dto) {
+
+        Post post = new Post {
+            Id = dto.Id
+        };
+
         await _unitOfWork.PostRepository.DeleteAsync(post);
+        bool success = await _unitOfWork.SaveAsync();
+
+        if (!success) {
+            return BadRequest(new { error = "No se pudo borrar post." });
+        }
+
+        return Ok(dto);
     }
 }
