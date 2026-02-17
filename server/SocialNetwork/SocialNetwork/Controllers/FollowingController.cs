@@ -28,6 +28,7 @@ namespace SocialNetwork.Controllers {
             return getFollowingDtos;
         }
 
+        // SEGUIR A UN USUARIO (POST)
         [Authorize]
         [HttpPost]
         public async Task<ActionResult<FollowingDto>> AddPost([FromBody] FollowingDto dto) {
@@ -47,5 +48,24 @@ namespace SocialNetwork.Controllers {
             return Ok(dto);
         }
 
+
+        // DEJAR DE SEGUIR A UN USUARIO (DELETE)
+        [Authorize]
+        [HttpDelete]
+        public async Task<ActionResult> DeleteFollowing([FromBody] FollowingDto dto) {
+            Following following = new Following {
+                FollowerId = dto.FollowerId,
+                FollowedId = dto.FollowedId
+            };
+
+            await _unitOfWork.FollowingRepository.DeleteAsync(following);
+            bool success = await _unitOfWork.SaveAsync();
+
+            if (!success) {
+                return BadRequest(new { error = "No se pudo borrar" });
+            }
+
+            return Ok(dto);
+        }
     }
 }
