@@ -11,3 +11,13 @@ span {
     font-size: 12px;
     color: gray;
 }
+
+img {
+    width: 30px;
+}
+
+.post-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}

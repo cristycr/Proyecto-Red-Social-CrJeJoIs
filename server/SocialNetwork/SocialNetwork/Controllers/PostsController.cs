@@ -35,7 +35,7 @@ public class PostsController : ControllerBase {
         return postsDto;
     }
 
-    // GET: api/posts
+    // GET: api/posts/login
     [Authorize]
     [HttpGet("login")]
     public async Task<IEnumerable<GetPostUserDto>> GetAllPostsOrderByLogin(long userId) {
