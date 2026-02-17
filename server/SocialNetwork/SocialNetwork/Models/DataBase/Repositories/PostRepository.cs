@@ -24,8 +24,8 @@ public class PostRepository : BaseRepository<Post, long> {
                 Id = post.Id,
                 UserId = post.UserId,
                 CreationDate = post.CreationDate,
-                Title = post.Title,
-                Description = post.Description,
+                Title = post.Title!,
+                Description = post.Description!,
                 Nickname = post.User!.Nickname,
                 AvatarPath = post.User.AvatarPath
             })
