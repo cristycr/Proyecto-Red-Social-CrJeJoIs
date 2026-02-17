@@ -31,7 +31,7 @@ namespace SocialNetwork.Services
                     { ClaimTypes.Name, user.Nickname },
                     { ClaimTypes.Role, user.Role },
                     { "AvatarPath", user.AvatarPath },
-                    { "biografy", user.Description }
+                    { "biography", user.Description }
                 },
                 // Aquí indicamos cuándo caduca el token
                 Expires = DateTime.UtcNow.AddDays(5),

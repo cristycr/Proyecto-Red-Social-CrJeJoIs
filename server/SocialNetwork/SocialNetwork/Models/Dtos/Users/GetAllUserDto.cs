@@ -10,6 +10,6 @@ namespace SocialNetwork.Models.Dtos.Users {
         public string? Role { get; set; }
         public string? Surname2 { get; set; }
         public string AvatarPath { get; set; } = "/defaultAvatar.png";
-        public string? Description { get; set; }
+        public string? Biography { get; set; }
     }
 }

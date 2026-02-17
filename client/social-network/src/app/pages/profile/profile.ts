@@ -15,7 +15,7 @@ export class Profile {
   
   protected readonly nickname = this.auth.nickname;
   protected readonly profileImage = this.auth.profileImage;
-  protected readonly biografy = this.auth.biografy;
+  protected readonly biography = this.auth.biography;
 
   logout() {
     this.auth.jwt = null;
