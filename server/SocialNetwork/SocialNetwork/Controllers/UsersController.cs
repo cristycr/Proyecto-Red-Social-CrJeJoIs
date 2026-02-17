@@ -104,7 +104,8 @@ public class UsersController : ControllerBase {
             Name = dto.Name,
             Surname1 = dto.Surname1,
             Surname2 = dto.Surname2,
-            Password = PasswordHelper.Hash(dto.Password)
+            Password = PasswordHelper.Hash(dto.Password),
+            Biography = dto.Biography
         };
 
         await _unitOfWork.UserRepository.InsertAsync(user);

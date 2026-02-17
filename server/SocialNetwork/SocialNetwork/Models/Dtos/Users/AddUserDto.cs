@@ -29,5 +29,7 @@ namespace SocialNetwork.Models.Dtos.Users
         [Required(ErrorMessage = "La contraseña es obligatoria.")]
         [StringLength(100, MinimumLength = 6, ErrorMessage = "La contraseña debe tener minimo 6 caracteres.")]
         public required string Password { get; set; } = null!;
+
+        public string? Biography { get; set; }
     }
 }
