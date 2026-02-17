@@ -32,6 +32,7 @@ public class PostRepository : BaseRepository<Post, long> {
             .ToArrayAsync();
     }
 
+    //Metodo ordenado por fecha de creación DESCENDENTE, pero solo de los usuarios que sigo
     public async Task<ICollection<GetPostUserDto>> GetPostsByCreationDateLoginAsync(long userId) {
         return await GetQueryable()
             .Include(post => post.User)
