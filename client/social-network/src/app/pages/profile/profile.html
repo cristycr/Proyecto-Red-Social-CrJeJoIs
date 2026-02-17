@@ -3,7 +3,9 @@
 		<img [src]="profileImage()" alt="Avatar" class="avatar">
         <div class="biografy">
 			<span class="nickname">{{ nickname() }}</span>
-            <p>Aquí puedes añadir una pequeña biografía para que la gente sepa sobre ti y te conozca. ¡Habla sobre tus gustos y lo que disfrutas hacer!</p>
+			@if (biografy()) {
+				<p>{{ biografy() }}</p>
+			}
         </div>
 	</div>
 	<div class="profile-stats">

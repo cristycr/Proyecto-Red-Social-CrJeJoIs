@@ -11,6 +11,7 @@ type JwtPayload = {
   role?: string;
   unique_name?: string;
   AvatarPath?: string | null;
+  biografy?: string | null;
 };
 
 @Injectable({
@@ -45,6 +46,11 @@ export class AuthService {
     const decoded = this.decodedPayload();
     const avatarPath = decoded?.AvatarPath?.trim();
     return avatarPath && avatarPath.length > 0 ? avatarPath : '/assets/images/avatar-default.png';
+  });
+  readonly biografy = computed(() => {
+    const decoded = this.decodedPayload();
+    const biografy = decoded?.biografy?.trim();
+    return biografy && biografy.length > 0 ? biografy : '';
   });
 
   // Mantiene compatibilidad con el código existente
