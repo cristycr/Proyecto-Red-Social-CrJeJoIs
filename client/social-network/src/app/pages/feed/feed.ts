@@ -16,6 +16,7 @@ export class Feed implements OnInit {
   posts = signal<Post[]>([]);
   private apiService = inject(ApiService);
   private authService = inject(AuthService);
+  readonly isAuthenticated = this.authService.isAuthenticated;
 
   async ngOnInit(): Promise<void> {
     let posts: Post[] = [];
