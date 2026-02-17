@@ -17,10 +17,10 @@ namespace SocialNetwork.Controllers {
 
         // PETICIÓN DE SEGUIDOS (GET)
         [HttpGet]
-        public async Task<IEnumerable<GetFollowingDto>> GetAllFollowing() {
+        public async Task<IEnumerable<FollowingDto>> GetAllFollowing() {
             ICollection<Following> following = await _unitOfWork.FollowingRepository.GetAllAsync();
 
-            IEnumerable<GetFollowingDto> getFollowingDtos = following.Select(following => new GetFollowingDto {
+            IEnumerable<FollowingDto> getFollowingDtos = following.Select(following => new FollowingDto {
                 FollowerId = following.FollowerId,
                 FollowedId = following.FollowedId
             });
