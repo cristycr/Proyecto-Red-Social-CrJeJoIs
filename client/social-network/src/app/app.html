@@ -33,7 +33,9 @@
     <div class="footer-links">
       <a routerLink="/feed">Feed</a>
       <a routerLink="/about">Nosotros</a>
-      <a routerLink="/admin">Panel admin</a>
+      @if (isAdmin()) {
+        <a routerLink="/admin">Panel admin</a>
+      }
       <a routerLink="/profile">Perfil</a>
     </div>
     <div class="footer-social">
