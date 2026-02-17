@@ -37,9 +37,5 @@ export class CreatePostModal {
       title: cleanTitle,
       description: cleanDescription,
     });
-
-    this.title = '';
-    this.description = '';
-    this.close();
   }
 }
