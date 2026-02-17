@@ -7,7 +7,10 @@ import { AuthResponse } from '../models/auth-response';
 import { Result } from '../models/result';
 
 type JwtPayload = {
+  id?: number;
   role?: string;
+  unique_name?: string;
+  AvatarPath?: string | null;
 };
 
 @Injectable({
@@ -15,19 +18,33 @@ type JwtPayload = {
 })
 export class AuthService {
   private readonly jwtSignal = signal<string | null>(null);
-  readonly isAuthenticated = computed(() => !!this.jwtSignal());
-  readonly isAdmin = computed(() => {
+  private readonly decodedPayload = computed<JwtPayload | null>(() => {
     const token = this.jwtSignal();
     if (!token) {
-      return false;
+      return null;
     }
 
     try {
-      const decoded = jwtDecode<JwtPayload>(token);
-      return decoded.role?.toLowerCase() === 'admin';
+      return jwtDecode<JwtPayload>(token);
     } catch {
-      return false;
+      return null;
     }
+  });
+
+  readonly isAuthenticated = computed(() => !!this.jwtSignal());
+  readonly isAdmin = computed(() => {
+    const decoded = this.decodedPayload();
+    return decoded?.role?.toLowerCase() === 'admin';
+  });
+  readonly nickname = computed(() => {
+    const decoded = this.decodedPayload();
+    const nickname = decoded?.unique_name?.trim();
+    return nickname && nickname.length > 0 ? nickname : 'Usuario';
+  });
+  readonly profileImage = computed(() => {
+    const decoded = this.decodedPayload();
+    const avatarPath = decoded?.AvatarPath?.trim();
+    return avatarPath && avatarPath.length > 0 ? avatarPath : '/assets/images/avatar-default.png';
   });
 
   // Mantiene compatibilidad con el código existente
@@ -39,7 +56,7 @@ export class AuthService {
     this.jwtSignal.set(value);
     this.api.jwt = value;
   }
-  
+
   constructor(private api: ApiService) {}
 
   // Establece el JWT que viene del localStorage
