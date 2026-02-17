@@ -20,7 +20,7 @@
 
                     <div class="div-input">
                         <span>
-                            {{ getLabel(field) }}<span *ngIf="isRequired(field)" class="required">*</span>
+                            {{ getLabel(field) }}<span *ngIf="isRequired(field)" class="required"> *</span>
                         </span>
 
                         <input [type]="field === 'password' || field === 'confirmPassword' ? 'password' : 'text'"
@@ -51,24 +51,3 @@
         </div>
     </form>
 </div>
-
-<style>
-    .error,
-    .error-global {
-        color: red;
-        font-size: 0.9em;
-        margin-top: 0.2em;
-    }
-
-    /* Mensaje global más grande y centrado */
-    .error-global {
-        font-size: 1.2em;
-        font-weight: bold;
-        text-align: center;
-        margin-bottom: 1em;
-    }
-
-    .required {
-        color: red;
-    }
-</style>
