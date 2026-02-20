@@ -30,32 +30,12 @@ public class UsersController : ControllerBase {
         return getUsersDto;
     }
 
-    //Get con todo para desarrollo
-    [HttpGet("All")]
-    public async Task<IEnumerable<GetAllUserDto>> GetAllOfUsers() {
-        ICollection<User> users = await _unitOfWork.UserRepository.GetAllAsync();
-
-        IEnumerable<GetAllUserDto> getAllUsersDto = users.Select(user => new GetAllUserDto {
-            Id = user.Id,
-            Email = user.Email,
-            Nickname = user.Nickname,
-            Name = user.Name,
-            Surname1 = user.Surname1,
-            Password = user.Password,
-            Role = user.Role,
-            Surname2 = user.Surname2,
-            AvatarPath = user.AvatarPath!,
-            Biography = user.Biography
-        });
-        return getAllUsersDto;
-    }
-
     // Get de los usuarios seguidos y seguidores de un usuario
     [Authorize]
     [HttpGet("Followeds")]
     public async Task<IEnumerable<GetUserDto>> GetFollowedUsers(long userId) {
         ICollection<GetUserDto> users = await _unitOfWork.UserRepository.GetFollowedUsersAsync(userId);
-
+        
         IEnumerable<GetUserDto> getUsersDto = users.Select(user => new GetUserDto {
             Id = user.Id,
             Nickname = user.Nickname,
