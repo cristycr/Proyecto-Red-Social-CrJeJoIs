@@ -34,12 +34,8 @@ export class ApiService {
       if (error instanceof HttpErrorResponse) {
         status = error.status;
 
-        if (error.error?.message) {
-          message = error.error.message;
-        }
-        else if (error.error?.errors) {
-          const firstKey = Object.keys(error.error.errors)[0];
-          message = error.error.errors[firstKey][0];
+        if (error.error) {
+          message = error.error;
         }
         else {
           message = error.message || error.statusText;

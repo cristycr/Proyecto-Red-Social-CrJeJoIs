@@ -94,17 +94,8 @@ export class Register implements OnInit, OnDestroy {
     };
 
     try {
-      // Validar duplicados
-      if (await this.api.getUserByNickname(user.Nickname)) {
-        this.fieldErrors['nickname'] = 'Nickname ya en uso.';
-        return;
-      }
-      if (await this.api.getUserByEmail(user.Email)) {
-        this.fieldErrors['email'] = 'Email ya en uso.';
-        return;
-      }
 
-      const result = await this.api.post<AddUserDto>('users', user);
+      const result = await this.api.post<AddUserDto>('Auth/register', user);
 
       if (result.success) {
         this.router.navigate(['/login']);
@@ -112,6 +103,8 @@ export class Register implements OnInit, OnDestroy {
       }
 
       // Procesamos errores del backend por campo
+
+      // TODO: Comprobar si devuelve "nickname" o "email" o "null" para mostrar el mensaje deseado en el formulario
       if (result.error && typeof result.error === 'object') {
         const errorObj = result.error as Record<string, string>;
         for (const key in errorObj) {

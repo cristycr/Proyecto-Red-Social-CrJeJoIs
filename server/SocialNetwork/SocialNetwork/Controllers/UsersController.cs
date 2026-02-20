@@ -31,7 +31,6 @@ public class UsersController : ControllerBase {
     }
 
     // Get de los usuarios seguidos y seguidores de un usuario
-    [Authorize]
     [HttpGet("Followeds")]
     public async Task<IEnumerable<GetUserDto>> GetFollowedUsers(long userId) {
         ICollection<GetUserDto> users = await _unitOfWork.UserRepository.GetFollowedUsersAsync(userId);
@@ -44,9 +43,9 @@ public class UsersController : ControllerBase {
         return getUsersDto;
     }
 
-    [Authorize]
     [HttpGet("Followers")]
     public async Task<IEnumerable<GetUserDto>> GetFollowerUsers(long userId) {
+        // long userId = long.Parse(User.FindFirst("id").Value);
         ICollection<GetUserDto> users = await _unitOfWork.UserRepository.GetFollowerUsersAsync(userId);
 
         IEnumerable<GetUserDto> getUsersDto = users.Select(user => new GetUserDto {
