@@ -18,27 +18,21 @@ public class Seeder {
         User user2 = new User { Email = "user2@example.com", Nickname = "usuario2", Name = "Usuario", Surname1 = "Dos", Password = PasswordHelper.Hash("2222"), Role = "user" };
 
         // Crear posts para cada usuario
-        Post post1 = new Post { UserId = admin.Id, User = admin, Title = "Post admin 1", Description = "Contenido admin 1" };
-        Post post2 = new Post { UserId = admin.Id, User = admin, Title = "Post admin 2", Description = "Contenido admin 2" };
 
-        Post post3 = new Post { UserId = user1.Id, User = user1, Title = "Post user1 1", Description = "Contenido user1 1" };
-        Post post4 = new Post { UserId = user1.Id, User = user1, Title = "Post user1 2", Description = "Contenido user1 2" };
-
-        Post post5 = new Post { UserId = user2.Id, User = user2, Title = "Post user2 1", Description = "Contenido user2 1" };
-        Post post6 = new Post { UserId = user2.Id, User = user2, Title = "Post user2 2", Description = "Contenido user2 2" };
-        
-        _context.Post.AddRange(post1, post2, post3, post4, post5, post6);
+        for (int i = 1; i <= 100; i++) {
+            Post postAdmin = new Post { UserId = admin.Id, User = admin, Title = $"Post admin {i}", Description = $"Contenido admin {i}" };
+            Post postUser1 = new Post { UserId = user1.Id, User = user1, Title = $"Post user1 {i}", Description = $"Contenido user1 {i}" };
+            Post postUser2 = new Post { UserId = user2.Id, User = user2, Title = $"Post user2 {i}", Description = $"Contenido user2 {i}" };
+            _context.Post.AddRange(postAdmin, postUser1, postUser2);
+        }
         _context.User.AddRange(admin, user1, user2);
         _context.SaveChanges();
 
-        //hay que arregñar los datos de Following
         // Crear relaciones Following
         Following f1 = new Following { FollowerId = user1.Id, FollowedId = admin.Id };
         Following f2 = new Following { FollowerId = user2.Id, FollowedId = admin.Id };
 
         _context.Following.AddRange(f1, f2);
         _context.SaveChanges();
-
-        //_context.SaveChanges();
     }
 }
