@@ -20,7 +20,7 @@ public class UserRepository : BaseRepository<User, long> {
     }
 
 
-    /// Método para obtener los usuarios seguidos por un usuario específico
+    // Método para obtener los usuarios seguidos por un usuario específico
     public async Task<ICollection<GetUserDto>> GetFollowedUsersAsync(long userId) {
         return await _dbContext.Following
             .Where(f => f.FollowerId == userId)
@@ -38,6 +38,7 @@ public class UserRepository : BaseRepository<User, long> {
             .ToArrayAsync();
     }
 
+    // Metodo para obtener los usuarios que siguen a un usuario específico
     public async Task<ICollection<GetUserDto>> GetFollowerUsersAsync(long userId) {
         return await _dbContext.Following
             .Where(f => f.FollowedId == userId)
@@ -54,4 +55,20 @@ public class UserRepository : BaseRepository<User, long> {
             .AsNoTracking()
             .ToArrayAsync();
     }
+
+
+    // Método para obtener el numero de usuarios seguidos por un usuario específico
+    public async Task<int> GetFollowedUsersCountAsync(long userId) {
+        return await _dbContext.Following
+            .Where(f => f.FollowerId == userId)
+            .CountAsync();
+    }
+
+    // Metodo para obtener el numero de usuarios que siguen a un usuario específico
+    public async Task<int> GetFollowerUsersCountAsync(long userId) {
+        return await _dbContext.Following
+            .Where(f => f.FollowedId == userId)
+            .CountAsync();
+    }
+
 }
