@@ -94,17 +94,8 @@ export class Register implements OnInit, OnDestroy {
     };
 
     try {
-      // Validar duplicados
-      if (await this.api.getUserByNickname(user.Nickname)) {
-        this.fieldErrors['nickname'] = 'Nickname ya en uso.';
-        return;
-      }
-      if (await this.api.getUserByEmail(user.Email)) {
-        this.fieldErrors['email'] = 'Email ya en uso.';
-        return;
-      }
 
-      const result = await this.api.post<AddUserDto>('users', user);
+      const result = await this.api.post<AddUserDto>('Auth/register', user);
 
       if (result.success) {
         this.router.navigate(['/login']);
@@ -112,16 +103,10 @@ export class Register implements OnInit, OnDestroy {
       }
 
       // Procesamos errores del backend por campo
-      if (result.error && typeof result.error === 'object') {
-        const errorObj = result.error as Record<string, string>;
-        for (const key in errorObj) {
-          if (Object.prototype.hasOwnProperty.call(errorObj, key)) {
-            const field = key.toLowerCase();
-            if (this.registerForm.controls[field]) {
-              this.fieldErrors[field] = errorObj[key];
-            }
-          }
-        }
+      if (result.error == "nickname") {
+        this.errorMessage.set('Nickname ya en uso.');
+      } else if (result.error == "email") {
+        this.errorMessage.set('Correo electrónico ya en uso.');
       } else {
         // Si es string o null/undefined, mostramos mensaje global
         this.errorMessage.set(result.error ?? 'Error al registrar usuario');

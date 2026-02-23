@@ -30,32 +30,11 @@ public class UsersController : ControllerBase {
         return getUsersDto;
     }
 
-    //Get con todo para desarrollo
-    [HttpGet("All")]
-    public async Task<IEnumerable<GetAllUserDto>> GetAllOfUsers() {
-        ICollection<User> users = await _unitOfWork.UserRepository.GetAllAsync();
-
-        IEnumerable<GetAllUserDto> getAllUsersDto = users.Select(user => new GetAllUserDto {
-            Id = user.Id,
-            Email = user.Email,
-            Nickname = user.Nickname,
-            Name = user.Name,
-            Surname1 = user.Surname1,
-            Password = user.Password,
-            Role = user.Role,
-            Surname2 = user.Surname2,
-            AvatarPath = user.AvatarPath!,
-            Biography = user.Biography
-        });
-        return getAllUsersDto;
-    }
-
     // Get de los usuarios seguidos y seguidores de un usuario
-    [Authorize]
     [HttpGet("Followeds")]
     public async Task<IEnumerable<GetUserDto>> GetFollowedUsers(long userId) {
         ICollection<GetUserDto> users = await _unitOfWork.UserRepository.GetFollowedUsersAsync(userId);
-
+        
         IEnumerable<GetUserDto> getUsersDto = users.Select(user => new GetUserDto {
             Id = user.Id,
             Nickname = user.Nickname,
@@ -64,9 +43,9 @@ public class UsersController : ControllerBase {
         return getUsersDto;
     }
 
-    [Authorize]
     [HttpGet("Followers")]
     public async Task<IEnumerable<GetUserDto>> GetFollowerUsers(long userId) {
+        // long userId = long.Parse(User.FindFirst("id").Value);
         ICollection<GetUserDto> users = await _unitOfWork.UserRepository.GetFollowerUsersAsync(userId);
 
         IEnumerable<GetUserDto> getUsersDto = users.Select(user => new GetUserDto {
@@ -76,48 +55,6 @@ public class UsersController : ControllerBase {
         });
         return getUsersDto;
     }
-
-
-    // POST
-    [HttpPost]
-    public async Task<ActionResult<AddUserDto>> AddUser([FromBody] AddUserDto dto) {
-
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(new { message = "Datos inválidos" });
-        }
-
-        if (await _unitOfWork.UserRepository.GetUserByNicknameAsync(dto.Nickname) != null)
-        {
-            return BadRequest(new { error = "nickname", message = "Nickname ya en uso" });
-        }
-
-        if (await _unitOfWork.UserRepository.GetUserByEmailAsync(dto.Email) != null)
-        {
-            return BadRequest(new { error = "email", message = "Email ya en uso" });
-        }
-
-        User user = new User {
-            Email = dto.Email,
-            Nickname = dto.Nickname,
-            AvatarPath = dto.AvatarPath,
-            Name = dto.Name,
-            Surname1 = dto.Surname1,
-            Surname2 = dto.Surname2,
-            Password = PasswordHelper.Hash(dto.Password),
-            Biography = dto.Biography
-        };
-
-        await _unitOfWork.UserRepository.InsertAsync(user);
-        bool success = await _unitOfWork.SaveAsync();
-
-        if (!success) {
-            return BadRequest(new { error = "No se pudo registrar el usuario." });
-        }
-
-        return Ok(dto);
-    }
-
 
     // PUT
     [Authorize]

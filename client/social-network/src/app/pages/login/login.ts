@@ -36,7 +36,7 @@ export class Login implements OnInit, OnDestroy {
 
     // Si el login es correcto, redirige al feed
     if (result.success) {
-      // Obtenemos el parámetro redirectTo si existe, si no vamos a feed
+      // Obtenemos el parámetro redirectTo si existe, si no redirecciona al feed
       const redirectTo = this.route.snapshot.queryParams['redirectTo'] || '/feed';
       this.router.navigateByUrl(redirectTo);
     } else {
