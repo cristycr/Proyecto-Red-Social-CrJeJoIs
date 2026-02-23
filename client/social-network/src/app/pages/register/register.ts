@@ -105,16 +105,10 @@ export class Register implements OnInit, OnDestroy {
       // Procesamos errores del backend por campo
 
       // TODO: Comprobar si devuelve "nickname" o "email" o "null" para mostrar el mensaje deseado en el formulario
-      if (result.error && typeof result.error === 'object') {
-        const errorObj = result.error as Record<string, string>;
-        for (const key in errorObj) {
-          if (Object.prototype.hasOwnProperty.call(errorObj, key)) {
-            const field = key.toLowerCase();
-            if (this.registerForm.controls[field]) {
-              this.fieldErrors[field] = errorObj[key];
-            }
-          }
-        }
+      if (result.error == "nickname") {
+        this.errorMessage.set('Nickname ya está en uso.');
+      } else if (result.error == "email") {
+        this.errorMessage.set('Correo electrónico ya está en uso.');
       } else {
         // Si es string o null/undefined, mostramos mensaje global
         this.errorMessage.set(result.error ?? 'Error al registrar usuario');
