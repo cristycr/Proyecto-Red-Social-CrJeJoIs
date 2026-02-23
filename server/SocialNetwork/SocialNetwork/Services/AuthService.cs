@@ -1,7 +1,9 @@
-﻿using SocialNetwork.Helpers;
+﻿using Microsoft.AspNetCore.Mvc;
+using SocialNetwork.Helpers;
 using SocialNetwork.Models.Database;
 using SocialNetwork.Models.Database.Entities;
 using SocialNetwork.Models.Dtos.Auth;
+using SocialNetwork.Models.Dtos.Users;
 
 namespace SocialNetwork.Services {
     public class AuthService {
@@ -42,9 +44,24 @@ namespace SocialNetwork.Services {
 
             return null;
         }
-        /*
-        public async Task<string?> RegisterAsync() {
-            
-        }*/
+
+        public async Task<bool> RegisterAsync([FromBody] AddUserDto dto) {
+
+            User user = new User {
+                Email = dto.Email,
+                Nickname = dto.Nickname,
+                AvatarPath = dto.AvatarPath,
+                Name = dto.Name,
+                Surname1 = dto.Surname1,
+                Surname2 = dto.Surname2,
+                Password = PasswordHelper.Hash(dto.Password),
+                Biography = dto.Biography
+            };
+
+            await _unitOfWork.UserRepository.InsertAsync(user);
+            bool success = await _unitOfWork.SaveAsync();
+
+            return success;
+        }
     }
 }

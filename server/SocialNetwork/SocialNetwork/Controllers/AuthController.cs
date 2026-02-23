@@ -34,12 +34,16 @@ namespace SocialNetwork.Controllers
                 return BadRequest("Datos inválidos");
             }
 
-            string error = await _authService.CheckUserExists(dto.Email, dto.Nickname);
+            string? error = await _authService.CheckUserExists(dto.Email, dto.Nickname);
             
             if(!string.IsNullOrEmpty(error))
                 return BadRequest(error);
 
-            //_authService.RegisterAsync;
+            bool success = await _authService.RegisterAsync(dto);
+
+            if (!success) {
+                return BadRequest(new { error = "No se pudo registrar el usuario." });
+            }
 
             return Ok(dto);
         }

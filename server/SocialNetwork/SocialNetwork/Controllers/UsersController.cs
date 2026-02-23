@@ -56,48 +56,6 @@ public class UsersController : ControllerBase {
         return getUsersDto;
     }
 
-
-    // POST
-    [HttpPost]
-    public async Task<ActionResult<AddUserDto>> AddUser([FromBody] AddUserDto dto) {
-
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(new { message = "Datos inválidos" });
-        }
-
-        if (await _unitOfWork.UserRepository.GetUserByNicknameAsync(dto.Nickname) != null)
-        {
-            return BadRequest(new { error = "nickname", message = "Nickname ya en uso" });
-        }
-
-        if (await _unitOfWork.UserRepository.GetUserByEmailAsync(dto.Email) != null)
-        {
-            return BadRequest(new { error = "email", message = "Email ya en uso" });
-        }
-
-        User user = new User {
-            Email = dto.Email,
-            Nickname = dto.Nickname,
-            AvatarPath = dto.AvatarPath,
-            Name = dto.Name,
-            Surname1 = dto.Surname1,
-            Surname2 = dto.Surname2,
-            Password = PasswordHelper.Hash(dto.Password),
-            Biography = dto.Biography
-        };
-
-        await _unitOfWork.UserRepository.InsertAsync(user);
-        bool success = await _unitOfWork.SaveAsync();
-
-        if (!success) {
-            return BadRequest(new { error = "No se pudo registrar el usuario." });
-        }
-
-        return Ok(dto);
-    }
-
-
     // PUT
     [Authorize]
     [HttpPut]
