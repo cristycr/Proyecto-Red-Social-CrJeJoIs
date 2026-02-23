@@ -15,6 +15,7 @@ export const routes: Routes = [
     { path: 'feed', component: Feed },
     { path: 'login', component: Login },
     { path: 'profile', component: Profile, canActivate: [redirectionGuard] },
+    { path: 'profile/:id', component: Profile },
     { path: 'landing', component: Landing },
     { path: 'register', component: Register },
     { path: '', redirectTo: 'landing', pathMatch: 'full' }

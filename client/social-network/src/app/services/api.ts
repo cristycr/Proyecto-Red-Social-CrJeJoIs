@@ -107,4 +107,13 @@ export class ApiService {
       throw err; // cualquier otro error
     }
   }
+
+  // Obtiene el perfil público de un usuario por su id
+  async getUserProfileById(userId: number): Promise<any> {
+    const request = this.http.get<any>(`${this.BASE_URL}users/${userId}/profile`, {
+      headers: this.getHeaders()
+    });
+    const response = await lastValueFrom(request);
+    return response;
+  }
 }

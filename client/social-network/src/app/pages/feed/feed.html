@@ -1,8 +1,10 @@
 @for (post of posts(); track $index) {
     <div class="post">
         <div class="post-header">
-            <img [src]="post.avatarPath ? post.avatarPath : '/assets/images/avatar-default.png'" alt="Avatar" class="avatar">
-            <span class="nickname">{{post.nickname}}</span>
+            <a class="user-link" [routerLink]="['/profile', post.userId]">
+                <img [src]="post.avatarPath ? post.avatarPath : '/assets/images/avatar-default.png'" alt="Avatar" class="avatar">
+                <span class="nickname">{{post.nickname}}</span>
+            </a>
         </div>
         <h3>{{post.title}}</h3>
         <p>{{post.description}}</p>
