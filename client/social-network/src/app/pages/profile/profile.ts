@@ -44,8 +44,8 @@ export class Profile implements OnInit {
     this.nickname.set(this.auth.nickname());
     this.profileImage.set(this.auth.profileImage());
     this.biography.set(this.auth.biography());
-    this.followers.set(0);
-    this.followeds.set(0);
+    this.followers.set(this.auth.followerCount());
+    this.followeds.set(this.auth.followedCount());
     this.errorMessage.set('');
     this.loading.set(false);
   }
@@ -60,8 +60,8 @@ export class Profile implements OnInit {
       this.nickname.set(profile?.nickname ?? 'Usuario');
       this.profileImage.set(profile?.avatarPath || '/assets/images/avatar-default.png');
       this.biography.set(profile?.biography ?? '');
-      this.followers.set(profile?.followers ?? profile?.followersCount ?? 0);
-      this.followeds.set(profile?.followeds ?? profile?.followedsCount ?? 0);
+      this.followers.set(profile?.followers ?? profile?.followerCount ?? 0);
+      this.followeds.set(profile?.followeds ?? profile?.followedCount ?? 0);
     } catch {
       this.errorMessage.set('No se pudo cargar el perfil del usuario.');
     } finally {

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using SocialNetwork.Models.Database;
 using SocialNetwork.Models.Database.Entities;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -11,10 +12,12 @@ namespace SocialNetwork.Services
     {
         // Obtenemos por inyección los parámetros preestablecidos
         // para crear los token
+        private readonly UnitOfWork _unitOfWork;
         private readonly TokenValidationParameters _tokenParameters;
 
-        public TokenService(IOptionsMonitor<JwtBearerOptions> jwtOptions)
+        public TokenService(UnitOfWork unitOfWork, IOptionsMonitor<JwtBearerOptions> jwtOptions)
         {
+            _unitOfWork = unitOfWork;
             _tokenParameters = jwtOptions
                 .Get(JwtBearerDefaults.AuthenticationScheme)
                 .TokenValidationParameters;
@@ -31,7 +34,9 @@ namespace SocialNetwork.Services
                     { ClaimTypes.Name, user.Nickname },
                     { ClaimTypes.Role, user.Role },
                     { "AvatarPath", user.AvatarPath },
-                    { "biography", user.Biography }
+                    { "biography", user.Biography },
+                    { "FollowerCount", _unitOfWork.UserRepository.GetFollowerUsersCountAsync(user.Id).Result },
+                    { "FollowedCount", _unitOfWork.UserRepository.GetFollowedUsersCountAsync(user.Id).Result }
                 },
                 // Aquí indicamos cuándo caduca el token
                 Expires = DateTime.UtcNow.AddDays(5),

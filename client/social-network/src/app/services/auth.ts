@@ -12,6 +12,8 @@ type JwtPayload = {
   unique_name?: string;
   AvatarPath?: string | null;
   biography?: string | null;
+  FollowerCount?: string | number;
+  FollowedCount?: string | number;
 };
 
 @Injectable({
@@ -60,6 +62,24 @@ export class AuthService {
     const decoded = this.decodedPayload();
     const biography = decoded?.biography?.trim();
     return biography && biography.length > 0 ? biography : '';
+  });
+  readonly followerCount = computed(() => {
+    const decoded = this.decodedPayload();
+    if (!decoded || decoded.FollowerCount === undefined || decoded.FollowerCount === null) {
+      return 0;
+    }
+
+    const followerCount = Number(decoded.FollowerCount);
+    return Number.isNaN(followerCount) ? 0 : followerCount;
+  });
+  readonly followedCount = computed(() => {
+    const decoded = this.decodedPayload();
+    if (!decoded || decoded.FollowedCount === undefined || decoded.FollowedCount === null) {
+      return 0;
+    }
+
+    const followedCount = Number(decoded.FollowedCount);
+    return Number.isNaN(followedCount) ? 0 : followedCount;
   });
 
   // Mantiene compatibilidad con el código existente
