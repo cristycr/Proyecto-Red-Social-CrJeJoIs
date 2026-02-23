@@ -103,8 +103,6 @@ export class Register implements OnInit, OnDestroy {
       }
 
       // Procesamos errores del backend por campo
-
-      // TODO: Comprobar si devuelve "nickname" o "email" o "null" para mostrar el mensaje deseado en el formulario
       if (result.error == "nickname") {
         this.errorMessage.set('Nickname ya está en uso.');
       } else if (result.error == "email") {
