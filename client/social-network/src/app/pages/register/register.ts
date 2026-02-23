@@ -104,9 +104,9 @@ export class Register implements OnInit, OnDestroy {
 
       // Procesamos errores del backend por campo
       if (result.error == "nickname") {
-        this.errorMessage.set('Nickname ya está en uso.');
+        this.errorMessage.set('Nickname ya en uso.');
       } else if (result.error == "email") {
-        this.errorMessage.set('Correo electrónico ya está en uso.');
+        this.errorMessage.set('Correo electrónico ya en uso.');
       } else {
         // Si es string o null/undefined, mostramos mensaje global
         this.errorMessage.set(result.error ?? 'Error al registrar usuario');
