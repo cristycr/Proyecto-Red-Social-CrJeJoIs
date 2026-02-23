@@ -5,10 +5,11 @@ import { DatePipe } from '@angular/common';
 import { AuthService } from '../../services/auth';
 import { jwtDecode } from 'jwt-decode';
 import { CreatePostBtn } from '../../components/create-post-btn/create-post-btn';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-feed',
-  imports: [DatePipe, CreatePostBtn],
+  imports: [DatePipe, CreatePostBtn, RouterModule],
   templateUrl: './feed.html',
   styleUrl: './feed.css',
 })
