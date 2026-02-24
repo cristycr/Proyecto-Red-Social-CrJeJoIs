@@ -30,6 +30,9 @@ public class Program
         builder.Services.AddScoped<SocialNetworkContext>();
         builder.Services.AddScoped<UnitOfWork>();
 
+        // Gestión Avatar
+        builder.Services.AddScoped<IFileService, FileService>();
+
         // Autenticacion JWT
         builder.Services.AddScoped<TokenService>();
         builder.Services.AddScoped<AuthService>();
