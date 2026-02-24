@@ -12,7 +12,7 @@ export class ApiService {
   jwt: string | null = null;
   private http = inject(HttpClient);
 
-  // POST genérico
+  // Método para hacer peticiones POST a la API
   async post<T = void>(path: string, body: any): Promise<Result<T>> {
     try {
       const response = await lastValueFrom(
@@ -33,19 +33,21 @@ export class ApiService {
     }
   }
 
-  // Headers incluyendo JWT
+  // Método para obtener los headers de las peticiones
+  // Incluyendo el JWT
   private getHeaders(): HttpHeaders {
     let headers: any = { 'Content-Type': 'application/json' };
     if (this.jwt) headers['Authorization'] = `Bearer ${this.jwt}`;
     return new HttpHeaders(headers);
   }
 
-  // Posts
+  // Método para obtener las publicaciones para el invitado
   async getPosts(): Promise<Post[]> {
     const request = this.http.get<Post[]>(`${this.BASE_URL}posts`);
     return await lastValueFrom(request);
   }
 
+  // Método para obtener las publicaciones del feed del usuario logueado
   async getPostsByLogin(userId: number): Promise<Post[]> {
     const request = this.http.get<Post[]>(`${this.BASE_URL}posts/login?userId=${userId}`, {
       headers: this.getHeaders()
@@ -53,7 +55,7 @@ export class ApiService {
     return await lastValueFrom(request);
   }
 
-  // Usuario por nickname/email
+  // Comprueba si existe un usuario con el nickname dado
   async getUserByNickname(nickname: string): Promise<boolean> {
     try {
       const response = await lastValueFrom(
@@ -69,6 +71,7 @@ export class ApiService {
     }
   }
 
+   // Comprueba si existe un usuario con el email dado
   async getUserByEmail(email: string): Promise<boolean> {
     try {
       const response = await lastValueFrom(
@@ -84,7 +87,7 @@ export class ApiService {
     }
   }
 
-  // Perfil público
+  // Obtiene el perfil público de un usuario por su id
   async getUserProfileById(userId: number): Promise<any> {
     const request = this.http.get<any>(`${this.BASE_URL}users/${userId}/profile`, {
       headers: this.getHeaders()
