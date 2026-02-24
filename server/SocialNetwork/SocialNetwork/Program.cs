@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using SocialNetwork.Models.Database;
@@ -87,7 +88,12 @@ public class Program
         }
 
         app.UseHttpsRedirection();   // redirige HTTP a HTTPS
-        app.UseStaticFiles();        // permite servir archivos desde wwwroot
+        app.UseStaticFiles(new StaticFileOptions // permite servir archivos desde wwwroot y uploads
+        {
+            FileProvider = new PhysicalFileProvider(
+        Path.Combine(builder.Environment.ContentRootPath, "wwwroot", "uploads")),
+            RequestPath = "/uploads"
+        });        
         app.UseAuthentication();     // middleware de autenticacion
         app.UseAuthorization();      // middleware de autorizacion
         app.MapControllers();        // mapea los endpoints de los controladores

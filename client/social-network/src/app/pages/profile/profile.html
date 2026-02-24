@@ -1,20 +1,37 @@
 <div class="container">
 	@if (loading()) {
-		<p>Cargando perfil...</p>
+	<p>Cargando perfil...</p>
 	} @else {
-		@if (errorMessage()) {
-			<p>{{ errorMessage() }}</p>
-		}
+	@if (errorMessage()) {
+	<p>{{ errorMessage() }}</p>
+	}
 
 	<div class="profile-header">
 		<img [src]="profileImage()" alt="Avatar" class="avatar">
-        <div class="biography">
+
+		@if (isOwnProfile()) {
+		<div class="avatar-actions">
+			<input type="file" id="avatarInput" (change)="onAvatarSelected($event)" hidden />
+			<button (click)="triggerAvatarInput()">Cambiar avatar</button>
+			<button (click)="removeAvatar()">Eliminar avatar</button>
+		</div>
+		}
+
+		<div class="biography">
 			<span class="nickname">{{ nickname() }}</span>
 			@if (biography()) {
-				<p>{{ biography() }}</p>
+			<p>{{ biography() }}</p>
 			}
-        </div>
+		</div>
 	</div>
+
+	<div class="biography">
+		<span class="nickname">{{ nickname() }}</span>
+		@if (biography()) {
+		<p>{{ biography() }}</p>
+		}
+	</div>
+
 	<div class="profile-stats">
 		<div class="stat">
 			<span class="stat-number">{{ followers() }}</span>
@@ -25,9 +42,10 @@
 			<span class="stat-label">Seguidos</span>
 		</div>
 	</div>
-    <!--Mostrar las publicaciones del usuario-->
+	
+	<!--Mostrar las publicaciones del usuario-->
 	@if (isOwnProfile()) {
-		<button class="logout" (click)="logout()">Cerrar sesión</button>
+	<button class="logout" (click)="logout()">Cerrar sesión</button>
 	}
 	}
 </div>

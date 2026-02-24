@@ -15,21 +15,26 @@ public class FileService : IFileService
         if (file == null || file.Length == 0)
             throw new ArgumentException("No se ha enviado ningún fichero.");
 
+        // Carpeta uploads dentro de wwwroot
         string uploadsFolder = Path.Combine(_env.WebRootPath, "uploads");
 
         if (!Directory.Exists(uploadsFolder))
             Directory.CreateDirectory(uploadsFolder);
 
-        string filePath = Path.Combine(uploadsFolder, file.FileName);
+        // Generar un nombre único para el archivo
+        string fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
+        string filePath = Path.Combine(uploadsFolder, fileName);
 
+        // Guardar el archivo
         using (var stream = new FileStream(filePath, FileMode.Create))
         {
             await file.CopyToAsync(stream);
         }
 
-        string fileUrl = $"/uploads/{file.FileName}";
+        // URL para acceder desde el frontend
+        string fileUrl = $"/uploads/{fileName}";
 
-        return (file.FileName, fileUrl);
+        return (fileName, fileUrl);
     }
 
     public Task DeleteFileAsync(string fileName)

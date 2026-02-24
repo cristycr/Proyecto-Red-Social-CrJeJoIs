@@ -105,17 +105,16 @@ public class UsersController : ControllerBase {
         if (user == null)
             return NotFound();
 
-        // Si ya tiene avatar → borrarlo
         if (!string.IsNullOrEmpty(user.AvatarPath))
             await _fileService.DeleteFileAsync(user.AvatarPath);
 
         var result = await _fileService.SaveFileAsync(file);
 
         user.AvatarPath = result.FileName;
-
         await _unitOfWork.UserRepository.UpdateAsync(user);
 
-        return Ok(new { AvatarUrl = result.Url });
+        // Devuelve URL completa al frontend
+        return Ok(new { avatarUrl = result.Url });
     }
 
     [Authorize]
