@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SocialNetwork.Services;
 using System.IO;
 
 namespace SocialNetwork.Controllers;
@@ -9,34 +10,25 @@ namespace SocialNetwork.Controllers;
 [ApiController]
 public class FilesController : ControllerBase
 {
-    private readonly IWebHostEnvironment _env;
+    private readonly IFileService _fileService;
 
-    public FilesController(IWebHostEnvironment env)
+    public FilesController(IFileService fileService)
     {
-        _env = env; // Permite acceder a wwwroot
+        _fileService = fileService;
     }
 
-    // POST: api/files/upload
     [HttpPost("upload")]
-    public ActionResult UploadFile(IFormFile file)
+    public async Task<ActionResult> UploadFile(IFormFile file)
     {
-        if (file == null || file.Length == 0)
-            return BadRequest("No se ha enviado ningún fichero.");
-
-        string uploadsFolder = Path.Combine(_env.WebRootPath, "uploads");
-
-        // Crear carpeta uploads si no existe
-        if (!Directory.Exists(uploadsFolder))
-            Directory.CreateDirectory(uploadsFolder);
-
-        string filePath = Path.Combine(uploadsFolder, file.FileName);
-
-        using (var stream = new FileStream(filePath, FileMode.Create))
+        try
         {
-            file.CopyTo(stream);
+            var result = await _fileService.SaveFileAsync(file);
+            return Ok(new { result.FileName, result.Url });
         }
-
-        string fileUrl = $"/uploads/{file.FileName}";
-        return Ok(new { FileName = file.FileName, Url = fileUrl });
+        catch (ArgumentException ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
+}
 }
