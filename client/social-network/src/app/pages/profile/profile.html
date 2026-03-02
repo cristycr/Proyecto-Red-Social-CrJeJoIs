@@ -1,53 +1,43 @@
 <div class="container">
 	@if (loading()) {
-	<p>Cargando perfil...</p>
+		<p>Cargando perfil...</p>
 	} @else {
-	@if (errorMessage()) {
-	<p>{{ errorMessage() }}</p>
-	}
-
-	<div class="profile-header">
-		<img [src]="profileImage()" alt="Avatar" class="avatar">
-
-		@if (isOwnProfile()) {
-		<div class="avatar-actions">
-			<input type="file" id="avatarInput" (change)="onAvatarSelected($event)" hidden />
-			<button (click)="triggerAvatarInput()">Cambiar avatar</button>
-			<button (click)="removeAvatar()">Eliminar avatar</button>
-		</div>
+		@if (errorMessage()) {
+			<p>{{ errorMessage() }}</p>
 		}
+
+		<div class="profile-header">
+			<img [src]="profileImage()" alt="Avatar" class="avatar">
+			<span class="nickname">{{ nickname() }}</span>
+		</div>
 
 		<div class="biography">
-			<span class="nickname">{{ nickname() }}</span>
 			@if (biography()) {
-			<p>{{ biography() }}</p>
+				<p>{{ biography() }}</p>
 			}
 		</div>
-	</div>
 
-	<div class="biography">
-		<span class="nickname">{{ nickname() }}</span>
-		@if (biography()) {
-		<p>{{ biography() }}</p>
+		<div class="profile-stats">
+			<div class="stat">
+				<span class="stat-number">{{ followers() }}</span>
+				<span class="stat-label">Seguidores</span>
+			</div>
+			<div class="stat">
+				<span class="stat-number">{{ followeds() }}</span>
+				<span class="stat-label">Seguidos</span>
+			</div>
+		</div>
+
+		@if (isOwnProfile()) {
+			<button class="logout" (click)="logout()">Cerrar sesión</button>
+			<div class="avatar-actions">
+					<input type="file" id="avatarInput" (change)="onAvatarSelected($event)" hidden />
+					<button (click)="triggerAvatarInput()">Cambiar avatar</button>
+					<button (click)="removeAvatar()">Eliminar avatar</button>
+			</div>
 		}
-	</div>
-
-	<div class="profile-stats">
-		<div class="stat">
-			<span class="stat-number">{{ followers() }}</span>
-			<span class="stat-label">Seguidores</span>
-		</div>
-		<div class="stat">
-			<span class="stat-number">{{ followeds() }}</span>
-			<span class="stat-label">Seguidos</span>
-		</div>
-	</div>
-	
-	<!--Mostrar las publicaciones del usuario-->
-	@if (isOwnProfile()) {
-	<button class="logout" (click)="logout()">Cerrar sesión</button>
 	}
-	}
+	<!--TODO: Mostrar las publicaciones del usuario-->
 </div>
 
 <app-create-post-btn />

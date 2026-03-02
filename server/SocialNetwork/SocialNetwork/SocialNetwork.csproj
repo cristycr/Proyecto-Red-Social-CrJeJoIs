@@ -6,6 +6,13 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 	</PropertyGroup>
 
+	<ItemGroup>
+	  <Compile Remove="wwwroot\UserAvatars\**" />
+	  <Content Remove="wwwroot\UserAvatars\**" />
+	  <EmbeddedResource Remove="wwwroot\UserAvatars\**" />
+	  <None Remove="wwwroot\UserAvatars\**" />
+	</ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.3" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.3" />
@@ -15,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\UserAvatars\" />
+    <Folder Include="wwwroot\" />
   </ItemGroup>
 	
 
