@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SocialNetwork.Models.Database.Entities;
-namespace SocialNetwork.Models.Database;
 
+namespace SocialNetwork.Models.Database;
 public class SocialNetworkContext : DbContext // Tiene que heredar de DbContext
 {
     private const string DATABASE_PATH = "socialnetwork.db";

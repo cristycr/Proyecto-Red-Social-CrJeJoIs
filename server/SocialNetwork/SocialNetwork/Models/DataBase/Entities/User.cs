@@ -1,6 +1,6 @@
-﻿namespace SocialNetwork.Models.Database.Entities;
+﻿using Microsoft.EntityFrameworkCore;
 
-using Microsoft.EntityFrameworkCore;
+namespace SocialNetwork.Models.Database.Entities;
 
 [Index(nameof(Email), IsUnique = true)]
 [Index(nameof(Nickname), IsUnique = true)]
