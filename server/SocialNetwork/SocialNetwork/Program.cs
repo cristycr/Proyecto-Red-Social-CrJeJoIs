@@ -88,12 +88,19 @@ public class Program
         }
 
         app.UseHttpsRedirection();   // redirige HTTP a HTTPS
+        var uploadsPath = Path.Combine(builder.Environment.ContentRootPath, "wwwroot", "uploads")),
+
+        if (!Directory.Exists(uploadsPath))
+        {
+            Directory.CreateDirectory(uploadsPath);
+        }
+
         app.UseStaticFiles(new StaticFileOptions // permite servir archivos desde wwwroot y uploads
         {
-            FileProvider = new PhysicalFileProvider(
-        Path.Combine(builder.Environment.ContentRootPath, "wwwroot", "uploads")),
+            FileProvider = new PhysicalFileProvider(uploadsPath),
             RequestPath = "/uploads"
-        });        
+        });
+
         app.UseAuthentication();     // middleware de autenticacion
         app.UseAuthorization();      // middleware de autorizacion
         app.MapControllers();        // mapea los endpoints de los controladores
