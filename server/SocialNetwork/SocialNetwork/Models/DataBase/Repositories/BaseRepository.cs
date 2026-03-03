@@ -23,11 +23,10 @@ public abstract class BaseRepository<TEntity, TId> : IRepository<TEntity, TId> w
         EntityEntry<TEntity> entry = await _dbContext.Set<TEntity>().AddAsync(entity);
         return entry.Entity;
     }
-    public async Task<TEntity> UpdateAsync(TEntity entity)
+    public Task<TEntity> UpdateAsync(TEntity entity)
     {
         _dbContext.Set<TEntity>().Update(entity);
-        await _dbContext.SaveChangesAsync();
-        return entity;
+        return Task.FromResult(entity);
     }
     public async Task DeleteAsync(TEntity entity) {
         _dbContext.Set<TEntity>().Remove(entity);
