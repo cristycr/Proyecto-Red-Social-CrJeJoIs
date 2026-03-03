@@ -88,7 +88,7 @@ public class Program
         }
 
         app.UseHttpsRedirection();   // redirige HTTP a HTTPS
-        var uploadsPath = Path.Combine(builder.Environment.ContentRootPath, "wwwroot", "uploads")),
+        var uploadsPath = Path.Combine(builder.Environment.ContentRootPath, "wwwroot", "uploads");
 
         if (!Directory.Exists(uploadsPath))
         {
