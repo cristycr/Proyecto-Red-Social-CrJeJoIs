@@ -112,6 +112,7 @@ public class UsersController : ControllerBase {
 
         user.AvatarPath = result.FileName;
         await _unitOfWork.UserRepository.UpdateAsync(user);
+        await _unitOfWork.SaveAsync();
 
         // Devuelve URL completa al frontend
         return Ok(new { avatarUrl = result.Url });
@@ -135,6 +136,7 @@ public class UsersController : ControllerBase {
         user.AvatarPath = null;
 
         await _unitOfWork.UserRepository.UpdateAsync(user);
+        await _unitOfWork.SaveAsync();
 
         return NoContent();
     }
