@@ -83,8 +83,11 @@ public class UsersController : ControllerBase {
     // PUT
     [Authorize]
     [HttpPut]
-    public async Task<User> UpdateUser([FromBody] User newUser) {
-        return await _unitOfWork.UserRepository.UpdateAsync(newUser);
+    public async Task<User> UpdateUser([FromBody] User newUser)
+    {
+        var updatedUser = await _unitOfWork.UserRepository.UpdateAsync(newUser);
+        await _unitOfWork.SaveAsync();
+        return updatedUser;
     }
 
     // DELETE
