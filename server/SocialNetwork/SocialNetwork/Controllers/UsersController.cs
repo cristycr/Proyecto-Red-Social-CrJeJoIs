@@ -1,8 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using SocialNetwork.Helpers;
 using SocialNetwork.Models.Database;
 using SocialNetwork.Models.Database.Entities;
 using SocialNetwork.Models.Dtos.Users;
+using SocialNetwork.Services;
+using System.Security.Claims;
 
 namespace SocialNetwork.Controllers;
 
@@ -11,9 +15,12 @@ namespace SocialNetwork.Controllers;
 public class UsersController : ControllerBase {
     // Inyeccion de UserRepository 
     private readonly UnitOfWork _unitOfWork;
+    private readonly IFileService _fileService;
 
-    public UsersController(UnitOfWork unitOfWork) {
+    public UsersController(UnitOfWork unitOfWork, IFileService fileService)
+    {
         _unitOfWork = unitOfWork;
+        _fileService = fileService;
     }
 
     //GET: api/users
@@ -76,8 +83,11 @@ public class UsersController : ControllerBase {
     // PUT
     [Authorize]
     [HttpPut]
-    public async Task<User> UpdateUser([FromBody] User newUser) {
-        return await _unitOfWork.UserRepository.UpdateAsync(newUser);
+    public async Task<User> UpdateUser([FromBody] User newUser)
+    {
+        var updatedUser = await _unitOfWork.UserRepository.UpdateAsync(newUser);
+        await _unitOfWork.SaveAsync();
+        return updatedUser;
     }
 
     // DELETE
@@ -86,5 +96,51 @@ public class UsersController : ControllerBase {
                  //Para ese caso habria que hacer otro metodo
     public async Task DeleteUser([FromBody] User user) {
         await _unitOfWork.UserRepository.DeleteAsync(user);
+    }
+
+    [Authorize]
+    [HttpPost("avatar")]
+    public async Task<IActionResult> UploadAvatar(IFormFile file)
+    {
+        long userId = long.Parse(User.FindFirst("id")!.Value);
+
+        User? user = await _unitOfWork.UserRepository.GetByIdAsync(userId);
+        if (user == null)
+            return NotFound();
+
+        if (!string.IsNullOrEmpty(user.AvatarPath))
+            await _fileService.DeleteFileAsync(user.AvatarPath);
+
+        var result = await _fileService.SaveFileAsync(file);
+
+        user.AvatarPath = result.FileName;
+        await _unitOfWork.UserRepository.UpdateAsync(user);
+        await _unitOfWork.SaveAsync();
+
+        // Devuelve URL completa al frontend
+        return Ok(new { avatarUrl = result.Url });
+    }
+
+    [Authorize]
+    [HttpDelete("avatar")]
+    public async Task<IActionResult> DeleteAvatar()
+    {
+        long userId = long.Parse(User.FindFirst("id")!.Value);
+
+        User? user = await _unitOfWork.UserRepository.GetByIdAsync(userId);
+        if (user == null)
+            return NotFound();
+
+        if (string.IsNullOrEmpty(user.AvatarPath))
+            return BadRequest("El usuario no tiene avatar.");
+
+        await _fileService.DeleteFileAsync(user.AvatarPath);
+
+        user.AvatarPath = null;
+
+        await _unitOfWork.UserRepository.UpdateAsync(user);
+        await _unitOfWork.SaveAsync();
+
+        return NoContent();
     }
 }

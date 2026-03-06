@@ -47,7 +47,7 @@ export class ApiService {
     }
   }
 
-  // Comprueba si existe un usuario con el email dado
+   // Comprueba si existe un usuario con el email dado
   async getUserByEmail(email: string): Promise<boolean> {
     try {
       await this.get(`users/by-email/${email}`);
@@ -61,5 +61,42 @@ export class ApiService {
   // Obtiene el perfil público de un usuario por su id
   async getUserProfileById(userId: number): Promise<any> {
     return await this.get<any>(`users/${userId}/profile`);
+  }
+
+  // Subir avatar
+  async uploadAvatar(file: File): Promise<{ avatarUrl: string }> {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const response = await lastValueFrom(
+        this.http.post<{ avatarUrl: string }>(
+          `${this.BASE_URL}users/avatar`,
+          formData,
+          {
+            headers: this.jwt ? new HttpHeaders({ 'Authorization': `Bearer ${this.jwt}` }) : undefined
+          }
+        )
+      );
+      // Siempre devolver avatarUrl
+      return { avatarUrl: response.avatarUrl || `/uploads/${response.avatarUrl}` };
+    } catch (err: any) {
+      console.error('Error subiendo avatar:', err);
+      throw err;
+    }
+  }
+
+  // Eliminar avatar
+  async deleteAvatar(): Promise<void> {
+    try {
+      await lastValueFrom(
+        this.http.delete(`${this.BASE_URL}users/avatar`, {
+          headers: this.getHeaders()
+        })
+      );
+    } catch (err: any) {
+      console.error('Error eliminando avatar:', err);
+      throw err;
+    }
   }
 }

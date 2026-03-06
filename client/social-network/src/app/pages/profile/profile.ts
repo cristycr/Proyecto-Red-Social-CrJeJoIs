@@ -36,7 +36,7 @@ export class Profile implements OnInit {
     }
 
     this.isOwnProfile.set(false);
-    await this.loadExternalProfile(requestedUserId);
+    await this.loadProfile(requestedUserId);
   }
 
   private loadOwnProfileFromJwt(): void {
@@ -50,7 +50,7 @@ export class Profile implements OnInit {
     this.loading.set(false);
   }
 
-  private async loadExternalProfile(userId: number): Promise<void> {
+  private async loadProfile(userId: number): Promise<void> {
     this.loading.set(true);
     this.errorMessage.set('');
 
@@ -58,7 +58,11 @@ export class Profile implements OnInit {
       const profile = await this.api.getUserProfileById(userId);
 
       this.nickname.set(profile?.nickname ?? 'Usuario');
-      this.profileImage.set(profile?.avatarPath || '/assets/images/avatar-default.png');
+
+      // Si el backend devuelve avatarUrl, usarlo. Si no, construir desde FileName.
+      const avatarUrl = profile?.avatarUrl ?? (profile?.avatarPath ? `/uploads/${profile.avatarPath}` : null);
+      this.profileImage.set(avatarUrl || '/assets/images/avatar-default.png');
+
       this.biography.set(profile?.biography ?? '');
       this.followers.set(profile?.followers ?? profile?.followerCount ?? 0);
       this.followeds.set(profile?.followeds ?? profile?.followedCount ?? 0);
@@ -73,5 +77,39 @@ export class Profile implements OnInit {
     this.auth.jwt = null;
     localStorage.removeItem('jwt');
     this.router.navigate(['/landing']);
+  }
+
+  // Avatar
+  triggerAvatarInput() {
+    document.getElementById('avatarInput')?.click();
+  }
+
+  async onAvatarSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
+
+    const file = input.files[0];
+
+    try {
+      const result = await this.api.uploadAvatar(file);
+      // Usar la URL completa devuelta por el backend
+      //La siguiente línea sería lo suyo arreglarla
+      this.profileImage.set(
+        result.avatarUrl
+          ? `https://localhost:7185${result.avatarUrl}`
+          : '/assets/images/avatar-default.png'
+      );
+    } catch (err) {
+      console.error('Error subiendo avatar:', err);
+    }
+  }
+
+  async removeAvatar() {
+    try {
+      await this.api.deleteAvatar();
+      this.profileImage.set('/assets/images/avatar-default.png');
+    } catch (err) {
+      console.error('Error eliminando avatar:', err);
+    }
   }
 }
