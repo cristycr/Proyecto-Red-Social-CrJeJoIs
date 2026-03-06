@@ -9,17 +9,16 @@ type JwtPayload = {
   id?: string | number;
   role?: string;
   unique_name?: string;
-  AvatarPath?: string | null;
-  biography?: string | null;
-  FollowerCount?: string | number;
-  FollowedCount?: string | number;
+  AvatarPath?: string;
+  biography?: string;
+  FollowerCount?: number | string;
+  FollowedCount?: number | string;
 };
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-
   private readonly jwtSignal = signal<string | null>(null);
 
   private readonly decodedPayload = computed<JwtPayload | null>(() => {
@@ -85,12 +84,10 @@ export class AuthService {
   }
 
   constructor(private api: ApiService) {
-
     const jwt = localStorage.getItem('jwt');
     if (jwt) {
       this.setJwt(jwt);
     }
-
   }
 
   setJwt(jwt: string): void {
@@ -101,11 +98,9 @@ export class AuthService {
     authData: AuthRequest,
     rememberMe: boolean = false
   ): Promise<boolean> {
-
     const response = await this.api.post<AuthResponse>('auth/login', authData);
 
     if (response?.accessToken) {
-
       this.jwt = response.accessToken;
 
       if (rememberMe) {
