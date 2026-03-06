@@ -4,8 +4,8 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using SocialNetwork.Models.Database;
 using SocialNetwork.Models.Database.Repositories;
+using SocialNetwork.Services;
 using SocialNetwork.Services.Auth;
-using SocialNetwork.Services.Internal;
 using Swashbuckle.AspNetCore.Filters;
 using System.Security.Claims;
 using System.Text;
@@ -32,9 +32,6 @@ public class Program
 
         // Gestión Avatar
         builder.Services.AddScoped<IFileService, FileService>();
-
-        // Internal Services
-        builder.Services.AddScoped<DataLoader>();
 
         // Auth & JWT
         builder.Services.AddScoped<TokenService>();
@@ -120,12 +117,9 @@ public class Program
         using IServiceScope scope = serviceProvider.CreateScope();
 
         var dbContext = scope.ServiceProvider.GetRequiredService<SocialNetworkContext>();
-        var dataLoader = scope.ServiceProvider.GetRequiredService<DataLoader>();
 
         if (dbContext.Database.EnsureCreated())  // Esto crea la DB si no existe
         {
-            await dataLoader.LoadAllDataAsync();
-
             Seeder seeder = new Seeder(dbContext);
             await seeder.SeedAsync();
         }
