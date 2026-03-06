@@ -2,8 +2,8 @@ import { Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { RouterLink, Router } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { ApiService } from '../../services/api';
-import { AddUserDto } from '../../models/add-user-dto';
+import { AuthService } from '../../services/auth';
+import { RegisterRequest } from '../../models/register-request';
 
 @Component({
   selector: 'app-register',
@@ -16,9 +16,13 @@ export class Register implements OnInit, OnDestroy {
 
   registerForm: FormGroup;
   errorMessage = signal('');
-  fieldErrors: { [key: string]: string } = {}; // errores por campo
 
-  constructor(private fb: FormBuilder, private api: ApiService, private router: Router) {
+  constructor(
+    private fb: FormBuilder,
+    private authService: AuthService,
+    private router: Router
+  ) {
+
     this.registerForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(2)]],
       surname1: ['', [Validators.required, Validators.minLength(2)]],
@@ -28,6 +32,7 @@ export class Register implements OnInit, OnDestroy {
       password: ['', [Validators.required, Validators.minLength(6)]],
       confirmPassword: ['', Validators.required]
     }, { validators: this.passwordMatchValidator });
+
   }
 
   ngOnInit() {
@@ -38,10 +43,16 @@ export class Register implements OnInit, OnDestroy {
     document.body.classList.remove('login-background');
   }
 
-  passwordMatchValidator(form: FormGroup) {
+  private passwordMatchValidator = (form: FormGroup) => {
     const password = form.get('password')?.value;
     const confirm = form.get('confirmPassword')?.value;
+
     return password === confirm ? null : { passwordsMismatch: true };
+  };
+
+  isRequired(field: string): boolean {
+    return ['name', 'surname1', 'nickname', 'email', 'password', 'confirmPassword']
+      .includes(field);
   }
 
   getLabel(field: string): string {
@@ -54,29 +65,32 @@ export class Register implements OnInit, OnDestroy {
       password: 'Contraseña',
       confirmPassword: 'Confirmar contraseña'
     };
-    return labels[field] ?? field;
-  }
 
-  isRequired(field: string): boolean {
-    return ['name', 'surname1', 'nickname', 'email', 'password', 'confirmPassword'].includes(field);
+    return labels[field] ?? field;
   }
 
   getAngularError(field: string): string {
     const control = this.registerForm.get(field);
-    if (!control || !control.errors) return '';
-    if (control.errors['required']) return `${this.getLabel(field)} es obligatorio.`;
+
+    if (!control?.errors) return '';
+
+    if (control.errors['required'])
+      return `${this.getLabel(field)} es obligatorio.`;
+
     if (control.errors['minlength']) {
       const min = control.errors['minlength'].requiredLength;
       return `${this.getLabel(field)} debe tener mínimo ${min} caracteres.`;
     }
-    if (control.errors['email']) return 'Correo electrónico inválido.';
+
+    if (control.errors['email'])
+      return 'Correo electrónico inválido.';
+
     return '';
   }
 
   async submit() {
-    // Reiniciamos errores
+
     this.errorMessage.set('');
-    this.fieldErrors = {};
 
     if (this.registerForm.invalid) {
       this.errorMessage.set('Revisa los campos obligatorios o errores.');
@@ -84,36 +98,39 @@ export class Register implements OnInit, OnDestroy {
     }
 
     const formValue = this.registerForm.value;
-    const user: any = {
-      Name: formValue.name,
-      Surname1: formValue.surname1,
-      Surname2: formValue.surname2 || undefined,
-      Nickname: formValue.nickname,
-      Email: formValue.email,
-      Password: formValue.password
+
+    const registerData: RegisterRequest = {
+      name: formValue.name,
+      surname1: formValue.surname1,
+      surname2: formValue.surname2 || null,
+      nickname: formValue.nickname,
+      email: formValue.email,
+      password: formValue.password
     };
 
     try {
 
-      const result = await this.api.post<AddUserDto>('Auth/register', user);
+      const success = await this.authService.register(registerData);
 
-      if (result.success) {
+      if (success) {
         this.router.navigate(['/login']);
         return;
       }
 
-      // Procesamos errores del backend por campo
-      if (result.error == "nickname") {
-        this.errorMessage.set('Nickname ya en uso.');
-      } else if (result.error == "email") {
-        this.errorMessage.set('Correo electrónico ya en uso.');
-      } else {
-        // Si es string o null/undefined, mostramos mensaje global
-        this.errorMessage.set(result.error ?? 'Error al registrar usuario');
-      }
+      this.errorMessage.set('No se pudo registrar el usuario.');
 
-    } catch {
-      this.errorMessage.set('Error de conexión con el servidor.');
+    } catch (err: any) {
+
+      const backendError =
+        typeof err?.error === 'string'
+          ? err.error
+          : err?.error?.error ||
+          err?.error?.message ||
+          err?.message;
+
+      this.errorMessage.set(
+        backendError || 'Error de conexión con el servidor.'
+      );
     }
   }
 }
