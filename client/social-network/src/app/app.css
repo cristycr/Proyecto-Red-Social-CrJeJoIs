@@ -36,7 +36,7 @@ header a {
 
 header a:hover {
     color: var(--secondary-color-hover);
-    text-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 /* Footer style */
