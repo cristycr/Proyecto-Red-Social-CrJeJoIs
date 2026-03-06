@@ -1,0 +1,48 @@
+.post {
+    color: black;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    margin: 25px auto;
+    width: 80%;
+    border-radius: 10px;
+    padding: 30px;
+}
+
+.avatar {
+    width: 30px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--secondary-color);
+    background: var(--secondary-color-transparent-light);
+}
+
+.avatar:hover {
+    cursor: pointer;
+}
+
+.nickname {
+    font-size: 14px;
+    color: var(--secondary-color);
+    font-weight: bold;
+}
+
+.nickname:hover {
+    cursor: pointer;
+}
+
+.post-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.user-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+}
+
+span {
+    font-size: 12px;
+    color: gray;
+}

@@ -1,0 +1,118 @@
+.big-container {
+    align-items: center;
+    height: fit-content;
+    justify-content: center;
+    width: 784px;
+    background-color: var(--primary-color);
+    margin: 60px auto;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+}
+
+form {
+    padding: 32px;
+    height: fit-content;
+}
+
+.container {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 55%;
+    margin: auto;
+    gap: 32px;
+}
+
+.container-header {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.div-form {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+}
+
+.div-input {
+    margin-bottom: 16px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+input {
+    padding: 8px;
+    border-radius: 5px;
+    border: none;
+}
+
+.div-checkbox {
+    align-items: center;
+    display: flex;
+    gap: 5px;
+}
+
+input[type="checkbox"] {
+    width: 15px;
+    height: 15px;
+    accent-color: var(--secondary-color);
+}
+
+.btn {
+    height: 35px;
+    transition: .3s;
+    font-size: 16px;
+    color: var(--text-color);
+    background-color: var(--secondary-color);
+    border: solid 2px var(--secondary-color);
+}
+
+.btn:hover {
+    cursor: pointer;
+    background-color: var(--secondary-color-hover);
+}
+
+.small-text {
+    font-size: 14px;
+    color: var(--primary-color-light);
+}
+
+.required {
+    color: var(--alert-color);
+}
+
+span a {
+    color: var(--secondary-color);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+span a:hover {
+    color: var(--secondary-color-hover);
+    text-decoration: underline;
+}
+
+.error, .error-global {
+    color: var(--alert-color);
+    font-size: 0.9em;
+    margin-top: 0.2em;
+}
+
+/* Mensaje global más grande y centrado */
+.error-global {
+    font-size: 1.2em;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 1em;
+}
+
+.required {
+    color: var(--alert-color);
+}

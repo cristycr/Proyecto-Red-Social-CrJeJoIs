@@ -1,0 +1,70 @@
+<div class="big-container">
+  <form [formGroup]="registerForm" (ngSubmit)="submit()">
+
+    <!-- Mensaje de error global -->
+    @if (errorMessage()) {
+      <div class="error-global">
+        {{ errorMessage() }}
+      </div>
+    }
+
+    <div class="container">
+      <div class="container-header">
+        <h1>¡Bienvenido a TechIt!</h1>
+        <span>Rellena los datos para crear tu cuenta.</span>
+      </div>
+
+      <div class="div-form">
+
+        @for (field of ['name','surname1','surname2','nickname','email','password','confirmPassword']; track field) {
+
+          <div class="div-input">
+            <span>
+              {{ getLabel(field) }}
+              @if (isRequired(field)) {
+                <span class="required"> *</span>
+              }
+            </span>
+
+            <input
+              [type]="field === 'password' || field === 'confirmPassword' ? 'password' : 'text'"
+              [formControlName]="field"
+              [placeholder]="getLabel(field)"
+              [autocomplete]="field === 'password' || field === 'confirmPassword' ? 'new-password' : 'off'">
+
+            <!-- Error Angular -->
+            @if (registerForm.get(field)?.touched && registerForm.get(field)?.invalid) {
+              <div class="error">
+                {{ getAngularError(field) }}
+              </div>
+            }
+
+            <!-- Error password mismatch -->
+            @if (
+              field === 'confirmPassword' &&
+              registerForm.errors?.['passwordsMismatch'] &&
+              registerForm.get('confirmPassword')?.touched
+            ) {
+              <div class="error">
+                Las contraseñas no coinciden
+              </div>
+            }
+
+          </div>
+
+        }
+
+        <!-- Botón -->
+        <div class="div-input">
+          <button type="submit" class="btn" [disabled]="registerForm.invalid">
+            Registrarse
+          </button>
+          <span class="small-text">
+            ¿Ya tienes cuenta? <a routerLink="/login">¡Inicia sesión!</a>
+          </span>
+        </div>
+
+      </div>
+    </div>
+  </form>
+</div>

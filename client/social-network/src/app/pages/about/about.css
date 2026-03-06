@@ -1,0 +1,175 @@
+.about-container {
+    width: 100%;
+    background: linear-gradient(135deg, var(--bg-dark-gradient-start) 0%, var(--bg-dark-gradient-end) 100%);
+    color: var(--text-color);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+.about-hero {
+    padding: 120px 40px;
+    text-align: center;
+    background: linear-gradient(135deg, var(--secondary-color) 0%, var(--secondary-color-hover) 100%);
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.hero-content h1 {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -2px;
+    margin: 0 0 20px 0;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.hero-subtitle {
+    font-size: 20px;
+    color: var(--text-color);
+    margin: 0;
+    font-weight: 300;
+}
+
+/* objetivo */
+.about-mission {
+    padding: 80px 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.about-mission h2 {
+    font-size: 42px;
+    font-weight: 900;
+    letter-spacing: -1px;
+    margin-bottom: 30px;
+    color: var(--secondary-color);
+}
+
+.about-mission p {
+    font-size: 18px;
+    line-height: 1.6;
+    color: var(--text-color);
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+/* estadisticas */
+.about-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 40px;
+    padding: 80px 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+    background: var(--secondary-color-transparent-light);
+    border-radius: 8px;
+}
+
+.stat-item {
+    text-align: center;
+    padding: 30px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    border: 1px solid var(--secondary-color-transparent-border);
+    transition: all 0.3s ease;
+}
+
+.stat-item:hover {
+    transform: translateY(-5px);
+    background: var(--secondary-color-transparent-medium);
+    border-color: var(--secondary-color);
+}
+
+.stat-item h3 {
+    font-size: 48px;
+    color: var(--secondary-color);
+    margin: 0 0 10px 0;
+    font-weight: 900;
+}
+
+.stat-item p {
+    font-size: 16px;
+    color: var(--primary-color-light);
+    margin: 0;
+}
+
+/* El equipo */
+.about-team {
+    padding: 80px 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.about-team h2 {
+    font-size: 42px;
+    font-weight: 900;
+    letter-spacing: -1px;
+    margin-bottom: 15px;
+    color: var(--secondary-color);
+    text-align: center;
+}
+
+.team-intro {
+    font-size: 18px;
+    color: var(--primary-color-light);
+    text-align: center;
+    max-width: 700px;
+    margin: 0 auto 50px;
+    line-height: 1.6;
+}
+
+.team-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+}
+
+.team-member {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--secondary-color-transparent-border);
+    border-radius: 8px;
+    padding: 40px 20px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.team-member:hover {
+    transform: translateY(-8px);
+    background: var(--secondary-color-transparent-medium);
+    border-color: var(--secondary-color);
+    box-shadow: 0 10px 30px var(--secondary-color-transparent-shadow);
+}
+
+.member-role {
+    font-size: 12px;
+    color: var(--secondary-color);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.team-member h3 {
+    font-size: 22px;
+    color: white;
+    margin: 0;
+    font-weight: 700;
+}
+
+/* Call to action */
+.about-cta {
+    padding: 80px 40px;
+    text-align: center;
+    background: var(--secondary-color-transparent-light);
+    border-top: 1px solid var(--secondary-color-transparent-border);
+}
+
+.about-cta h2 {
+    font-size: 42px;
+    font-weight: 900;
+    margin-bottom: 20px;
+    color: var(--secondary-color);
+}
+
+.about-cta p {
+    font-size: 18px;
+    color: var(--primary-color-light);
+}

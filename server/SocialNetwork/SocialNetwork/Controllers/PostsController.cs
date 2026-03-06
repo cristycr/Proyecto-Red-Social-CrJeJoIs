@@ -1,0 +1,122 @@
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using SocialNetwork.Helpers;
+using SocialNetwork.Models.Database;
+using SocialNetwork.Models.Database.Entities;
+using SocialNetwork.Models.Dtos.Posts;
+using SocialNetwork.Models.Dtos.Users;
+
+namespace SocialNetwork.Controllers;
+
+[Route("api/[controller]")]
+[ApiController]
+public class PostsController : ControllerBase {
+
+    // Inyección del Repositorio
+    private readonly UnitOfWork _unitOfWork;
+    public PostsController(UnitOfWork unitOfWork) {
+        _unitOfWork = unitOfWork;
+    }
+
+    // GET: api/posts
+    [HttpGet]
+    public async Task<IEnumerable<GetPostUserDto>> GetAllPostsOrderBy() {
+        IEnumerable<GetPostUserDto> posts = await _unitOfWork.PostRepository.GetPostsByCreationDateAsync();
+
+        IEnumerable<GetPostUserDto> postsDto = posts.Select(post =>
+        new GetPostUserDto() {
+            Id = post.Id,
+            UserId = post.UserId,
+            CreationDate = post.CreationDate,
+            Title = post.Title,
+            Description = post.Description,
+            Nickname = post.Nickname,
+            AvatarPath = post.AvatarPath
+        });
+
+        return postsDto;
+    }
+
+    // GET: api/posts/login
+    [Authorize]
+    [HttpGet("login")]
+    public async Task<IEnumerable<GetPostUserDto>> GetAllPostsOrderByLogin(long userId) {
+        IEnumerable<GetPostUserDto> posts = await _unitOfWork.PostRepository.GetPostsByCreationDateLoginAsync(userId);
+
+        IEnumerable<GetPostUserDto> postsDto = posts.Select(post =>
+        new GetPostUserDto() {
+            Id = post.Id,
+            UserId = post.UserId,
+            CreationDate = post.CreationDate,
+            Title = post.Title,
+            Description = post.Description,
+            Nickname = post.Nickname,
+            AvatarPath = post.AvatarPath
+        });
+
+        return postsDto;
+    }
+
+    // Este endpoint es para cuando un usuario entra en el perfil de otro
+    // entonces verá las publicaciones concretas de ese usuario.
+    // También para cuando entra en su propio perfil, para ver sus publicaciones.
+    [HttpGet("by-user/{userId:long}")]
+    public async Task<IEnumerable<GetPostDto>> GetPostsByUserId(long userId) {
+        IEnumerable<Post> posts = await _unitOfWork.PostRepository.GetPostsByUserIdAsync(userId);
+
+        IEnumerable<GetPostDto> postsDto = posts.Select(post =>
+        new GetPostDto() {
+            Id = post.Id,
+            UserId = post.UserId,
+            CreationDate = post.CreationDate,
+            Title = post.Title!,
+            Description = post.Description!
+        });
+        return postsDto;
+    }
+
+    [Authorize]
+    [HttpPost]
+    public async Task<ActionResult<AddPostDto>> AddPost([FromBody] AddPostDto dto) {
+
+        Post post = new Post {
+            UserId = dto.UserId,
+            Title = dto.Title,
+            Description = dto.Description
+        };
+
+        await _unitOfWork.PostRepository.InsertAsync(post);
+        bool success = await _unitOfWork.SaveAsync();
+
+        if (!success) {
+            return BadRequest(new { error = "No se pudo subir post." });
+        }
+
+        return Ok(dto);
+    }
+
+    /*
+    [HttpPut]
+    public async Task<Post> UpdatePost([FromBody] Post newPost) {
+        return await _unitOfWork.PostRepository.UpdateAsync(newPost);
+    }
+    */
+
+    [Authorize]
+    [HttpDelete]
+    public async Task<ActionResult<DeletePostDto>> DeletePost([FromBody] DeletePostDto dto) {
+
+        Post post = new Post {
+            Id = dto.Id
+        };
+
+        await _unitOfWork.PostRepository.DeleteAsync(post);
+        bool success = await _unitOfWork.SaveAsync();
+
+        if (!success) {
+            return BadRequest(new { error = "No se pudo borrar post." });
+        }
+
+        return Ok(dto);
+    }
+}

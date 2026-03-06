@@ -1,0 +1,18 @@
+<div class="modal-overlay" (click)="onBackdropClick($event)">
+	<div class="modal-content" role="dialog" aria-modal="true" aria-label="Crear publicación">
+		<h2>Crear publicación</h2>
+
+		<form (ngSubmit)="submit()">
+			<label for="post-title">Título</label>
+			<input id="post-title" name="title" type="text" [(ngModel)]="title" required maxlength="120">
+
+			<label for="post-description">Descripción</label>
+			<textarea id="post-description" name="description" [(ngModel)]="description" required rows="4"></textarea>
+
+			<div class="actions">
+				<button type="button" class="secondary" (click)="close()">Cancelar</button>
+				<button type="submit" class="primary">Publicar</button>
+			</div>
+		</form>
+	</div>
+</div>
