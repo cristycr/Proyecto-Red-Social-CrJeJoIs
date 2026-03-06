@@ -70,5 +70,4 @@ public class UserRepository : BaseRepository<User, long> {
             .Where(f => f.FollowedId == userId)
             .CountAsync();
     }
-
 }

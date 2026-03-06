@@ -17,7 +17,7 @@ export class CreatePostBtn {
   constructor(
     private apiService: ApiService,
     private authService: AuthService
-  ) {}
+  ) { }
 
   openModal() {
     this.isModalOpen.set(true);
@@ -41,13 +41,11 @@ export class CreatePostBtn {
       description: postData.description,
     };
 
-    const result = await this.apiService.post<AddPostDto>('posts', dto);
-
-    if (!result.success) {
-      alert(result.error || 'No se pudo crear la publicación.');
-      return;
+    try {
+      await this.apiService.post<AddPostDto>('posts', dto);
+      this.closeModal();
+    } catch (err: any) {
+      alert(err?.error?.error ?? 'No se pudo crear la publicación.');
     }
-
-    this.closeModal();
   }
 }

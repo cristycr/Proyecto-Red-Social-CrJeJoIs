@@ -1,26 +1,41 @@
 <div class="big-container">
+    @if (errorMessage()) {
+    <div class="error-global">
+        {{ errorMessage() }}
+    </div>
+    }
     <form (submit)="submit()">
         <div class="container">
             <div class="container-header">
                 <h1>¡Hola de nuevo!</h1>
                 <span>¡Nos alegramos mucho de volver a verte!</span>
             </div>
+
             <div class="div-form">
+
                 <div class="div-input">
                     <span>Nombre de usuario <span class="required">*</span></span>
                     <input type="text" [(ngModel)]="nickname" [ngModelOptions]="{standalone: true}">
                 </div>
+
                 <div class="div-input">
                     <span>Contraseña <span class="required">*</span></span>
                     <input type="password" [(ngModel)]="password" [ngModelOptions]="{standalone: true}">
+
                     <div class="div-checkbox">
-                        <input type="checkbox" id="remember-me" [(ngModel)]="rememberMeChecked" [ngModelOptions]="{standalone: true}"><span class="small-text">Mantener la sesión iniciada</span>
+                        <input type="checkbox" [(ngModel)]="rememberMeChecked" [ngModelOptions]="{standalone: true}">
+                        <span class="small-text">Mantener la sesión iniciada</span>
                     </div>
                 </div>
+
                 <div class="div-input">
                     <input class="btn" type="submit" value="Iniciar sesión">
-                    <span class="small-text">¿No tienes cuenta? <a routerLink="/register">Registrarse</a></span>
+                    <span class="small-text">
+                        ¿No tienes cuenta?
+                        <a routerLink="/register">Registrarse</a>
+                    </span>
                 </div>
+
             </div>
         </div>
     </form>

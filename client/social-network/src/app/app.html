@@ -8,13 +8,13 @@
 
       <li><a routerLink="/about">Nosotros</a></li>
       @if (isAdmin()) {
-        <li><a routerLink="/admin">Panel admin</a></li>
+      <li><a routerLink="/admin">Panel admin</a></li>
       }
       @if (!isAuthenticated()) {
-        <li><a routerLink="/login">Iniciar sesión</a></li>
-        <li><a routerLink="/register">Registrarse</a></li>
+      <li><a routerLink="/login">Iniciar sesión</a></li>
+      <li><a routerLink="/register">Registrarse</a></li>
       } @else {
-        <li><a routerLink="/profile">Perfil</a></li>
+      <li><a routerLink="/profile">Perfil</a></li>
       }
 
     </ul>
@@ -31,7 +31,8 @@
       <a routerLink="/landing">TechIt!</a>
     </div>
     <div class="footer-social">
-      <a href="https://github.com/cristycr/Proyecto-Red-Social-CrJeJoIs" title="GitHub" aria-label="GitHub"><img src="assets/icons/github.svg" alt="GitHub" height="24"></a>
+      <a href="https://github.com/cristycr/Proyecto-Red-Social-CrJeJoIs" title="GitHub" aria-label="GitHub"><img
+          src="assets/icons/github.svg" alt="GitHub" height="24"></a>
     </div>
   </div>
   <div class="footer-bottom">TechIt© 2026</div>

@@ -6,7 +6,7 @@ using SocialNetwork.Models.Database.Entities;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
-namespace SocialNetwork.Services
+namespace SocialNetwork.Services.Auth
 {
     public class TokenService
     {
