@@ -33,19 +33,19 @@ public class PostRepository : BaseRepository<Post, long> {
     }
 
     //Metodo ordenado por fecha de creación DESCENDENTE, pero solo de los usuarios que sigo
-    public async Task<ICollection<GetPostUserDto>> GetPostsByCreationDateLoginAsync(long userId) {
+    public async Task<ICollection<GetPostUserDto>> GetPostsByCreationDateLoginAsync(long userId)
+    {
         return await GetQueryable()
             .Include(post => post.User)
-            .Join(
-                    _dbContext.Following,
-                    post => post.UserId,
-                    f => f.FollowedId,
-                    (post, f) => new { post, f }
+            .Where(post =>
+                _dbContext.Following.Any(f =>
+                    f.FollowerId == userId &&
+                    f.FollowedId == post.UserId
                 )
-            .Where(x => x.f.FollowerId == userId)
-            .Select(x => x.post)
-            .OrderByDescending(p => p.CreationDate)
-            .Select(post => new GetPostUserDto {
+            )
+            .OrderByDescending(post => post.CreationDate)
+            .Select(post => new GetPostUserDto
+            {
                 Id = post.Id,
                 UserId = post.UserId,
                 CreationDate = post.CreationDate,

@@ -1,10 +1,9 @@
-// Servicio de autenticación para manejar el login y el JWT
 import { computed, Injectable, signal } from '@angular/core';
 import { jwtDecode } from 'jwt-decode';
 import { AuthRequest } from '../models/auth-request';
-import { ApiService } from './api';
 import { AuthResponse } from '../models/auth-response';
-import { Result } from '../models/result';
+import { RegisterRequest } from '../models/register-request';
+import { ApiService } from './api';
 
 type JwtPayload = {
   id?: string | number;
@@ -20,12 +19,12 @@ type JwtPayload = {
   providedIn: 'root',
 })
 export class AuthService {
+
   private readonly jwtSignal = signal<string | null>(null);
+
   private readonly decodedPayload = computed<JwtPayload | null>(() => {
     const token = this.jwtSignal();
-    if (!token) {
-      return null;
-    }
+    if (!token) return null;
 
     try {
       return jwtDecode<JwtPayload>(token);
@@ -35,54 +34,47 @@ export class AuthService {
   });
 
   readonly isAuthenticated = computed(() => !!this.jwtSignal());
+
   readonly currentUserId = computed(() => {
     const decoded = this.decodedPayload();
-    if (!decoded || decoded.id === undefined || decoded.id === null) {
-      return null;
-    }
+    if (!decoded?.id) return null;
 
-    const userId = Number(decoded.id);
-    return Number.isNaN(userId) ? null : userId;
+    const id = Number(decoded.id);
+    return Number.isNaN(id) ? null : id;
   });
-  readonly isAdmin = computed(() => {
-    const decoded = this.decodedPayload();
-    return decoded?.role?.toLowerCase() === 'admin';
-  });
+
+  readonly isAdmin = computed(() =>
+    this.decodedPayload()?.role?.toLowerCase() === 'admin'
+  );
+
   readonly nickname = computed(() => {
-    const decoded = this.decodedPayload();
-    const nickname = decoded?.unique_name?.trim();
+    const nickname = this.decodedPayload()?.unique_name?.trim();
     return nickname && nickname.length > 0 ? nickname : 'Usuario';
   });
+
   readonly profileImage = computed(() => {
-    const decoded = this.decodedPayload();
-    const avatarPath = decoded?.AvatarPath?.trim();
-    return avatarPath && avatarPath.length > 0 ? avatarPath : '/assets/images/avatar-default.png';
+    const avatarPath = this.decodedPayload()?.AvatarPath?.trim();
+    return avatarPath && avatarPath.length > 0
+      ? avatarPath
+      : '/assets/images/avatar-default.png';
   });
-  readonly biography = computed(() => {
-    const decoded = this.decodedPayload();
-    const biography = decoded?.biography?.trim();
-    return biography && biography.length > 0 ? biography : '';
-  });
+
+  readonly biography = computed(() =>
+    this.decodedPayload()?.biography?.trim() || ''
+  );
+
   readonly followerCount = computed(() => {
-    const decoded = this.decodedPayload();
-    if (!decoded || decoded.FollowerCount === undefined || decoded.FollowerCount === null) {
-      return 0;
-    }
-
-    const followerCount = Number(decoded.FollowerCount);
-    return Number.isNaN(followerCount) ? 0 : followerCount;
+    const value = this.decodedPayload()?.FollowerCount;
+    const n = Number(value ?? 0);
+    return Number.isNaN(n) ? 0 : n;
   });
+
   readonly followedCount = computed(() => {
-    const decoded = this.decodedPayload();
-    if (!decoded || decoded.FollowedCount === undefined || decoded.FollowedCount === null) {
-      return 0;
-    }
-
-    const followedCount = Number(decoded.FollowedCount);
-    return Number.isNaN(followedCount) ? 0 : followedCount;
+    const value = this.decodedPayload()?.FollowedCount;
+    const n = Number(value ?? 0);
+    return Number.isNaN(n) ? 0 : n;
   });
 
-  // Mantiene compatibilidad con el código existente
   get jwt(): string | null {
     return this.jwtSignal();
   }
@@ -92,26 +84,42 @@ export class AuthService {
     this.api.jwt = value;
   }
 
-  constructor(private api: ApiService) {}
+  constructor(private api: ApiService) {
 
-  // Establece el JWT que viene del localStorage
+    const jwt = localStorage.getItem('jwt');
+    if (jwt) {
+      this.setJwt(jwt);
+    }
+
+  }
+
   setJwt(jwt: string): void {
     this.jwt = jwt;
   }
 
-  async login(authData: AuthRequest, rememberMe: boolean = false): Promise<Result<AuthResponse>> {
-    const result = await this.api.post<AuthResponse>('auth/login', authData);
+  async login(
+    authData: AuthRequest,
+    rememberMe: boolean = false
+  ): Promise<boolean> {
 
-    if (result.success) {
-      const token = result.data.accessToken;
-      this.jwt = token;
-      
-      // Se guarda el token en localStorage solo si rememberMe es true
+    const response = await this.api.post<AuthResponse>('auth/login', authData);
+
+    if (response?.accessToken) {
+
+      this.jwt = response.accessToken;
+
       if (rememberMe) {
-        localStorage.setItem('jwt', token);
+        localStorage.setItem('jwt', response.accessToken);
       }
+
+      return true;
     }
 
-    return result;
+    return false;
+  }
+
+  async register(registerData: RegisterRequest): Promise<boolean> {
+    await this.api.post('auth/register', registerData);
+    return true;
   }
 }

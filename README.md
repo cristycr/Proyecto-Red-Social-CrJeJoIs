@@ -13,4 +13,3 @@ login o registro, una vez que se haya logueado o registrado se le redirigirá a 
 el usuario quería en un inicio.*
 
 Tecnologías utilizadas
-

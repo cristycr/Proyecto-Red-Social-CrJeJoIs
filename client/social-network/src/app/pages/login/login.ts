@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { RouterLink, Router, ActivatedRoute } from "@angular/router";
 import { AuthRequest } from '../../models/auth-request';
 import { AuthService } from '../../services/auth';
@@ -10,7 +10,6 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './login.html',
   styleUrl: './login.css',
 })
-
 export class Login implements OnInit, OnDestroy {
 
   // Variables del formulario de login
@@ -18,7 +17,8 @@ export class Login implements OnInit, OnDestroy {
   password: string = '';
   rememberMeChecked: boolean = false;
 
-  // Inyectamos los servicios necesarios
+  errorMessage = signal('');
+
   constructor(
     private authService: AuthService,
     private router: Router,
@@ -27,20 +27,44 @@ export class Login implements OnInit, OnDestroy {
 
   // Método del submit del formulario de login
   async submit() {
+
+    this.errorMessage.set('');
+
     const authData: AuthRequest = {
       nickname: this.nickname,
       password: this.password
     };
 
-    const result = await this.authService.login(authData, this.rememberMeChecked);
+    try {
 
-    // Si el login es correcto, redirige al feed
-    if (result.success) {
-      // Obtenemos el parámetro redirectTo si existe, si no redirecciona al feed
-      const redirectTo = this.route.snapshot.queryParams['redirectTo'] || '/feed';
-      this.router.navigateByUrl(redirectTo);
-    } else {
-      alert('El usuario o la contraseña son incorrectos');
+      const result = await this.authService.login(
+        authData,
+        this.rememberMeChecked
+      );
+
+      if (result === true) {
+
+        const redirectTo =
+          this.route.snapshot.queryParams['redirectTo'] || '/feed';
+
+        this.router.navigateByUrl(redirectTo);
+        return;
+      }
+
+      this.errorMessage.set('Usuario o contraseña incorrectos.');
+
+    } catch (err: any) {
+
+      const backendError =
+        typeof err?.error === 'string'
+          ? err.error
+          : err?.error?.error ||
+            err?.error?.message ||
+            err?.message;
+
+      this.errorMessage.set(
+        backendError || 'Error de conexión con el servidor.'
+      );
     }
   }
 
