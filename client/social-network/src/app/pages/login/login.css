@@ -102,3 +102,19 @@ span a:hover {
     color: var(--secondary-color-hover);
     text-decoration: underline;
 }
+
+.error, .error-global {
+    color: var(--alert-color);
+    font-size: 0.9em;
+    margin-top: 0.2em;
+}
+
+/* Mensaje global más grande y centrado */
+.error-global {
+    font-size: 1.2em;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 12px;
+    position: relative;
+    top: 12px;
+}
