@@ -69,12 +69,10 @@ namespace SocialNetwork.Services.Auth
             {
                 Email = dto.Email,
                 Nickname = dto.Nickname,
-                AvatarPath = dto.AvatarPath,
                 Name = dto.Name,
                 Surname1 = dto.Surname1,
                 Surname2 = dto.Surname2,
                 Password = PasswordHelper.Hash(dto.Password),
-                Biography = dto.Biography,
                 Role = "user"
             };
 

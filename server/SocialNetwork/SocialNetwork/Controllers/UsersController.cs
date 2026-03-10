@@ -91,12 +91,6 @@ public class UsersController : ControllerBase {
     }
 
     // DELETE
-    [Authorize(Roles = "admin")]
-    [HttpDelete] //Este delete es para que el admin pueda borrar usuarios, no para que un usuario pueda borrar su cuenta
-                 //Para ese caso habria que hacer otro metodo
-    public async Task DeleteUser([FromBody] User user) {
-        await _unitOfWork.UserRepository.DeleteAsync(user);
-    }
 
     [Authorize]
     [HttpPost("avatar")]
