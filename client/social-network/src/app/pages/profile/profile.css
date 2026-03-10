@@ -80,6 +80,55 @@ p {
     color: var(--primary-color);
 }
 
+.posts-section {
+	width: min(100%, 860px);
+	margin-top: 28px;
+}
+
+.posts-section h2 {
+	margin: 0 0 14px;
+	font-size: 1.25rem;
+	color: var(--secondary-color);
+}
+
+.posts-status,
+.posts-error {
+	margin: 0;
+	max-width: none;
+}
+
+.posts-error {
+	color: #b71c1c;
+}
+
+.posts-list {
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+}
+
+.profile-post {
+	padding: 16px;
+	border-radius: 12px;
+	background: var(--secondary-color-transparent-light);
+	box-shadow: 0 2px 10px var(--secondary-color-transparent-shadow);
+}
+
+.profile-post h3 {
+	margin: 0;
+	color: var(--secondary-color-dark);
+}
+
+.profile-post p {
+	margin: 10px 0;
+	max-width: none;
+}
+
+.profile-post-date {
+	font-size: 0.82rem;
+	color: var(--secondary-color-light);
+}
+
 .modal-overlay {
 	position: fixed;
 	inset: 0;

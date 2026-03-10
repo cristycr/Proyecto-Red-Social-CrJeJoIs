@@ -5,6 +5,7 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { CreatePostBtn } from '../../components/create-post-btn/create-post-btn';
 import { ApiService } from '../../services/api';
 import { GetUserDto } from '../../models/get-user-dto';
+import { Post } from '../../models/post';
 
 type UserListItem = {
   id: number;
@@ -40,6 +41,9 @@ export class Profile implements OnInit {
   protected readonly usersModalLoadingMessage = signal('Cargando seguidos...');
   protected readonly usersModalEmptyMessage = signal('Este perfil no sigue a nadie aun.');
   protected readonly modalUsers = signal<UserListItem[]>([]);
+  protected readonly userPosts = signal<Post[]>([]);
+  protected readonly postsLoading = signal(true);
+  protected readonly postsErrorMessage = signal('');
 
   private profileUserId: number | null = null;
 
@@ -68,6 +72,9 @@ export class Profile implements OnInit {
         this.biography.set('');
         this.followers.set(0);
         this.followeds.set(0);
+        this.userPosts.set([]);
+        this.postsLoading.set(false);
+        this.postsErrorMessage.set('No se pudieron cargar las publicaciones del usuario.');
         this.loading.set(false);
       }
       return;
@@ -87,9 +94,17 @@ export class Profile implements OnInit {
   private async loadProfile(userId: number): Promise<void> {
     this.loading.set(true);
     this.errorMessage.set('');
+    this.postsLoading.set(true);
+    this.postsErrorMessage.set('');
+    this.userPosts.set([]);
 
-    try {
-      const profile = await this.api.getUserProfileById(userId);
+    const [profileResult, postsResult] = await Promise.allSettled([
+      this.api.getUserProfileById(userId),
+      this.api.getPostsByUserId(userId),
+    ]);
+
+    if (profileResult.status === 'fulfilled') {
+      const profile = profileResult.value;
 
       this.nickname.set(profile?.nickname ?? 'Usuario');
       this.profileImage.set(this.buildAvatarUrl(profile?.avatarPath ?? null));
@@ -97,11 +112,23 @@ export class Profile implements OnInit {
       this.biography.set(profile?.biography ?? '');
       this.followers.set(profile?.followers ?? profile?.followerCount ?? 0);
       this.followeds.set(profile?.followeds ?? profile?.followedCount ?? 0);
-    } catch {
+    } else {
       this.errorMessage.set('No se pudo cargar el perfil del usuario.');
-    } finally {
-      this.loading.set(false);
+      this.nickname.set('Usuario');
+      this.profileImage.set('/assets/images/avatar-default.png');
+      this.biography.set('');
+      this.followers.set(0);
+      this.followeds.set(0);
     }
+
+    if (postsResult.status === 'fulfilled') {
+      this.userPosts.set(postsResult.value);
+    } else {
+      this.postsErrorMessage.set('No se pudieron cargar las publicaciones del usuario.');
+    }
+
+    this.loading.set(false);
+    this.postsLoading.set(false);
   }
 
   async openFollowersModal(): Promise<void> {
@@ -166,6 +193,24 @@ export class Profile implements OnInit {
 
   closeUsersModal(): void {
     this.usersModalOpen.set(false);
+  }
+
+  protected formatPostDate(dateValue: Date | string): string {
+    const parsedDate = new Date(dateValue);
+
+    if (Number.isNaN(parsedDate.getTime())) {
+      return '';
+    }
+
+    return parsedDate.toLocaleString('es-ES', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+      timeZone: 'UTC',
+    });
   }
 
   onUsersModalBackdropClick(event: MouseEvent): void {
