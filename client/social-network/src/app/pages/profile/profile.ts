@@ -56,8 +56,20 @@ export class Profile implements OnInit {
     const currentUserId = this.auth.currentUserId();
 
     if (!requestedUserId || Number.isNaN(requestedUserId)) {
+      this.isOwnProfile.set(true);
       this.profileUserId = currentUserId;
-      this.loadOwnProfileFromJwt();
+
+      if (currentUserId) {
+        await this.loadProfile(currentUserId);
+      } else {
+        this.errorMessage.set('No se pudo identificar el usuario autenticado.');
+        this.nickname.set('Usuario');
+        this.profileImage.set('/assets/images/avatar-default.png');
+        this.biography.set('');
+        this.followers.set(0);
+        this.followeds.set(0);
+        this.loading.set(false);
+      }
       return;
     }
 
@@ -72,17 +84,6 @@ export class Profile implements OnInit {
     await this.loadProfile(requestedUserId);
   }
 
-  private loadOwnProfileFromJwt(): void {
-    this.isOwnProfile.set(true);
-    this.nickname.set(this.auth.nickname());
-    this.profileImage.set(this.auth.profileImage());
-    this.biography.set(this.auth.biography());
-    this.followers.set(this.auth.followerCount());
-    this.followeds.set(this.auth.followedCount());
-    this.errorMessage.set('');
-    this.loading.set(false);
-  }
-
   private async loadProfile(userId: number): Promise<void> {
     this.loading.set(true);
     this.errorMessage.set('');
@@ -91,10 +92,7 @@ export class Profile implements OnInit {
       const profile = await this.api.getUserProfileById(userId);
 
       this.nickname.set(profile?.nickname ?? 'Usuario');
-
-      // Si el backend devuelve avatarUrl, usarlo. Si no, construir desde FileName.
-      const avatarUrl = profile?.avatarUrl ?? (profile?.avatarPath ? `/uploads/${profile.avatarPath}` : null);
-      this.profileImage.set(avatarUrl || '/assets/images/avatar-default.png');
+      this.profileImage.set(this.buildAvatarUrl(profile?.avatarPath ?? null));
 
       this.biography.set(profile?.biography ?? '');
       this.followers.set(profile?.followers ?? profile?.followerCount ?? 0);
@@ -212,6 +210,10 @@ export class Profile implements OnInit {
           ? `https://localhost:7185${result.avatarUrl}`
           : '/assets/images/avatar-default.png'
       );
+
+      if (this.profileUserId) {
+        await this.loadProfile(this.profileUserId);
+      }
     } catch (err) {
       console.error('Error subiendo avatar:', err);
     }
@@ -221,6 +223,10 @@ export class Profile implements OnInit {
     try {
       await this.api.deleteAvatar();
       this.profileImage.set('/assets/images/avatar-default.png');
+
+      if (this.profileUserId) {
+        await this.loadProfile(this.profileUserId);
+      }
     } catch (err) {
       console.error('Error eliminando avatar:', err);
     }
