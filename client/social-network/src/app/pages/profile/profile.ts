@@ -1,10 +1,11 @@
-import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { Component, DestroyRef, computed, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AuthService } from '../../services/auth';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { CreatePostBtn } from '../../components/create-post-btn/create-post-btn';
 import { ApiService } from '../../services/api';
 import { GetUserDto } from '../../models/get-user-dto';
+import { Post } from '../../models/post';
 
 type UserListItem = {
   id: number;
@@ -40,6 +41,28 @@ export class Profile implements OnInit {
   protected readonly usersModalLoadingMessage = signal('Cargando seguidos...');
   protected readonly usersModalEmptyMessage = signal('Este perfil no sigue a nadie aun.');
   protected readonly modalUsers = signal<UserListItem[]>([]);
+  protected readonly userPosts = signal<Post[]>([]);
+  protected readonly postsLoading = signal(true);
+  protected readonly postsErrorMessage = signal('');
+  protected readonly postsPerPage = signal(10);
+  protected readonly currentPostsPage = signal(1);
+  protected readonly totalPostsPages = computed(() => {
+    const totalPosts = this.userPosts().length;
+    const perPage = this.postsPerPage();
+
+    if (totalPosts === 0) {
+      return 1;
+    }
+
+    return Math.ceil(totalPosts / perPage);
+  });
+  protected readonly paginatedUserPosts = computed(() => {
+    const posts = this.userPosts();
+    const perPage = this.postsPerPage();
+    const startIndex = (this.currentPostsPage() - 1) * perPage;
+
+    return posts.slice(startIndex, startIndex + perPage);
+  });
 
   private profileUserId: number | null = null;
 
@@ -68,6 +91,10 @@ export class Profile implements OnInit {
         this.biography.set('');
         this.followers.set(0);
         this.followeds.set(0);
+        this.userPosts.set([]);
+        this.postsLoading.set(false);
+        this.postsErrorMessage.set('No se pudieron cargar las publicaciones del usuario.');
+        this.currentPostsPage.set(1);
         this.loading.set(false);
       }
       return;
@@ -87,9 +114,18 @@ export class Profile implements OnInit {
   private async loadProfile(userId: number): Promise<void> {
     this.loading.set(true);
     this.errorMessage.set('');
+    this.postsLoading.set(true);
+    this.postsErrorMessage.set('');
+    this.userPosts.set([]);
+    this.currentPostsPage.set(1);
 
-    try {
-      const profile = await this.api.getUserProfileById(userId);
+    const [profileResult, postsResult] = await Promise.allSettled([
+      this.api.getUserProfileById(userId),
+      this.api.getPostsByUserId(userId),
+    ]);
+
+    if (profileResult.status === 'fulfilled') {
+      const profile = profileResult.value;
 
       this.nickname.set(profile?.nickname ?? 'Usuario');
       this.profileImage.set(this.buildAvatarUrl(profile?.avatarPath ?? null));
@@ -97,11 +133,62 @@ export class Profile implements OnInit {
       this.biography.set(profile?.biography ?? '');
       this.followers.set(profile?.followers ?? profile?.followerCount ?? 0);
       this.followeds.set(profile?.followeds ?? profile?.followedCount ?? 0);
-    } catch {
+    } else {
       this.errorMessage.set('No se pudo cargar el perfil del usuario.');
-    } finally {
-      this.loading.set(false);
+      this.nickname.set('Usuario');
+      this.profileImage.set('/assets/images/avatar-default.png');
+      this.biography.set('');
+      this.followers.set(0);
+      this.followeds.set(0);
     }
+
+    if (postsResult.status === 'fulfilled') {
+      this.userPosts.set(postsResult.value);
+    } else {
+      this.postsErrorMessage.set('No se pudieron cargar las publicaciones del usuario.');
+    }
+
+    this.loading.set(false);
+    this.postsLoading.set(false);
+  }
+
+  protected onPostsPerPageInput(event: Event): void {
+    const target = event.target as HTMLInputElement;
+    const selectedValue = Number(target.value);
+
+    if (Number.isNaN(selectedValue) || selectedValue <= 0) {
+      return;
+    }
+
+    this.postsPerPage.set(Math.floor(selectedValue));
+    this.currentPostsPage.set(1);
+  }
+
+  protected goToPreviousPostsPage(): void {
+    if (this.currentPostsPage() <= 1) {
+      return;
+    }
+
+    this.currentPostsPage.update((page) => page - 1);
+  }
+
+  protected goToNextPostsPage(): void {
+    const totalPages = this.totalPostsPages();
+
+    if (this.currentPostsPage() >= totalPages) {
+      return;
+    }
+
+    this.currentPostsPage.update((page) => page + 1);
+    this.scrollToTop();
+  }
+
+  private scrollToTop(): void {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: 'smooth',
+    });
   }
 
   async openFollowersModal(): Promise<void> {
@@ -166,6 +253,24 @@ export class Profile implements OnInit {
 
   closeUsersModal(): void {
     this.usersModalOpen.set(false);
+  }
+
+  protected formatPostDate(dateValue: Date | string): string {
+    const parsedDate = new Date(dateValue);
+
+    if (Number.isNaN(parsedDate.getTime())) {
+      return '';
+    }
+
+    return parsedDate.toLocaleString('es-ES', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+      timeZone: 'UTC',
+    });
   }
 
   onUsersModalBackdropClick(event: MouseEvent): void {

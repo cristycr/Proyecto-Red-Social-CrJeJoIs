@@ -38,6 +38,11 @@ export class ApiService {
     return await this.get<Post[]>(`posts/login?userId=${userId}`);
   }
 
+  // Método para obtener las publicaciones de un usuario concreto
+  async getPostsByUserId(userId: number): Promise<Post[]> {
+    return await this.get<Post[]>(`posts/by-user/${userId}`);
+  }
+
   // Comprueba si existe un usuario con el nickname dado
   async getUserByNickname(nickname: string): Promise<boolean> {
     try {

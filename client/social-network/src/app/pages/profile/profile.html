@@ -50,8 +50,64 @@
 					<button (click)="removeAvatar()">Eliminar avatar</button>
 			</div>
 		}
+
+		<section class="posts-section">
+			<h2>Publicaciones</h2>
+
+			@if (postsLoading()) {
+				<p class="posts-status">Cargando publicaciones...</p>
+			} @else if (postsErrorMessage()) {
+				<p class="posts-error">{{ postsErrorMessage() }}</p>
+			} @else if (userPosts().length === 0) {
+				<p class="posts-status">Este usuario aun no tiene publicaciones.</p>
+			} @else {
+				<div class="posts-list">
+					@for (post of paginatedUserPosts(); track post.id) {
+						<article class="profile-post">
+							<h3>{{ post.title }}</h3>
+							<p>{{ post.description }}</p>
+							<span class="profile-post-date">{{ formatPostDate(post.creationDate) }}</span>
+						</article>
+					}
+				</div>
+
+				<div class="posts-pagination">
+					<button
+						type="button"
+						class="posts-page-btn"
+						(click)="goToPreviousPostsPage()"
+						[disabled]="currentPostsPage() === 1"
+					>
+						Anterior
+					</button>
+
+					<span class="posts-page-current">Pagina {{ currentPostsPage() }} / {{ totalPostsPages() }}</span>
+
+					<button
+						type="button"
+						class="posts-page-btn"
+						(click)="goToNextPostsPage()"
+						[disabled]="currentPostsPage() === totalPostsPages()"
+					>
+						Siguiente
+					</button>
+				</div>
+
+				<div class="posts-toolbar">
+					<label for="postsPerPage">Publicaciones por pagina:</label>
+					<input
+						id="postsPerPage"
+						type="number"
+						min="1"
+						step="1"
+						class="posts-per-page-input"
+						[value]="postsPerPage()"
+						(input)="onPostsPerPageInput($event)"
+					/>
+				</div>
+			}
+		</section>
 	}
-	<!--TODO: Mostrar las publicaciones del usuario-->
 </div>
 
 @if (usersModalOpen()) {
