@@ -1,4 +1,3 @@
-/* Contenedor principal del perfil */
 .container {
 	width: 95%;
 	box-shadow: 0 2px 12px var(--secondary-color-transparent-shadow);
@@ -9,7 +8,6 @@
 	align-items: center;
 }
 
-/* Cabecera: avatar y nombre */
 .profile-header {
 	display: flex;
 	align-items: center;
@@ -31,7 +29,6 @@
 	color: var(--secondary-color);
 }
 
-/* Estadísticas */
 .profile-stats {
 	display: flex;
 	gap: 40px;
@@ -43,15 +40,10 @@
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-    transition: transform 0.25s ease;
 }
 
 .clickable-stat {
 	cursor: pointer;
-}
-
-.clickable-stat:hover {
-    cursor: pointer;
 }
 
 .clickable-stat:hover .stat-number {
@@ -66,13 +58,11 @@
 	font-size: 1.3rem;
 	font-weight: 700;
 	color: var(--secondary-color);
-	transition: color 0.25s ease;
 }
 
 .stat-label {
 	font-size: 0.95rem;
 	color: var(--secondary-color-light);
-	transition: color 0.25s ease;
 }
 
 p {
@@ -107,6 +97,25 @@ p {
 	gap: 14px;
 }
 
+.posts-toolbar {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+	margin-top: 10px;
+	flex-wrap: wrap;
+	color: var(--primary-color);
+}
+
+.posts-per-page-input {
+	padding: 6px 10px;
+	width: 72px;
+	border-radius: 8px;
+	border: 1px solid var(--secondary-color-transparent-border);
+	background: var(--text-color);
+	color: var(--secondary-color-dark);
+}
+
 .profile-post {
 	padding: 16px;
 	border-radius: 12px;
@@ -127,6 +136,29 @@ p {
 .profile-post-date {
 	font-size: 0.82rem;
 	color: var(--secondary-color-light);
+}
+
+.posts-pagination {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap: 12px;
+	margin-top: 14px;
+	color: var(--primary-color);
+}
+
+.posts-page-btn {
+	margin-top: 0;
+	padding: 8px 14px;
+	font-size: 0.92rem;
+	background: var(--secondary-color);
+	color: var(--text-color);
+	border-radius: 8px;
+}
+
+.posts-page-btn:disabled {
+	opacity: 0.45;
+	cursor: not-allowed;
 }
 
 .modal-overlay {

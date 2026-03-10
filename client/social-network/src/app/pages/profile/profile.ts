@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { Component, DestroyRef, computed, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AuthService } from '../../services/auth';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -44,6 +44,25 @@ export class Profile implements OnInit {
   protected readonly userPosts = signal<Post[]>([]);
   protected readonly postsLoading = signal(true);
   protected readonly postsErrorMessage = signal('');
+  protected readonly postsPerPage = signal(10);
+  protected readonly currentPostsPage = signal(1);
+  protected readonly totalPostsPages = computed(() => {
+    const totalPosts = this.userPosts().length;
+    const perPage = this.postsPerPage();
+
+    if (totalPosts === 0) {
+      return 1;
+    }
+
+    return Math.ceil(totalPosts / perPage);
+  });
+  protected readonly paginatedUserPosts = computed(() => {
+    const posts = this.userPosts();
+    const perPage = this.postsPerPage();
+    const startIndex = (this.currentPostsPage() - 1) * perPage;
+
+    return posts.slice(startIndex, startIndex + perPage);
+  });
 
   private profileUserId: number | null = null;
 
@@ -75,6 +94,7 @@ export class Profile implements OnInit {
         this.userPosts.set([]);
         this.postsLoading.set(false);
         this.postsErrorMessage.set('No se pudieron cargar las publicaciones del usuario.');
+        this.currentPostsPage.set(1);
         this.loading.set(false);
       }
       return;
@@ -97,6 +117,7 @@ export class Profile implements OnInit {
     this.postsLoading.set(true);
     this.postsErrorMessage.set('');
     this.userPosts.set([]);
+    this.currentPostsPage.set(1);
 
     const [profileResult, postsResult] = await Promise.allSettled([
       this.api.getUserProfileById(userId),
@@ -129,6 +150,45 @@ export class Profile implements OnInit {
 
     this.loading.set(false);
     this.postsLoading.set(false);
+  }
+
+  protected onPostsPerPageInput(event: Event): void {
+    const target = event.target as HTMLInputElement;
+    const selectedValue = Number(target.value);
+
+    if (Number.isNaN(selectedValue) || selectedValue <= 0) {
+      return;
+    }
+
+    this.postsPerPage.set(Math.floor(selectedValue));
+    this.currentPostsPage.set(1);
+  }
+
+  protected goToPreviousPostsPage(): void {
+    if (this.currentPostsPage() <= 1) {
+      return;
+    }
+
+    this.currentPostsPage.update((page) => page - 1);
+  }
+
+  protected goToNextPostsPage(): void {
+    const totalPages = this.totalPostsPages();
+
+    if (this.currentPostsPage() >= totalPages) {
+      return;
+    }
+
+    this.currentPostsPage.update((page) => page + 1);
+    this.scrollToTop();
+  }
+
+  private scrollToTop(): void {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: 'smooth',
+    });
   }
 
   async openFollowersModal(): Promise<void> {
