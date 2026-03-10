@@ -3,6 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { lastValueFrom } from 'rxjs';
 import { GetUserDto } from '../models/get-user-dto';
 import { Post } from '../models/post';
+import { FollowingDto } from '../models/following-dto';
 
 @Injectable({
   providedIn: 'root',
@@ -25,6 +26,13 @@ export class ApiService {
   async get<T>(path: string): Promise<T> {
     return await lastValueFrom(
       this.http.get<T>(`${this.BASE_URL}${path}`)
+    );
+  }
+
+  // Metodo para hacer peticiones DELETE a la API
+  async delete(path: string, body?: any): Promise<void> {
+    await lastValueFrom(
+      this.http.delete<void>(`${this.BASE_URL}${path}`, { body })
     );
   }
 
@@ -78,6 +86,33 @@ export class ApiService {
   // Obtiene la lista de seguidores de un usuario
   async getFollowerUsers(userId: number): Promise<GetUserDto[]> {
     return await this.get<GetUserDto[]>(`users/Followers?userId=${userId}`);
+  }
+
+  async followUser(dto: FollowingDto): Promise<FollowingDto> {
+    try {
+      return await this.post<FollowingDto>('following', dto);
+    } catch (err: any) {
+      if (err?.status === 404) {
+        return await this.post<FollowingDto>('followings', dto);
+      }
+
+      throw err;
+    }
+  }
+
+  async unfollowUser(followerId: number, followedId: number): Promise<void> {
+    const body: FollowingDto = { followerId, followedId };
+
+    try {
+      await this.delete('following', body);
+    } catch (err: any) {
+      if (err?.status === 404) {
+        await this.delete('followings', body);
+        return;
+      }
+
+      throw err;
+    }
   }
 
   async uploadAvatar(file: File): Promise<{ avatarUrl: string }> {

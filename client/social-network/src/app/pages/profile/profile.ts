@@ -32,6 +32,9 @@ export class Profile implements OnInit {
   protected readonly followers = signal(0);
   protected readonly followeds = signal(0);
   protected readonly isOwnProfile = signal(true);
+  protected readonly isFollowingProfile = signal(false);
+  protected readonly followActionLoading = signal(false);
+  protected readonly followActionError = signal('');
   protected readonly loading = signal(true);
   protected readonly errorMessage = signal('');
   protected readonly usersModalOpen = signal(false);
@@ -78,8 +81,12 @@ export class Profile implements OnInit {
     const requestedUserId = routeId ? Number(routeId) : null;
     const currentUserId = this.auth.currentUserId();
 
+    this.followActionLoading.set(false);
+    this.followActionError.set('');
+
     if (!requestedUserId || Number.isNaN(requestedUserId)) {
       this.isOwnProfile.set(true);
+      this.isFollowingProfile.set(false);
       this.profileUserId = currentUserId;
 
       if (currentUserId) {
@@ -102,13 +109,88 @@ export class Profile implements OnInit {
 
     if (requestedUserId === currentUserId) {
       this.profileUserId = currentUserId;
+      this.isFollowingProfile.set(false);
       await this.router.navigate(['/profile']);
       return;
     }
 
     this.profileUserId = requestedUserId;
     this.isOwnProfile.set(false);
-    await this.loadProfile(requestedUserId);
+    this.isFollowingProfile.set(false);
+
+    await Promise.allSettled([
+      this.loadProfile(requestedUserId),
+      this.loadFollowStatus(requestedUserId, currentUserId),
+    ]);
+  }
+
+  private async loadFollowStatus(
+    profileUserId: number,
+    currentUserId: number | null
+  ): Promise<void> {
+    if (!currentUserId || currentUserId === profileUserId) {
+      this.isFollowingProfile.set(false);
+      return;
+    }
+
+    try {
+      const followedUsers = await this.api.getFollowedUsers(currentUserId);
+
+      this.isFollowingProfile.set(
+        followedUsers.some((user) => user.id === profileUserId)
+      );
+    } catch {
+      this.isFollowingProfile.set(false);
+    }
+  }
+
+  protected async onFollowButtonClick(): Promise<void> {
+    const followedId = this.profileUserId;
+
+    if (!followedId || this.isOwnProfile()) {
+      return;
+    }
+
+    const followerId = this.auth.currentUserId();
+
+    if (!followerId || !this.auth.jwt) {
+      await this.router.navigate(['/login'], {
+        queryParams: { redirectTo: this.router.url },
+      });
+      return;
+    }
+
+    if (followerId === followedId) {
+      return;
+    }
+
+    this.followActionLoading.set(true);
+    this.followActionError.set('');
+
+    try {
+      if (this.isFollowingProfile()) {
+        await this.api.unfollowUser(followerId, followedId);
+        this.isFollowingProfile.set(false);
+        this.followers.update((count) => Math.max(0, count - 1));
+      } else {
+        await this.api.followUser({ followerId, followedId });
+        this.isFollowingProfile.set(true);
+        this.followers.update((count) => count + 1);
+      }
+    } catch (err: any) {
+      const backendError =
+        typeof err?.error === 'string'
+          ? err.error
+          : err?.error?.error ||
+            err?.error?.message ||
+            err?.message;
+
+      this.followActionError.set(
+        backendError || 'No se pudo actualizar el seguimiento.'
+      );
+    } finally {
+      this.followActionLoading.set(false);
+    }
   }
 
   private async loadProfile(userId: number): Promise<void> {

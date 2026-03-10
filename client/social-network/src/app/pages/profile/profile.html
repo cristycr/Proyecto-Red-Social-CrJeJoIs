@@ -42,6 +42,27 @@
 			</div>
 		</div>
 
+		@if (!isOwnProfile()) {
+			<div class="follow-actions">
+				<button
+					type="button"
+					class="follow-btn"
+					(click)="onFollowButtonClick()"
+					[disabled]="followActionLoading()"
+				>
+					@if (followActionLoading()) {
+						Actualizando...
+					} @else {
+						{{ isFollowingProfile() ? 'Dejar de seguir' : 'Seguir' }}
+					}
+				</button>
+
+				@if (followActionError()) {
+					<p class="follow-error">{{ followActionError() }}</p>
+				}
+			</div>
+		}
+
 		@if (isOwnProfile()) {
 			<button class="logout" (click)="logout()">Cerrar sesión</button>
 			<div class="avatar-actions">
@@ -61,6 +82,10 @@
 			} @else if (userPosts().length === 0) {
 				<p class="posts-status">Este usuario aun no tiene publicaciones.</p>
 			} @else {
+				<span class="posts-page-current posts-page-current-top">
+					Pagina {{ currentPostsPage() }} / {{ totalPostsPages() }}
+				</span>
+
 				<div class="posts-list">
 					@for (post of paginatedUserPosts(); track post.id) {
 						<article class="profile-post">

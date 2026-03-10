@@ -65,6 +65,34 @@
 	color: var(--secondary-color-light);
 }
 
+.follow-actions {
+	margin-top: 18px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 8px;
+}
+
+.follow-btn {
+	margin-top: 0;
+	min-width: 170px;
+	background: var(--secondary-color);
+}
+
+.follow-btn:hover:not(:disabled) {
+	background: var(--secondary-color-dark);
+}
+
+.follow-btn:disabled {
+	opacity: 0.65;
+	cursor: wait;
+}
+
+.follow-error {
+	margin: 0;
+	color: #b71c1c;
+}
+
 p {
     max-width: 50ch;
     color: var(--primary-color);
@@ -145,6 +173,17 @@ p {
 	gap: 12px;
 	margin-top: 14px;
 	color: var(--primary-color);
+}
+
+.posts-page-current {
+	font-weight: 400;
+	color: var(--secondary-color);
+}
+
+.posts-page-current-top {
+	display: block;
+	text-align: left;
+	margin-bottom: 10px;
 }
 
 .posts-page-btn {
