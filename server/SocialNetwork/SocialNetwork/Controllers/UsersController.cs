@@ -49,6 +49,19 @@ public class UsersController : ControllerBase {
         return getUsersDto;
     }
 
+    [HttpGet("Followers")]
+    public async Task<IEnumerable<GetUserDto>> GetFollowerUsers(long userId) {
+        // long userId = long.Parse(User.FindFirst("id").Value);
+        ICollection<GetUserDto> users = await _unitOfWork.UserRepository.GetFollowerUsersAsync(userId);
+
+        IEnumerable<GetUserDto> getUsersDto = users.Select(user => new GetUserDto {
+            Id = user.Id,
+            Nickname = user.Nickname,
+            AvatarPath = user.AvatarPath!
+        });
+        return getUsersDto;
+    }
+
     // metodo para obtener un usuario por su id, para mostrar su perfil
     [HttpGet("{id}/profile")]
     public async Task<GetUserProfileDto> GetUserById(long id) {
@@ -65,19 +78,6 @@ public class UsersController : ControllerBase {
             FollowedCount = _unitOfWork.UserRepository.GetFollowedUsersCountAsync(id).Result,
         };
         return getUserCountDto;
-    }
-
-    [HttpGet("Followers")]
-    public async Task<IEnumerable<GetUserDto>> GetFollowerUsers(long userId) {
-        // long userId = long.Parse(User.FindFirst("id").Value);
-        ICollection<GetUserDto> users = await _unitOfWork.UserRepository.GetFollowerUsersAsync(userId);
-
-        IEnumerable<GetUserDto> getUsersDto = users.Select(user => new GetUserDto {
-            Id = user.Id,
-            Nickname = user.Nickname,
-            AvatarPath = user.AvatarPath!
-        });
-        return getUsersDto;
     }
 
     // PUT
