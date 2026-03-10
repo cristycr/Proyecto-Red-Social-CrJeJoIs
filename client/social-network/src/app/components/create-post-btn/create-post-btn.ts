@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CreatePostModal } from '../create-post-modal/create-post-modal';
 import { ApiService } from '../../services/api';
 import { AuthService } from '../../services/auth';
@@ -13,11 +13,8 @@ import { AddPostDto } from '../../models/add-post-dto';
 })
 export class CreatePostBtn {
   protected readonly isModalOpen = signal(false);
-
-  constructor(
-    private apiService: ApiService,
-    private authService: AuthService
-  ) { }
+  private readonly apiService = inject(ApiService);
+  private readonly authService = inject(AuthService);
 
   openModal() {
     this.isModalOpen.set(true);

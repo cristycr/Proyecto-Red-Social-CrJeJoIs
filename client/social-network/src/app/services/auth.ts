@@ -1,4 +1,4 @@
-import { computed, Injectable, signal } from '@angular/core';
+import { computed, inject, Injectable, signal } from '@angular/core';
 import { jwtDecode } from 'jwt-decode';
 import { AuthRequest } from '../models/auth-request';
 import { AuthResponse } from '../models/auth-response';
@@ -19,6 +19,8 @@ type JwtPayload = {
   providedIn: 'root',
 })
 export class AuthService {
+  private readonly api = inject(ApiService);
+
   private readonly jwtSignal = signal<string | null>(null);
 
   private readonly decodedPayload = computed<JwtPayload | null>(() => {
@@ -83,7 +85,7 @@ export class AuthService {
     this.api.jwt = value;
   }
 
-  constructor(private api: ApiService) {
+  constructor() {
     const jwt = localStorage.getItem('jwt');
     if (jwt) {
       this.setJwt(jwt);
