@@ -24,13 +24,13 @@ public class SocialNetworkContext : DbContext // Tiene que heredar de DbContext
             .HasOne(f => f.Follower) // La propiedad en Following que representa al seguidor
             .WithMany(u => u.Following) // La colección en User que representa a los seguidos
             .HasForeignKey(f => f.FollowerId) // La clave foránea en Following
-            .OnDelete(DeleteBehavior.Restrict); // Evita eliminaciones en cascada
+            .OnDelete(DeleteBehavior.Cascade); // Eliminar seguimientos cuando se borra el usuario
 
         modelBuilder.Entity<Following>()
             .HasOne(f => f.Followed) // La propiedad en Following que representa al seguido
             .WithMany(u => u.Followers) // La colección en User que representa a los seguidores
             .HasForeignKey(f => f.FollowedId) // La clave foránea en Following
-            .OnDelete(DeleteBehavior.Restrict); // Evita eliminaciones en cascada
+            .OnDelete(DeleteBehavior.Cascade); // Eliminar seguimientos cuando se borra el usuario
 
         modelBuilder.Entity<Post>() // ¿Mantener?
             .HasOne(p => p.User)

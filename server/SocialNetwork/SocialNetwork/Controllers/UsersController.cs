@@ -49,6 +49,19 @@ public class UsersController : ControllerBase {
         return getUsersDto;
     }
 
+    [HttpGet("Followers")]
+    public async Task<IEnumerable<GetUserDto>> GetFollowerUsers(long userId) {
+        // long userId = long.Parse(User.FindFirst("id").Value);
+        ICollection<GetUserDto> users = await _unitOfWork.UserRepository.GetFollowerUsersAsync(userId);
+
+        IEnumerable<GetUserDto> getUsersDto = users.Select(user => new GetUserDto {
+            Id = user.Id,
+            Nickname = user.Nickname,
+            AvatarPath = user.AvatarPath!
+        });
+        return getUsersDto;
+    }
+
     // metodo para obtener un usuario por su id, para mostrar su perfil
     [HttpGet("{id}/profile")]
     public async Task<GetUserProfileDto> GetUserById(long id) {
@@ -67,19 +80,6 @@ public class UsersController : ControllerBase {
         return getUserCountDto;
     }
 
-    [HttpGet("Followers")]
-    public async Task<IEnumerable<GetUserDto>> GetFollowerUsers(long userId) {
-        // long userId = long.Parse(User.FindFirst("id").Value);
-        ICollection<GetUserDto> users = await _unitOfWork.UserRepository.GetFollowerUsersAsync(userId);
-
-        IEnumerable<GetUserDto> getUsersDto = users.Select(user => new GetUserDto {
-            Id = user.Id,
-            Nickname = user.Nickname,
-            AvatarPath = user.AvatarPath!
-        });
-        return getUsersDto;
-    }
-
     // PUT
     [Authorize]
     [HttpPut]
@@ -91,12 +91,6 @@ public class UsersController : ControllerBase {
     }
 
     // DELETE
-    [Authorize(Roles = "admin")]
-    [HttpDelete] //Este delete es para que el admin pueda borrar usuarios, no para que un usuario pueda borrar su cuenta
-                 //Para ese caso habria que hacer otro metodo
-    public async Task DeleteUser([FromBody] User user) {
-        await _unitOfWork.UserRepository.DeleteAsync(user);
-    }
 
     [Authorize]
     [HttpPost("avatar")]

@@ -13,8 +13,6 @@ namespace SocialNetwork.Models.Dtos.Users
         [StringLength(30, MinimumLength = 3, ErrorMessage = "El nickname debe tener minimo 3 caracteres.")]
         public required string Nickname { get; set; } = null!;
 
-        public string? AvatarPath { get; set; }
-
         [Required(ErrorMessage = "El nombre es obligatorio.")]
         [StringLength(50, MinimumLength = 2, ErrorMessage = "El nombre debe tener minimo 2 caracteres.")]
         public required string Name { get; set; } = null!;
@@ -29,7 +27,5 @@ namespace SocialNetwork.Models.Dtos.Users
         [Required(ErrorMessage = "La contraseña es obligatoria.")]
         [StringLength(100, MinimumLength = 6, ErrorMessage = "La contraseña debe tener minimo 6 caracteres.")]
         public required string Password { get; set; } = null!;
-
-        public string? Biography { get; set; }
     }
 }

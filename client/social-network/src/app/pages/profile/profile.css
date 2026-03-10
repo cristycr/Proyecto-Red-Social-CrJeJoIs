@@ -43,28 +43,151 @@
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-    transition: 0.3s ease;
+    transition: transform 0.25s ease;
 }
 
-.stat:hover {
-    color: white;
+.clickable-stat {
+	cursor: pointer;
+}
+
+.clickable-stat:hover {
     cursor: pointer;
+}
+
+.clickable-stat:hover .stat-number {
+	color: #b3a5d9;
+}
+
+.clickable-stat:hover .stat-label {
+	color: #c4b8e4;
 }
 
 .stat-number {
 	font-size: 1.3rem;
 	font-weight: 700;
 	color: var(--secondary-color);
+	transition: color 0.25s ease;
 }
 
 .stat-label {
 	font-size: 0.95rem;
 	color: var(--secondary-color-light);
+	transition: color 0.25s ease;
 }
 
 p {
     max-width: 50ch;
     color: var(--primary-color);
+}
+
+.modal-overlay {
+	position: fixed;
+	inset: 0;
+	background: var(--secondary-color-transparent-shadow);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	z-index: 120;
+}
+
+.followers-modal {
+	width: min(94vw, 620px);
+	max-height: 70vh;
+	overflow: hidden;
+	background: var(--text-color);
+	border: 1px solid var(--secondary-color-transparent-border);
+	border-radius: 12px;
+	box-shadow: 0 8px 24px var(--secondary-color-transparent-shadow);
+	padding: 16px;
+}
+
+.followers-modal-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+	margin-bottom: 12px;
+}
+
+.followers-modal-header h3 {
+	margin: 0;
+	color: var(--secondary-color);
+}
+
+.followers-close-btn {
+	margin-top: 0;
+	width: 36px;
+	height: 36px;
+	padding: 0;
+	border-radius: 8px;
+	background: var(--secondary-color-transparent-light);
+	color: var(--secondary-color-dark);
+	font-size: 1rem;
+	font-weight: 700;
+	line-height: 1;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.followers-close-btn:hover {
+	background: var(--secondary-color-transparent-medium);
+}
+
+.followers-list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	max-height: calc(70vh - 80px);
+	overflow-y: auto;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.follower-item {
+	display: flex;
+	align-items: center;
+	padding: 8px;
+	border-radius: 10px;
+	background: var(--secondary-color-transparent-light);
+}
+
+.follower-link {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	width: 100%;
+	text-decoration: none;
+	cursor: pointer;
+}
+
+.follower-link:hover .follower-nickname {
+	color: var(--secondary-color);
+}
+
+.follower-avatar {
+	width: 34px;
+	height: 34px;
+	border-radius: 50%;
+	object-fit: cover;
+	border: 2px solid var(--secondary-color-transparent-border);
+}
+
+.follower-nickname {
+	font-weight: 600;
+	color: var(--secondary-color-dark);
+	transition: color 0.2s ease;
+}
+
+.followers-status,
+.followers-error {
+	margin: 0;
+	padding: 8px 0;
+}
+
+.followers-error {
+	color: #b71c1c;
 }
 
 button {
