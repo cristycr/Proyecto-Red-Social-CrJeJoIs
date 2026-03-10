@@ -1,6 +1,7 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AuthService } from '../../services/auth';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { CreatePostBtn } from '../../components/create-post-btn/create-post-btn';
 import { ApiService } from '../../services/api';
 import { GetUserDto } from '../../models/get-user-dto';
@@ -13,7 +14,7 @@ type UserListItem = {
 
 @Component({
   selector: 'app-profile',
-  imports: [CreatePostBtn],
+  imports: [CreatePostBtn, RouterModule],
   templateUrl: './profile.html',
   styleUrl: './profile.css',
 })
@@ -22,6 +23,7 @@ export class Profile implements OnInit {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly api = inject(ApiService);
+  private readonly destroyRef = inject(DestroyRef);
 
   protected readonly nickname = signal('Usuario');
   protected readonly profileImage = signal('/assets/images/avatar-default.png');
@@ -41,14 +43,27 @@ export class Profile implements OnInit {
 
   private profileUserId: number | null = null;
 
-  async ngOnInit(): Promise<void> {
-    const routeId = this.route.snapshot.paramMap.get('id');
+  ngOnInit(): void {
+    this.route.paramMap
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((params) => {
+        void this.handleProfileRouteChange(params.get('id'));
+      });
+  }
+
+  private async handleProfileRouteChange(routeId: string | null): Promise<void> {
     const requestedUserId = routeId ? Number(routeId) : null;
     const currentUserId = this.auth.currentUserId();
 
-    if (!requestedUserId || Number.isNaN(requestedUserId) || requestedUserId === currentUserId) {
+    if (!requestedUserId || Number.isNaN(requestedUserId)) {
       this.profileUserId = currentUserId;
       this.loadOwnProfileFromJwt();
+      return;
+    }
+
+    if (requestedUserId === currentUserId) {
+      this.profileUserId = currentUserId;
+      await this.router.navigate(['/profile']);
       return;
     }
 
