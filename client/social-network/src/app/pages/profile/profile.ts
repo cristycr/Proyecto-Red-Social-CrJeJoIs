@@ -3,6 +3,13 @@ import { AuthService } from '../../services/auth';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CreatePostBtn } from '../../components/create-post-btn/create-post-btn';
 import { ApiService } from '../../services/api';
+import { GetUserDto } from '../../models/get-user-dto';
+
+type UserListItem = {
+  id: number;
+  nickname: string;
+  avatarUrl: string;
+};
 
 @Component({
   selector: 'app-profile',
@@ -24,6 +31,15 @@ export class Profile implements OnInit {
   protected readonly isOwnProfile = signal(true);
   protected readonly loading = signal(true);
   protected readonly errorMessage = signal('');
+  protected readonly usersModalOpen = signal(false);
+  protected readonly usersModalLoading = signal(false);
+  protected readonly usersModalError = signal('');
+  protected readonly usersModalTitle = signal('Seguidos');
+  protected readonly usersModalLoadingMessage = signal('Cargando seguidos...');
+  protected readonly usersModalEmptyMessage = signal('Este perfil no sigue a nadie aun.');
+  protected readonly modalUsers = signal<UserListItem[]>([]);
+
+  private profileUserId: number | null = null;
 
   async ngOnInit(): Promise<void> {
     const routeId = this.route.snapshot.paramMap.get('id');
@@ -31,10 +47,12 @@ export class Profile implements OnInit {
     const currentUserId = this.auth.currentUserId();
 
     if (!requestedUserId || Number.isNaN(requestedUserId) || requestedUserId === currentUserId) {
+      this.profileUserId = currentUserId;
       this.loadOwnProfileFromJwt();
       return;
     }
 
+    this.profileUserId = requestedUserId;
     this.isOwnProfile.set(false);
     await this.loadProfile(requestedUserId);
   }
@@ -71,6 +89,86 @@ export class Profile implements OnInit {
     } finally {
       this.loading.set(false);
     }
+  }
+
+  async openFollowersModal(): Promise<void> {
+    await this.openUsersModal({
+      title: 'Seguidores',
+      loadingMessage: 'Cargando seguidores...',
+      emptyMessage: 'Este perfil no tiene seguidores aun.',
+      errorMessage: 'No se pudo cargar la lista de seguidores.',
+      fetchUsers: (userId) => this.api.getFollowerUsers(userId),
+    });
+  }
+
+  async openFollowedsModal(): Promise<void> {
+    await this.openUsersModal({
+      title: 'Seguidos',
+      loadingMessage: 'Cargando seguidos...',
+      emptyMessage: 'Este perfil no sigue a nadie aun.',
+      errorMessage: 'No se pudo cargar la lista de seguidos.',
+      fetchUsers: (userId) => this.api.getFollowedUsers(userId),
+    });
+  }
+
+  private async openUsersModal(config: {
+    title: string;
+    loadingMessage: string;
+    emptyMessage: string;
+    errorMessage: string;
+    fetchUsers: (userId: number) => Promise<GetUserDto[]>;
+  }): Promise<void> {
+    this.usersModalTitle.set(config.title);
+    this.usersModalLoadingMessage.set(config.loadingMessage);
+    this.usersModalEmptyMessage.set(config.emptyMessage);
+
+    if (!this.profileUserId) {
+      this.usersModalError.set('No se pudo identificar el usuario del perfil.');
+      this.modalUsers.set([]);
+      this.usersModalOpen.set(true);
+      return;
+    }
+
+    this.usersModalOpen.set(true);
+    this.usersModalLoading.set(true);
+    this.usersModalError.set('');
+    this.modalUsers.set([]);
+
+    try {
+      const users = await config.fetchUsers(this.profileUserId);
+
+      this.modalUsers.set(
+        users.map((user) => ({
+          id: user.id,
+          nickname: user.nickname,
+          avatarUrl: this.buildAvatarUrl(user.avatarPath),
+        }))
+      );
+    } catch {
+      this.usersModalError.set(config.errorMessage);
+    } finally {
+      this.usersModalLoading.set(false);
+    }
+  }
+
+  closeUsersModal(): void {
+    this.usersModalOpen.set(false);
+  }
+
+  onUsersModalBackdropClick(event: MouseEvent): void {
+    if (event.target === event.currentTarget) {
+      this.closeUsersModal();
+    }
+  }
+
+  private buildAvatarUrl(avatarPath: string | null): string {
+    const cleanAvatarPath = avatarPath?.trim();
+
+    if (!cleanAvatarPath) {
+      return '/assets/images/avatar-default.png';
+    }
+
+    return `https://localhost:7185/uploads/${cleanAvatarPath}`;
   }
 
   logout() {

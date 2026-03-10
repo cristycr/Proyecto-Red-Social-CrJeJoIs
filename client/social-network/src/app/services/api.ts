@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { lastValueFrom } from 'rxjs';
+import { GetUserDto } from '../models/get-user-dto';
 import { Post } from '../models/post';
 
 @Injectable({
@@ -62,6 +63,16 @@ export class ApiService {
   // Obtiene el perfil público de un usuario por su id
   async getUserProfileById(userId: number): Promise<any> {
     return await this.get<any>(`users/${userId}/profile`);
+  }
+
+  // Obtiene la lista de usuarios que siguen a un usuario
+  async getFollowedUsers(userId: number): Promise<GetUserDto[]> {
+    return await this.get<GetUserDto[]>(`users/Followeds?userId=${userId}`);
+  }
+
+  // Obtiene la lista de seguidores de un usuario
+  async getFollowerUsers(userId: number): Promise<GetUserDto[]> {
+    return await this.get<GetUserDto[]>(`users/Followers?userId=${userId}`);
   }
 
   async uploadAvatar(file: File): Promise<{ avatarUrl: string }> {

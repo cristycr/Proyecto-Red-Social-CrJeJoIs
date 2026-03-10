@@ -18,11 +18,25 @@
 		</div>
 
 		<div class="profile-stats">
-			<div class="stat">
+			<div
+				class="stat clickable-stat"
+				role="button"
+				tabindex="0"
+				(click)="openFollowersModal()"
+				(keydown.enter)="openFollowersModal()"
+				(keydown.space)="openFollowersModal(); $event.preventDefault()"
+			>
 				<span class="stat-number">{{ followers() }}</span>
 				<span class="stat-label">Seguidores</span>
 			</div>
-			<div class="stat">
+			<div
+				class="stat clickable-stat"
+				role="button"
+				tabindex="0"
+				(click)="openFollowedsModal()"
+				(keydown.enter)="openFollowedsModal()"
+				(keydown.space)="openFollowedsModal(); $event.preventDefault()"
+			>
 				<span class="stat-number">{{ followeds() }}</span>
 				<span class="stat-label">Seguidos</span>
 			</div>
@@ -39,5 +53,33 @@
 	}
 	<!--TODO: Mostrar las publicaciones del usuario-->
 </div>
+
+@if (usersModalOpen()) {
+	<div class="modal-overlay" (click)="onUsersModalBackdropClick($event)">
+		<div class="followers-modal" role="dialog" aria-modal="true" [attr.aria-label]="usersModalTitle() + ' del perfil'">
+			<div class="followers-modal-header">
+				<h3>{{ usersModalTitle() }}</h3>
+				<button type="button" class="followers-close-btn" aria-label="Cerrar modal" (click)="closeUsersModal()">✕</button>
+			</div>
+
+			@if (usersModalLoading()) {
+				<p class="followers-status">{{ usersModalLoadingMessage() }}</p>
+			} @else if (usersModalError()) {
+				<p class="followers-error">{{ usersModalError() }}</p>
+			} @else if (modalUsers().length === 0) {
+				<p class="followers-status">{{ usersModalEmptyMessage() }}</p>
+			} @else {
+				<ul class="followers-list">
+					@for (user of modalUsers(); track user.id) {
+						<li class="follower-item">
+							<img [src]="user.avatarUrl" [alt]="'Avatar de ' + user.nickname" class="follower-avatar">
+							<span class="follower-nickname">{{ user.nickname }}</span>
+						</li>
+					}
+				</ul>
+			}
+		</div>
+	</div>
+}
 
 <app-create-post-btn />
