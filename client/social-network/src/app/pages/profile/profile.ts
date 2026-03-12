@@ -47,6 +47,8 @@ export class Profile implements OnInit {
   protected readonly userPosts = signal<Post[]>([]);
   protected readonly postsLoading = signal(true);
   protected readonly postsErrorMessage = signal('');
+  protected readonly postDeleteError = signal('');
+  protected readonly deletingPostIds = signal<number[]>([]);
   protected readonly postsPerPage = signal(10);
   protected readonly currentPostsPage = signal(1);
   protected readonly totalPostsPages = computed(() => {
@@ -198,6 +200,8 @@ export class Profile implements OnInit {
     this.errorMessage.set('');
     this.postsLoading.set(true);
     this.postsErrorMessage.set('');
+    this.postDeleteError.set('');
+    this.deletingPostIds.set([]);
     this.userPosts.set([]);
     this.currentPostsPage.set(1);
 
@@ -232,6 +236,66 @@ export class Profile implements OnInit {
 
     this.loading.set(false);
     this.postsLoading.set(false);
+  }
+
+  protected canDeletePost(post: Post): boolean {
+    const jwtUserId = this.auth.currentUserId();
+    const postUserId = this.parsePostUserId(post.userId);
+
+    return (
+      this.isOwnProfile() &&
+      !!this.auth.jwt &&
+      jwtUserId !== null &&
+      postUserId !== null &&
+      jwtUserId === postUserId
+    );
+  }
+
+  protected isDeletingPost(postId: number): boolean {
+    return this.deletingPostIds().includes(postId);
+  }
+
+  protected async onDeletePost(post: Post): Promise<void> {
+    this.postDeleteError.set('');
+
+    if (!this.canDeletePost(post)) {
+      this.postDeleteError.set('No tienes permisos para eliminar esta publicación.');
+      return;
+    }
+
+    if (this.isDeletingPost(post.id)) {
+      return;
+    }
+
+    const shouldDelete = window.confirm(
+      '¿Seguro que quieres eliminar esta publicación? Esta acción no se puede deshacer.'
+    );
+
+    if (!shouldDelete) {
+      return;
+    }
+
+    this.setPostDeleting(post.id, true);
+
+    try {
+      await this.api.deletePost(post.id);
+
+      this.userPosts.update((posts) =>
+        posts.filter((currentPost) => currentPost.id !== post.id)
+      );
+
+      const maxAvailablePage = this.totalPostsPages();
+
+      if (this.currentPostsPage() > maxAvailablePage) {
+        this.currentPostsPage.set(maxAvailablePage);
+      }
+    } catch (err: any) {
+      this.postDeleteError.set(
+        this.extractBackendError(err, 'No se pudo eliminar la publicación.')
+      );
+    } finally {
+      this.setPostDeleting(post.id, false);
+    }
   }
 
   protected onPostsPerPageInput(event: Event): void {
@@ -359,6 +423,36 @@ export class Profile implements OnInit {
     if (event.target === event.currentTarget) {
       this.closeUsersModal();
     }
+  }
+
+  private setPostDeleting(postId: number, isDeleting: boolean): void {
+    this.deletingPostIds.update((postIds) => {
+      if (isDeleting) {
+        return postIds.includes(postId) ? postIds : [...postIds, postId];
+      }
+
+      return postIds.filter((id) => id !== postId);
+    });
+  }
+
+  private parsePostUserId(userId: string | number | null | undefined): number | null {
+    const parsedId = Number(userId);
+
+    if (Number.isNaN(parsedId)) {
+      return null;
+    }
+
+    return parsedId;
+  }
+
+  private extractBackendError(err: any, fallbackMessage: string): string {
+    return (
+      (typeof err?.error === 'string' ? err.error : null) ||
+      err?.error?.error ||
+      err?.error?.message ||
+      err?.message ||
+      fallbackMessage
+    );
   }
 
   private buildAvatarUrl(avatarPath: string | null): string {

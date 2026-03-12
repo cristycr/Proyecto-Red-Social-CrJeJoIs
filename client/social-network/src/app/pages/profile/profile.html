@@ -82,6 +82,10 @@
 			} @else if (userPosts().length === 0) {
 				<p class="posts-status">Este usuario aun no tiene publicaciones.</p>
 			} @else {
+				@if (postDeleteError()) {
+					<p class="posts-error posts-action-error">{{ postDeleteError() }}</p>
+				}
+
 				<span class="posts-page-current posts-page-current-top">
 					Pagina {{ currentPostsPage() }} / {{ totalPostsPages() }}
 				</span>
@@ -89,7 +93,21 @@
 				<div class="posts-list">
 					@for (post of paginatedUserPosts(); track post.id) {
 						<article class="profile-post">
-							<h3>{{ post.title }}</h3>
+							<div class="profile-post-header">
+								<h3>{{ post.title || 'Sin titulo' }}</h3>
+
+								@if (canDeletePost(post)) {
+									<button
+										type="button"
+										class="delete-post-btn"
+										(click)="onDeletePost(post)"
+										[disabled]="isDeletingPost(post.id)"
+										[attr.aria-label]="'Eliminar publicación ' + (post.title || '')"
+									>
+										<img src="assets/icons/trash.svg" alt="" aria-hidden="true" class="delete-post-icon">
+									</button>
+								}
+							</div>
 							<p>{{ post.description }}</p>
 							<span class="profile-post-date">{{ formatPostDate(post.creationDate) }}</span>
 						</article>

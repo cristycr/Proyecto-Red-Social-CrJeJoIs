@@ -51,6 +51,11 @@ export class ApiService {
     return await this.get<Post[]>(`posts/by-user/${userId}`);
   }
 
+  // Método para eliminar una publicación por id
+  async deletePost(postId: number): Promise<void> {
+    await this.delete('posts', { id: postId });
+  }
+
   // Método para obtener todos los usuarios
   async getAllUsers(): Promise<GetUserDto[]> {
     return await this.get<GetUserDto[]>('users');
