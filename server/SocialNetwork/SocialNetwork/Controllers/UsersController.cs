@@ -36,6 +36,23 @@ public class UsersController : ControllerBase {
         return getUsersDto;
     }
 
+    [HttpGet("all")]
+    public async Task<GetUserProfileExtendDto> GetProfileUsers(long userId) {
+        User? user = await _unitOfWork.UserRepository.GetByIdAsync(userId);
+
+        if (user == null) throw new Exception("User not found");
+
+        var dto = new GetUserProfileExtendDto {
+            Email = user.Email,
+            Name = user.Name,
+            Surname1 = user.Surname1,
+            Surname2 = user.Surname2,
+            Biography = user.Biography
+        };
+
+        return dto;
+    }
+
     // Get de los usuarios seguidos y seguidores de un usuario
     [HttpGet("Followeds")]
     public async Task<IEnumerable<GetUserDto>> GetFollowedUsers(long userId) {
@@ -81,17 +98,29 @@ public class UsersController : ControllerBase {
     }
 
     // PUT
-    [Authorize]
     [HttpPut]
-    public async Task<User> UpdateUser([FromBody] User newUser)
-    {
-        var updatedUser = await _unitOfWork.UserRepository.UpdateAsync(newUser);
-        await _unitOfWork.SaveAsync();
-        return updatedUser;
+    [Authorize]
+    public async Task<IActionResult> UpdateUser(int id, [FromBody] PutUserDto dto) {
+
+        User? user = await _unitOfWork.UserRepository.GetByIdAsync(id);
+        if (user == null) {
+            return NotFound();
+        }
+        user.Email = dto.Email;
+        user.Name = dto.Name;
+        user.Surname1 = dto.Surname1;
+        user.Password = PasswordHelper.Hash(dto.Password);
+        user.Surname2 = dto.Surname2;
+        user.Biography = dto.Biography;
+        await _unitOfWork.UserRepository.UpdateAsync(user);
+        bool success = await _unitOfWork.SaveAsync();
+        if (!success) {
+            return BadRequest();
+        }
+        return Ok(dto);
     }
 
-    // DELETE
-
+    // POST
     [Authorize]
     [HttpPost("avatar")]
     public async Task<IActionResult> UploadAvatar(IFormFile file)
@@ -115,6 +144,8 @@ public class UsersController : ControllerBase {
         return Ok(new { avatarUrl = result.Url });
     }
 
+
+    // DELETE
     [Authorize]
     [HttpDelete("avatar")]
     public async Task<IActionResult> DeleteAvatar()
