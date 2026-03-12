@@ -90,6 +90,22 @@
     color: var(--alert-color);
 }
 
+.feed-empty-image {
+    display: block;
+    width: min(220px, 58vw);
+    height: auto;
+    object-fit: contain;
+    margin: 12px auto 10px;
+}
+
+.feed-empty-text {
+    margin: 0 auto 28px;
+    font-size: clamp(1.06rem, 1.4vw, 1.26rem);
+    color: var(--secondary-color-dark);
+    font-weight: 700;
+    line-height: 1.5;
+}
+
 .feed-loading-more {
     width: fit-content;
     margin: 18px auto 34px;
