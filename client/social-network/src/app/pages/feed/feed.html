@@ -1,16 +1,32 @@
-@for (post of posts(); track $index) {
-    <div class="post">
-        <div class="post-header">
-            <a class="user-link" [routerLink]="['/profile', post.userId]">
-                <img [src]="post.avatarPath ? post.avatarPath : '/assets/images/avatar-default.png'" alt="Avatar" class="avatar">
-                <span class="nickname">{{post.nickname}}</span>
-            </a>
+@if (initialLoading()) {
+    <p class="feed-state">Cargando publicaciones...</p>
+} @else if (loadingError()) {
+    <p class="feed-state feed-state-error">{{ loadingError() }}</p>
+} @else {
+    @for (post of posts(); track post.id) {
+        <div class="post">
+            <div class="post-header">
+                <a class="user-link" [routerLink]="['/profile', post.userId]">
+                    <img [src]="post.avatarPath ? post.avatarPath : '/assets/images/avatar-default.png'" alt="Avatar" class="avatar">
+                    <span class="nickname">{{post.nickname}}</span>
+                </a>
+            </div>
+            <h3>{{post.title}}</h3>
+            <p>{{post.description}}</p>
+            <span>{{post.creationDate | date: 'dd/MM/yyyy HH:mm':'UTC'}}</span>
         </div>
-        <h3>{{post.title}}</h3>
-        <p>{{post.description}}</p>
-        <span>{{post.creationDate | date: 'dd/MM/yyyy HH:mm':'UTC'}}</span>
-    </div>
+    }
+
+    @if (posts().length === 0) {
+        <p class="feed-state">No hay publicaciones por mostrar.</p>
+    }
+
+    @if (hasMorePosts()) {
+        <p class="feed-loading-more">Desplazate para cargar mas publicaciones...</p>
+    }
 }
+
+<div #scrollAnchor class="feed-scroll-anchor" aria-hidden="true"></div>
 
 @if (isAuthenticated()) {
     <app-create-post-btn />
