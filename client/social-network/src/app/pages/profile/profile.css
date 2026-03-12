@@ -1,111 +1,111 @@
 .container {
-	width: min(1100px, 95%);
-	padding: 28px clamp(16px, 3vw, 34px);
+	width: min(1180px, 96%);
 	margin: 0 auto;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
+	padding: clamp(16px, 2.8vw, 30px);
 	border-radius: 20px;
 	border: 1px solid var(--secondary-color-transparent-border);
 	box-shadow: 0 16px 34px rgba(19, 32, 58, 0.1);
 	background: var(--surface-panel);
 }
 
-.profile-header {
+.profile-status,
+.profile-error {
+	margin: 0;
+	color: var(--text-muted);
+}
+
+.profile-error {
+	margin-bottom: 14px;
+	color: var(--alert-color);
+}
+
+.profile-layout {
+	display: grid;
+	grid-template-columns: minmax(250px, 320px) minmax(0, 1fr);
+	gap: 32px;
+	align-items: start;
+}
+
+.profile-sidebar {
 	display: flex;
-	align-items: center;
-	gap: 20px;
-	margin-top: 6px;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 12px;
 }
 
 .avatar {
-	width: 136px;
-	height: 136px;
+	width: min(100%, 260px);
+	aspect-ratio: 1 / 1;
 	border-radius: 50%;
 	object-fit: cover;
 	border: 4px solid var(--secondary-color);
 	background: var(--surface-highlight);
-	box-shadow: 0 8px 16px rgba(19, 32, 58, 0.16);
+	box-shadow: 0 10px 20px rgba(19, 32, 58, 0.18);
 }
 
 .nickname {
-	font-size: 1.72rem;
+	margin: 2px 0 0;
+	font-size: clamp(1.45rem, 1.8vw, 1.8rem);
 	font-weight: 700;
 	color: var(--secondary-color-dark);
+	word-break: break-word;
 }
 
 .biography {
-	width: min(100%, 700px);
-	margin-top: 14px;
-}
-
-.biography p {
 	margin: 0;
-	text-align: center;
-	max-width: none;
-	line-height: 1.6;
+	max-width: 100%;
 	color: var(--text-main);
-	padding: 12px 16px;
-	border-radius: 12px;
-	background: linear-gradient(180deg, #fff6f0 0%, #fff1e9 100%);
+	line-height: 1.55;
+	white-space: pre-line;
 }
 
-.profile-stats {
+.profile-connections {
 	display: flex;
-	gap: 20px;
-	justify-content: center;
-	margin-top: 20px;
-	flex-wrap: wrap;
-}
-
-.stat {
-	min-width: 130px;
-	padding: 12px 16px;
-	border-radius: 12px;
-	border: 1px solid var(--secondary-color-transparent-border);
-	background: linear-gradient(180deg, #fff9f4 0%, #fff1e8 100%);
-	display: flex;
-	flex-direction: column;
 	align-items: center;
-	transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.clickable-stat {
-	cursor: pointer;
-}
-
-.clickable-stat:hover {
-	transform: translateY(-1px);
-	box-shadow: 0 10px 16px rgba(19, 32, 58, 0.1);
-}
-
-.clickable-stat:hover .stat-number {
-	color: var(--secondary-color-dark);
-}
-
-.clickable-stat:hover .stat-label {
-	color: var(--secondary-color-dark);
-}
-
-.stat-number {
-	font-size: 1.4rem;
-	font-weight: 700;
-	color: var(--secondary-color-dark);
-}
-
-.stat-label {
-	font-size: 0.92rem;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin-top: 4px;
 	color: var(--text-muted);
 }
 
-.follow-actions {
-	margin-top: 18px;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: 8px;
+.connections-icon {
+	width: 18px;
+	height: 18px;
+	opacity: 0.9;
 }
 
+.connection-link {
+	padding: 0;
+	border: none;
+	background: transparent;
+	color: var(--text-main);
+	font-size: 0.95rem;
+	cursor: pointer;
+	transition: color 0.2s ease;
+}
+
+.connection-link strong {
+	color: var(--primary-color);
+	font-weight: 700;
+	transition: color 0.2s ease;
+}
+
+.connection-link:hover,
+.connection-link:focus-visible {
+	color: var(--secondary-color-dark);
+	outline: none;
+}
+
+.connection-link:hover strong,
+.connection-link:focus-visible strong {
+	color: var(--secondary-color-dark);
+}
+
+.connections-separator {
+	color: var(--text-muted);
+}
+
+.edit-profile-btn,
 .follow-btn,
 .profile-action-btn,
 .posts-page-btn,
@@ -116,9 +116,41 @@
 	transition: background-color 0.2s ease, transform 0.2s ease, opacity 0.2s ease;
 }
 
+.edit-profile-btn {
+	width: 100%;
+	margin-top: 6px;
+	padding: 10px 14px;
+	border-radius: 10px;
+	border: 1px solid var(--border-soft);
+	background: linear-gradient(180deg, #ffffff 0%, #f7fafc 100%);
+	color: var(--text-main);
+	font-size: 0.94rem;
+	font-weight: 600;
+	text-align: center;
+}
+
+.edit-profile-btn:hover {
+	border-color: var(--secondary-color-transparent-border);
+	background: linear-gradient(180deg, #ffffff 0%, #fff4eb 100%);
+}
+
+.edit-profile-btn:focus-visible {
+	outline: 2px solid var(--secondary-color);
+	outline-offset: 2px;
+}
+
+.follow-actions {
+	margin-top: 6px;
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+	gap: 8px;
+	width: 100%;
+}
+
 .follow-btn {
-	margin-top: 0;
-	min-width: 180px;
+	min-width: 0;
+	width: 100%;
 	padding: 10px 16px;
 	border-radius: 10px;
 	font-size: 0.96rem;
@@ -142,14 +174,22 @@
 	color: var(--alert-color);
 }
 
+.avatar-actions {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	width: 100%;
+	margin-top: 2px;
+}
+
 .profile-action-btn {
-	margin-top: 14px;
 	padding: 10px 18px;
 	border-radius: 10px;
 	font-size: 0.94rem;
 	font-weight: 600;
 	background: var(--secondary-color);
 	color: #fff;
+	width: 100%;
 }
 
 .profile-action-btn:hover {
@@ -173,17 +213,13 @@
 	background: #9f2016;
 }
 
-.avatar-actions {
-	display: flex;
-	gap: 10px;
-	flex-wrap: wrap;
-	justify-content: center;
+.profile-content {
+	min-width: 0;
 }
 
 .posts-section {
-	width: min(100%, 900px);
-	margin-top: 28px;
-	padding-top: 20px;
+	width: 100%;
+	padding-top: 6px;
 	border-top: 1px solid var(--border-soft);
 }
 
@@ -456,13 +492,51 @@
 	color: var(--alert-color);
 }
 
-@media (max-width: 780px) {
-	.profile-header {
-		flex-direction: column;
+@media (max-width: 980px) {
+	.profile-layout {
+		grid-template-columns: 1fr;
+		gap: 24px;
+	}
+
+	.profile-sidebar {
+		width: 100%;
+		max-width: 560px;
+	}
+
+	.avatar {
+		width: min(220px, 55vw);
+	}
+}
+
+@media (max-width: 640px) {
+	.container {
+		width: min(98%, 100%);
+		padding: 16px 14px 20px;
+	}
+
+	.profile-sidebar {
+		align-items: center;
 		text-align: center;
+	}
+
+	.biography {
+		text-align: center;
+	}
+
+	.profile-connections {
+		justify-content: center;
+	}
+
+	.avatar-actions,
+	.follow-actions {
+		max-width: 340px;
 	}
 
 	.posts-page-current-top {
 		text-align: center;
+	}
+
+	.posts-toolbar {
+		justify-content: flex-start;
 	}
 }
