@@ -51,6 +51,11 @@ export class ApiService {
     return await this.get<Post[]>(`posts/by-user/${userId}`);
   }
 
+  // Método para obtener todos los usuarios
+  async getAllUsers(): Promise<GetUserDto[]> {
+    return await this.get<GetUserDto[]>('users');
+  }
+
   // Comprueba si existe un usuario con el nickname dado
   async getUserByNickname(nickname: string): Promise<boolean> {
     try {
