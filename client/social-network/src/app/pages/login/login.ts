@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { RouterLink, Router, ActivatedRoute } from "@angular/router";
 import { AuthRequest } from '../../models/auth-request';
 import { AuthService } from '../../services/auth';
@@ -10,7 +10,7 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './login.html',
   styleUrl: './login.css',
 })
-export class Login implements OnInit, OnDestroy {
+export class Login {
 
   // Variables del formulario de login
   nickname: string = '';
@@ -65,11 +65,4 @@ export class Login implements OnInit, OnDestroy {
     }
   }
 
-  ngOnInit() {
-    document.body.classList.add('login-background');
-  }
-
-  ngOnDestroy() {
-    document.body.classList.remove('login-background');
-  }
 }

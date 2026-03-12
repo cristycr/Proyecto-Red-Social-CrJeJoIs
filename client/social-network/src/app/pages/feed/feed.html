@@ -18,7 +18,14 @@
     }
 
     @if (posts().length === 0) {
-        <p class="feed-state">No hay publicaciones por mostrar.</p>
+        <img
+            src="/assets/images/carpincho.png"
+            alt="Carpincho relajado"
+            class="feed-empty-image"
+        >
+        <p class="feed-state feed-empty-text">
+            Vaya, parece que aqui no hay nada... Sigue a otros usuarios para enterarte de cosas interesantes.
+        </p>
     }
 
     @if (hasMorePosts()) {
