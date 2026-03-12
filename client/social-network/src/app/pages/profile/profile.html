@@ -64,11 +64,11 @@
 		}
 
 		@if (isOwnProfile()) {
-			<button class="logout" (click)="logout()">Cerrar sesión</button>
+			<button type="button" class="profile-action-btn logout-btn" (click)="logout()">Cerrar sesión</button>
 			<div class="avatar-actions">
 					<input type="file" id="avatarInput" (change)="onAvatarSelected($event)" hidden />
-					<button (click)="triggerAvatarInput()">Cambiar avatar</button>
-					<button (click)="removeAvatar()">Eliminar avatar</button>
+					<button type="button" class="profile-action-btn" (click)="triggerAvatarInput()">Cambiar avatar</button>
+					<button type="button" class="profile-action-btn profile-action-btn-danger" (click)="removeAvatar()">Eliminar avatar</button>
 			</div>
 		}
 

@@ -26,9 +26,3 @@ html, body {
     font-family: 'Ubuntu', sans-serif;
     color: var(--text-color);
 }
-
-body.login-background {
-    background-image: url("/assets/images/login-background.jpg");
-    background-repeat: repeat;
-    background-size: 512px 512px;
-}
