@@ -4,6 +4,8 @@ import { lastValueFrom } from 'rxjs';
 import { GetUserDto } from '../models/get-user-dto';
 import { Post } from '../models/post';
 import { FollowingDto } from '../models/following-dto';
+import { GetUserProfileExtendDto } from '../models/get-user-profile-extend-dto';
+import { PutUserDto } from '../models/put-user-dto';
 
 @Injectable({
   providedIn: 'root',
@@ -33,6 +35,13 @@ export class ApiService {
   async delete(path: string, body?: any): Promise<void> {
     await lastValueFrom(
       this.http.delete<void>(`${this.BASE_URL}${path}`, { body })
+    );
+  }
+
+  // Método para hacer peticiones PUT a la API
+  async put<T>(path: string, body: any): Promise<T> {
+    return await lastValueFrom(
+      this.http.put<T>(`${this.BASE_URL}${path}`, body)
     );
   }
 
@@ -75,7 +84,7 @@ export class ApiService {
   // Comprueba si existe un usuario con el email dado
   async getUserByEmail(email: string): Promise<boolean> {
     try {
-      await this.get(`users/by-email/${email}`);
+      await this.get(`users/by-email/${encodeURIComponent(email)}`);
       return true;
     } catch (err: any) {
       if (err.status === 404) return false;
@@ -86,6 +95,16 @@ export class ApiService {
   // Obtiene el perfil público de un usuario por su id
   async getUserProfileById(userId: number): Promise<any> {
     return await this.get<any>(`users/${userId}/profile`);
+  }
+
+  // Obtiene el perfil extendido (email, nombre, apellidos y biografia) de un usuario
+  async getUserProfileExtendById(userId: number): Promise<GetUserProfileExtendDto> {
+    return await this.get<GetUserProfileExtendDto>(`users/all?userId=${userId}`);
+  }
+
+  // Actualiza los datos de perfil de un usuario
+  async updateUser(userId: number, dto: PutUserDto): Promise<PutUserDto> {
+    return await this.put<PutUserDto>(`users?id=${userId}`, dto);
   }
 
   // Obtiene la lista de usuarios que siguen a un usuario

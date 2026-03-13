@@ -174,14 +174,6 @@
 	color: var(--alert-color);
 }
 
-.avatar-actions {
-	display: flex;
-	flex-direction: column;
-	gap: 10px;
-	width: 100%;
-	margin-top: 2px;
-}
-
 .profile-action-btn {
 	padding: 10px 18px;
 	border-radius: 10px;
@@ -527,7 +519,6 @@
 		justify-content: center;
 	}
 
-	.avatar-actions,
 	.follow-actions {
 		max-width: 340px;
 	}

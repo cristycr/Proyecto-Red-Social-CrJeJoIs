@@ -31,14 +31,8 @@
 				</div>
 
 				@if (isOwnProfile()) {
-					<button type="button" class="edit-profile-btn">Editar perfil</button>
-
-					<div class="avatar-actions">
-						<input type="file" id="avatarInput" (change)="onAvatarSelected($event)" hidden />
-						<button type="button" class="profile-action-btn" (click)="triggerAvatarInput()">Cambiar avatar</button>
-						<button type="button" class="profile-action-btn profile-action-btn-danger" (click)="removeAvatar()">Eliminar avatar</button>
-						<button type="button" class="profile-action-btn logout-btn" (click)="logout()">Cerrar sesión</button>
-					</div>
+					<button type="button" class="edit-profile-btn" [routerLink]="['/profile/edit']">Editar perfil</button>
+					<button type="button" class="profile-action-btn logout-btn" (click)="logout()">Cerrar sesión</button>
 				} @else {
 					<div class="follow-actions">
 						<button
@@ -81,7 +75,7 @@
 						</span>
 
 						<div class="posts-list">
-							@for (post of paginatedUserPosts(); track post.id) {
+							@for (post of paginatedUserPosts(); track $index) {
 								<article class="profile-post">
 									<div class="profile-post-header">
 										<h3>{{ post.title || 'Sin titulo' }}</h3>

@@ -1,0 +1,174 @@
+<section class="profile-edit-container">
+	<header class="profile-edit-header">
+		<h1>Editar perfil</h1>
+		<p>
+			Actualiza aqui la biografia, email, nombre y apellidos con los datos actuales de tu cuenta.
+		</p>
+	</header>
+
+	@if (loading()) {
+		<p class="profile-edit-status">Cargando datos del perfil...</p>
+	} @else {
+		@if (errorMessage()) {
+			<p class="profile-edit-error">{{ errorMessage() }}</p>
+		}
+
+		<form class="profile-edit-form" [formGroup]="profileForm" (ngSubmit)="onSubmit()">
+			<div class="profile-edit-grid">
+				<div class="profile-edit-fields">
+					<label for="nickname">Nickname</label>
+					<input id="nickname" type="text" formControlName="nickname" readonly />
+
+					<label for="email">Email <span class="required">*</span></label>
+					<input
+						id="email"
+						type="email"
+						formControlName="email"
+						placeholder="Tu email"
+						(blur)="onEmailBlur()"
+						(input)="clearEmailTakenError()"
+					/>
+					@if (shouldShowControlError('email')) {
+						<p class="field-error">{{ getFieldErrorMessage('email') }}</p>
+					}
+					@if (checkingEmail()) {
+						<p class="field-status">Comprobando si el email ya existe...</p>
+					}
+
+					<label for="name">Nombre <span class="required">*</span></label>
+					<input id="name" type="text" formControlName="name" placeholder="Tu nombre" />
+					@if (shouldShowControlError('name')) {
+						<p class="field-error">{{ getFieldErrorMessage('name') }}</p>
+					}
+
+					<div class="surnames-grid">
+						<div>
+							<label for="surname1">Primer apellido <span class="required">*</span></label>
+							<input id="surname1" type="text" formControlName="surname1" placeholder="Primer apellido" />
+							@if (shouldShowControlError('surname1')) {
+								<p class="field-error">{{ getFieldErrorMessage('surname1') }}</p>
+							}
+						</div>
+						<div>
+							<label for="surname2">Segundo apellido</label>
+							<input id="surname2" type="text" formControlName="surname2" placeholder="Segundo apellido" />
+						</div>
+					</div>
+
+					<label for="biography">Biografia</label>
+					<textarea
+						id="biography"
+						formControlName="biography"
+						rows="5"
+						placeholder="Cuentanos un poco sobre ti"
+					></textarea>
+
+					<p class="field-hint">{{ biographyLength }} / 280 caracteres</p>
+
+					<label for="password">Contraseña <span class="required">*</span> (obligatoria para guardar)</label>
+					<input
+						id="password"
+						type="password"
+						formControlName="password"
+						placeholder="Minimo 6 caracteres"
+					/>
+					@if (shouldShowControlError('password')) {
+						<p class="field-error">{{ getFieldErrorMessage('password') }}</p>
+					}
+
+					<label for="confirmPassword">Confirmar contraseña <span class="required">*</span></label>
+					<input
+						id="confirmPassword"
+						type="password"
+						formControlName="confirmPassword"
+						placeholder="Repite la contraseña"
+					/>
+					@if (shouldShowControlError('confirmPassword')) {
+						<p class="field-error">{{ getFieldErrorMessage('confirmPassword') }}</p>
+					}
+					@if (showPasswordMismatch()) {
+						<p class="field-error">Las contraseñas deben ser iguales.</p>
+					}
+				</div>
+
+				<aside class="profile-avatar-panel">
+					<h2>Foto de perfil</h2>
+					<div class="profile-avatar-shell" #avatarMenuContainer>
+						<img [src]="avatarUrl()" alt="Avatar del perfil" class="profile-avatar-preview" />
+						<input #avatarInput type="file" accept="image/*" (change)="onAvatarSelected($event)" hidden />
+
+						<button
+							type="button"
+							class="avatar-edit-trigger"
+							(click)="toggleAvatarMenu($event)"
+							[attr.aria-expanded]="avatarMenuOpen()"
+							aria-haspopup="menu"
+							[disabled]="avatarActionLoading()"
+						>
+							<img src="assets/icons/lapiz.svg" alt="" aria-hidden="true" class="avatar-edit-icon" />
+							Editar
+						</button>
+
+						@if (avatarMenuOpen()) {
+							<div class="avatar-dropdown" role="menu" aria-label="Opciones de foto de perfil">
+								<button
+									type="button"
+									class="avatar-dropdown-item"
+									(click)="triggerAvatarInput($event)"
+									[disabled]="avatarActionLoading()"
+								>
+									Cambiar foto...
+								</button>
+								<button
+									type="button"
+									class="avatar-dropdown-item avatar-dropdown-item-danger"
+									(click)="removeAvatar($event)"
+									[disabled]="avatarActionLoading()"
+								>
+									Eliminar foto
+								</button>
+							</div>
+						}
+					</div>
+					<p class="avatar-nickname">{{ profileForm.controls.nickname.value || 'Usuario' }}</p>
+					<p class="avatar-note">
+						Puedes cambiar o eliminar la foto usando el boton Editar sobre el avatar.
+					</p>
+
+					@if (avatarActionLoading()) {
+						<p class="avatar-note avatar-note-muted">Actualizando foto...</p>
+					}
+
+					@if (avatarActionError()) {
+						<p class="avatar-note avatar-note-error">{{ avatarActionError() }}</p>
+					}
+
+					@if (!hasPrivateData()) {
+						<p class="avatar-note avatar-note-muted">
+							Aun no hay nombre, apellidos ni email cargados desde backend.
+						</p>
+					}
+				</aside>
+			</div>
+
+			<div class="profile-edit-actions">
+				<a routerLink="/profile" class="profile-btn profile-btn-secondary">Volver al perfil</a>
+				<button
+					type="submit"
+					class="profile-btn profile-btn-primary"
+					[disabled]="submitLoading() || avatarActionLoading() || checkingEmail()"
+				>
+					@if (submitLoading()) {
+						Actualizando...
+					} @else {
+						Actualizar perfil
+					}
+				</button>
+			</div>
+
+			@if (submitMessage()) {
+				<p class="profile-edit-info">{{ submitMessage() }}</p>
+			}
+		</form>
+	}
+</section>
