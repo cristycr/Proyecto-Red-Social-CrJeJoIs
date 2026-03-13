@@ -17,16 +17,16 @@ export class ToastService {
 
   readonly toasts = computed(() => this._toasts());
 
-  showSuccess(message: string, durationMs: number = 3200): void {
-    this.show('success', message, durationMs);
+  showSuccess(message: string): void {
+    this.show('success', message);
   }
 
-  showError(message: string, durationMs: number = 4000): void {
-    this.show('error', message, durationMs);
+  showError(message: string): void {
+    this.show('error', message);
   }
 
-  showInfo(message: string, durationMs: number = 3200): void {
-    this.show('info', message, durationMs);
+  showInfo(message: string): void {
+    this.show('info', message);
   }
 
   dismiss(id: number): void {
@@ -35,7 +35,7 @@ export class ToastService {
     );
   }
 
-  private show(type: ToastType, message: string, durationMs: number): void {
+  private show(type: ToastType, message: string): void {
     const id = this.nextToastId++;
 
     this._toasts.update((currentToasts) => [
@@ -46,9 +46,5 @@ export class ToastService {
         message,
       },
     ]);
-
-    window.setTimeout(() => {
-      this.dismiss(id);
-    }, durationMs);
   }
 }
