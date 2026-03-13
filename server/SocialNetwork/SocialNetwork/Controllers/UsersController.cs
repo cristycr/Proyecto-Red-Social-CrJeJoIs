@@ -17,8 +17,7 @@ public class UsersController : ControllerBase {
     private readonly UnitOfWork _unitOfWork;
     private readonly IFileService _fileService;
 
-    public UsersController(UnitOfWork unitOfWork, IFileService fileService)
-    {
+    public UsersController(UnitOfWork unitOfWork, IFileService fileService) {
         _unitOfWork = unitOfWork;
         _fileService = fileService;
     }
@@ -57,7 +56,7 @@ public class UsersController : ControllerBase {
     [HttpGet("Followeds")]
     public async Task<IEnumerable<GetUserDto>> GetFollowedUsers(long userId) {
         ICollection<GetUserDto> users = await _unitOfWork.UserRepository.GetFollowedUsersAsync(userId);
-        
+
         IEnumerable<GetUserDto> getUsersDto = users.Select(user => new GetUserDto {
             Id = user.Id,
             Nickname = user.Nickname,
@@ -106,12 +105,34 @@ public class UsersController : ControllerBase {
         if (user == null) {
             return NotFound();
         }
+
+        // Comprobar que el email no está en uso por otro usuario
+        User? userWithEmail = await _unitOfWork.UserRepository.GetUserByEmailAsync(dto.Email);
+        if (userWithEmail != null && userWithEmail.Id != id) {
+            return BadRequest("email");
+        }
         user.Email = dto.Email;
         user.Name = dto.Name;
         user.Surname1 = dto.Surname1;
-        user.Password = PasswordHelper.Hash(dto.Password);
         user.Surname2 = dto.Surname2;
         user.Biography = dto.Biography;
+        await _unitOfWork.UserRepository.UpdateAsync(user);
+        bool success = await _unitOfWork.SaveAsync();
+        if (!success) {
+            return BadRequest();
+        }
+        return Ok(dto);
+    }
+
+    [HttpPut("Password")]
+    //[Authorize]
+    public async Task<IActionResult> UpdatePassword(int id, [FromBody] PutPasswordDto dto) {
+
+        User? user = await _unitOfWork.UserRepository.GetByIdAsync(id);
+        if (user == null) {
+            return NotFound();
+        }
+        user.Password = PasswordHelper.Hash(dto.Password);
         await _unitOfWork.UserRepository.UpdateAsync(user);
         bool success = await _unitOfWork.SaveAsync();
         if (!success) {

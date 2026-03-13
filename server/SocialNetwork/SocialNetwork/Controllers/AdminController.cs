@@ -29,7 +29,8 @@ public class AdminController : ControllerBase {
             Id = user.Id,
             Nickname = user.Nickname,
             AvatarPath = user.AvatarPath!,
-            Email = user.Email
+            Email = user.Email,
+            Role = user.Role
         });
         return getUsersDto;
     }
