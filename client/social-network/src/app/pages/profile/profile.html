@@ -57,6 +57,23 @@
 	(close)="closeUsersModal()"
 ></app-profile-users-modal>
 
+@if (deletePostModalOpen()) {
+	<div class="delete-post-modal-overlay" (click)="onDeletePostModalBackdropClick($event)">
+		<div class="delete-post-modal" role="dialog" aria-modal="true" aria-label="Confirmar eliminacion">
+			<h3>Confirmar eliminacion</h3>
+			<p>{{ deletePostConfirmationMessage }}</p>
+			<div class="delete-post-modal-actions">
+				<button type="button" class="delete-post-cancel-btn" (click)="closeDeletePostModal()">
+					Cancelar
+				</button>
+				<button type="button" class="delete-post-confirm-btn" (click)="confirmDeletePost()">
+					Eliminar
+				</button>
+			</div>
+		</div>
+	</div>
+}
+
 @if (isAuthenticated()) {
 	<app-create-post-btn />
 }

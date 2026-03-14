@@ -9,6 +9,7 @@ import { Post } from '../../models/post';
 import { ProfileSidebarCard } from '../../components/profile-sidebar-card/profile-sidebar-card';
 import { ProfilePostsSection } from '../../components/profile-posts-section/profile-posts-section';
 import { ProfileUsersModal } from '../../components/profile-users-modal/profile-users-modal';
+import { ToastService } from '../../services/toast';
 
 type UserListItem = {
   id: number;
@@ -33,6 +34,7 @@ export class Profile implements OnInit {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly api = inject(ApiService);
+  private readonly toast = inject(ToastService);
   private readonly destroyRef = inject(DestroyRef);
 
   protected readonly nickname = signal('Usuario');
@@ -58,6 +60,10 @@ export class Profile implements OnInit {
   protected readonly postsLoading = signal(true);
   protected readonly postsErrorMessage = signal('');
   protected readonly postDeleteError = signal('');
+  protected readonly deletePostModalOpen = signal(false);
+  protected readonly postPendingDeletion = signal<Post | null>(null);
+  protected readonly deletePostConfirmationMessage =
+    '¿Seguro que quieres eliminar esta publicación? Esta acción no se puede deshacer.';
   protected readonly deletingPostIds = signal<number[]>([]);
   protected readonly postsPerPage = signal(10);
   protected readonly currentPostsPage = signal(1);
@@ -217,6 +223,8 @@ export class Profile implements OnInit {
     this.postsLoading.set(true);
     this.postsErrorMessage.set('');
     this.postDeleteError.set('');
+    this.deletePostModalOpen.set(false);
+    this.postPendingDeletion.set(null);
     this.deletingPostIds.set([]);
     this.userPosts.set([]);
     this.currentPostsPage.set(1);
@@ -271,11 +279,13 @@ export class Profile implements OnInit {
     return this.deletingPostIds().includes(postId);
   }
 
-  protected async onDeletePost(post: Post): Promise<void> {
+  protected onDeletePost(post: Post): void {
     this.postDeleteError.set('');
 
     if (!this.canDeletePost(post)) {
-      this.postDeleteError.set('No tienes permisos para eliminar esta publicación.');
+      const message = 'No tienes permisos para eliminar esta publicación.';
+      this.postDeleteError.set(message);
+      this.toast.showError(message);
       return;
     }
 
@@ -283,14 +293,46 @@ export class Profile implements OnInit {
       return;
     }
 
-    const shouldDelete = window.confirm(
-      '¿Seguro que quieres eliminar esta publicación? Esta acción no se puede deshacer.'
-    );
+    this.postPendingDeletion.set(post);
+    this.deletePostModalOpen.set(true);
+  }
 
-    if (!shouldDelete) {
+  protected onDeletePostModalBackdropClick(event: MouseEvent): void {
+    if (event.target === event.currentTarget) {
+      this.closeDeletePostModal();
+    }
+  }
+
+  protected closeDeletePostModal(): void {
+    this.deletePostModalOpen.set(false);
+    this.postPendingDeletion.set(null);
+  }
+
+  protected async confirmDeletePost(): Promise<void> {
+    const post = this.postPendingDeletion();
+
+    if (!post) {
+      this.closeDeletePostModal();
       return;
     }
 
+    this.closeDeletePostModal();
+
+    if (!this.canDeletePost(post)) {
+      const message = 'No tienes permisos para eliminar esta publicación.';
+      this.postDeleteError.set(message);
+      this.toast.showError(message);
+      return;
+    }
+
+    if (this.isDeletingPost(post.id)) {
+      return;
+    }
+
+    await this.deletePost(post);
+  }
+
+  private async deletePost(post: Post): Promise<void> {
     this.setPostDeleting(post.id, true);
 
     try {
@@ -305,10 +347,16 @@ export class Profile implements OnInit {
       if (this.currentPostsPage() > maxAvailablePage) {
         this.currentPostsPage.set(maxAvailablePage);
       }
+
+      this.toast.showSuccess('Publicación eliminada con éxito.');
     } catch (err: any) {
-      this.postDeleteError.set(
-        this.extractBackendError(err, 'No se pudo eliminar la publicación.')
+      const message = this.extractBackendError(
+        err,
+        'No se pudo eliminar la publicación.'
       );
+
+      this.postDeleteError.set(message);
+      this.toast.showError(message);
     } finally {
       this.setPostDeleting(post.id, false);
     }
