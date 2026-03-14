@@ -169,4 +169,6 @@
 	</div>
 }
 
-<app-create-post-btn />
+@if (isAuthenticated()) {
+	<app-create-post-btn />
+}

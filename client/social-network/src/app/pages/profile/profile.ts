@@ -37,6 +37,7 @@ export class Profile implements OnInit {
   protected readonly followActionError = signal('');
   protected readonly loading = signal(true);
   protected readonly errorMessage = signal('');
+  protected readonly isAuthenticated = this.auth.isAuthenticated;
   protected readonly usersModalOpen = signal(false);
   protected readonly usersModalLoading = signal(false);
   protected readonly usersModalError = signal('');

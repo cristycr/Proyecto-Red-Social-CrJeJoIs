@@ -28,6 +28,7 @@ export class App {
   private usersRequested = false;
 
   @ViewChild('userSearchContainer') private userSearchContainer?: ElementRef<HTMLDivElement>;
+  @ViewChild('profileMenuContainer') private profileMenuContainer?: ElementRef<HTMLLIElement>;
 
   protected readonly title = signal('social-network');
   protected readonly isAuthenticated = this.authService.isAuthenticated;
@@ -36,8 +37,13 @@ export class App {
   protected readonly usersLoading = signal(false);
   protected readonly usersLoadError = signal('');
   protected readonly searchOpen = signal(false);
+  protected readonly profileMenuOpen = signal(false);
   protected readonly allUsers = signal<GetUserDto[]>([]);
   protected readonly toasts = this.toastService.toasts;
+  protected readonly currentUserNickname = this.authService.nickname;
+  protected readonly currentUserAvatar = computed(() =>
+    this.buildAvatarUrl(this.authService.profileImage())
+  );
   protected readonly filteredUsers = computed(() => {
     const query = this.searchQuery().trim().toLowerCase();
 
@@ -85,6 +91,15 @@ export class App {
     this.searchOpen.set(false);
   }
 
+  protected toggleProfileMenu(event: MouseEvent): void {
+    event.stopPropagation();
+    this.profileMenuOpen.update((isOpen) => !isOpen);
+  }
+
+  protected closeProfileMenu(): void {
+    this.profileMenuOpen.set(false);
+  }
+
   protected dismissToast(id: number): void {
     this.toastService.dismiss(id);
   }
@@ -101,14 +116,19 @@ export class App {
   @HostListener('document:click', ['$event'])
   protected onDocumentClick(event: MouseEvent): void {
     const searchContainer = this.userSearchContainer?.nativeElement;
+    const profileMenuContainer = this.profileMenuContainer?.nativeElement;
     const target = event.target as Node | null;
 
-    if (!searchContainer || !target) {
+    if (!target) {
       return;
     }
 
-    if (!searchContainer.contains(target)) {
+    if (searchContainer && !searchContainer.contains(target)) {
       this.searchOpen.set(false);
+    }
+
+    if (profileMenuContainer && !profileMenuContainer.contains(target)) {
+      this.profileMenuOpen.set(false);
     }
   }
 

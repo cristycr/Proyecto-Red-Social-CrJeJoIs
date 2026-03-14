@@ -288,9 +288,86 @@ header nav ul {
     display: flex;
     flex-direction: row;
     justify-content: flex-end;
+    align-items: center;
     padding: 0 40px;
     margin: 0;
     gap: 34px;
+}
+
+.header-user-menu {
+    position: relative;
+}
+
+.header-user-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    border: none;
+    padding: 0;
+    background: transparent;
+    color: var(--text-color);
+    font-size: 0.92rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: color 0.2s, opacity 0.2s;
+}
+
+.header-user-trigger:hover {
+    color: var(--secondary-color);
+}
+
+.header-user-trigger:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(255, 90, 31, 0.28);
+}
+
+.header-user-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(255, 90, 31, 0.45);
+    background: rgba(255, 90, 31, 0.15);
+}
+
+.header-user-nickname {
+    max-width: 140px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.header-user-caret {
+    font-size: 0.82rem;
+    opacity: 0.9;
+}
+
+.header-user-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    min-width: 190px;
+    padding: 6px;
+    border: 1px solid var(--border-soft);
+    border-radius: 12px;
+    background: var(--surface-panel);
+    box-shadow: 0 14px 28px rgba(19, 32, 58, 0.22);
+    z-index: 25;
+}
+
+.header-user-dropdown a {
+    display: block;
+    padding: 10px 12px;
+    border-radius: 9px;
+    color: var(--text-main);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: background-color 0.2s;
+}
+
+.header-user-dropdown a:hover {
+    background: var(--surface-highlight);
 }
 
 header a {
@@ -333,6 +410,7 @@ header a:hover {
     header nav ul {
         justify-content: flex-end;
         flex-wrap: wrap;
+        align-items: center;
         gap: 18px 22px;
         padding: 0;
     }
