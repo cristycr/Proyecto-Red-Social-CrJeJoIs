@@ -50,7 +50,24 @@
         Anterior
       </button>
 
-      <span class="posts-page-current">Pagina {{ currentPage() }} / {{ totalPages() }}</span>
+      <div class="posts-page-numbers" aria-label="Paginas disponibles">
+        @for (item of paginationItems(); track trackPaginationItem(item)) {
+          @if (item.kind === 'page') {
+            <button
+              type="button"
+              class="posts-page-number-btn"
+              [class.is-active]="item.page === currentPage()"
+              [disabled]="item.page === currentPage()"
+              [attr.aria-label]="'Ir a la pagina ' + item.page"
+              (click)="onPageClick(item.page)"
+            >
+              {{ item.page }}
+            </button>
+          } @else {
+            <span class="posts-page-ellipsis" aria-hidden="true">...</span>
+          }
+        }
+      </div>
 
       <button
         type="button"

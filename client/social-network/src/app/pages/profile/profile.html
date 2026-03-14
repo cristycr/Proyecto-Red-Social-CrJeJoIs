@@ -39,6 +39,7 @@
 					(deletePost)="onDeletePost($event)"
 					(previousPage)="goToPreviousPostsPage()"
 					(nextPage)="goToNextPostsPage()"
+					(pageSelected)="goToPostsPage($event)"
 					(postsPerPageChange)="onPostsPerPageSelected($event)"
 				></app-profile-posts-section>
 			</section>

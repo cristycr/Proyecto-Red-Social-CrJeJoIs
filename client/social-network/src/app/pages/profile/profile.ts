@@ -373,6 +373,7 @@ export class Profile implements OnInit {
     }
 
     this.currentPostsPage.update((page) => page - 1);
+    this.scrollToTop();
   }
 
   protected goToNextPostsPage(): void {
@@ -383,6 +384,22 @@ export class Profile implements OnInit {
     }
 
     this.currentPostsPage.update((page) => page + 1);
+    this.scrollToTop();
+  }
+
+  protected goToPostsPage(page: number): void {
+    const targetPage = Math.floor(page);
+    const totalPages = this.totalPostsPages();
+
+    if (
+      targetPage < 1 ||
+      targetPage > totalPages ||
+      targetPage === this.currentPostsPage()
+    ) {
+      return;
+    }
+
+    this.currentPostsPage.set(targetPage);
     this.scrollToTop();
   }
 
