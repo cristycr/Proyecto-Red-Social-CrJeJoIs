@@ -21,17 +21,20 @@ public class UserRepository : BaseRepository<User, long> {
 
 
     // Método para obtener los usuarios seguidos por un usuario específico
-    public async Task<ICollection<GetUserDto>> GetFollowedUsersAsync(long userId) {
+    public async Task<ICollection<GetFollowDto>> GetFollowedUsersAsync(long userId) {
         return await _dbContext.Following
             .Where(f => f.FollowerId == userId)
             .Join(
                 _dbContext.User,
                 f => f.FollowedId,
                 u => u.Id,
-                (f, u) => new GetUserDto {
+                (f, u) => new GetFollowDto {
                     Id = u.Id,
                     Nickname = u.Nickname!,
-                    AvatarPath = u.AvatarPath!
+                    AvatarPath = u.AvatarPath!,
+                    Name = u.Name,
+                    Surname1 = u.Surname1,
+                    Surname2 = u.Surname2
                 }
             )
             .AsNoTracking()
@@ -39,17 +42,20 @@ public class UserRepository : BaseRepository<User, long> {
     }
 
     // Metodo para obtener los usuarios que siguen a un usuario específico
-    public async Task<ICollection<GetUserDto>> GetFollowerUsersAsync(long userId) {
+    public async Task<ICollection<GetFollowDto>> GetFollowerUsersAsync(long userId) {
         return await _dbContext.Following
             .Where(f => f.FollowedId == userId)
             .Join(
                 _dbContext.User,
                 f => f.FollowerId,
                 u => u.Id,
-                (f, u) => new GetUserDto {
+                (f, u) => new GetFollowDto {
                     Id = u.Id,
                     Nickname = u.Nickname!,
-                    AvatarPath = u.AvatarPath!
+                    AvatarPath = u.AvatarPath!,
+                    Name = u.Name,
+                    Surname1 = u.Surname1,
+                    Surname2 = u.Surname2
                 }
             )
             .AsNoTracking()

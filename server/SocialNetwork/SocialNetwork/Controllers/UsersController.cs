@@ -55,28 +55,34 @@ public class UsersController : ControllerBase {
 
     // Get de los usuarios seguidos y seguidores de un usuario
     [HttpGet("Followeds")]
-    public async Task<IEnumerable<GetUserDto>> GetFollowedUsers(long userId) {
-        ICollection<GetUserDto> users = await _unitOfWork.UserRepository.GetFollowedUsersAsync(userId);
+    public async Task<IEnumerable<GetFollowDto>> GetFollowedUsers(long userId) {
+        ICollection<GetFollowDto> users = await _unitOfWork.UserRepository.GetFollowedUsersAsync(userId);
 
-        IEnumerable<GetUserDto> getUsersDto = users.Select(user => new GetUserDto {
+        IEnumerable<GetFollowDto> getFollowDto = users.Select(user => new GetFollowDto {
             Id = user.Id,
             Nickname = user.Nickname,
-            AvatarPath = user.AvatarPath!
+            AvatarPath = user.AvatarPath!,
+            Name = user.Name,
+            Surname1 = user.Surname1,
+            Surname2 = user.Surname2
         });
-        return getUsersDto;
+        return getFollowDto;
     }
 
     [HttpGet("Followers")]
-    public async Task<IEnumerable<GetUserDto>> GetFollowerUsers(long userId) {
+    public async Task<IEnumerable<GetFollowDto>> GetFollowerUsers(long userId) {
         // long userId = long.Parse(User.FindFirst("id").Value);
-        ICollection<GetUserDto> users = await _unitOfWork.UserRepository.GetFollowerUsersAsync(userId);
+        ICollection<GetFollowDto> users = await _unitOfWork.UserRepository.GetFollowerUsersAsync(userId);
 
-        IEnumerable<GetUserDto> getUsersDto = users.Select(user => new GetUserDto {
+        IEnumerable<GetFollowDto> getFollowDto = users.Select(user => new GetFollowDto {
             Id = user.Id,
             Nickname = user.Nickname,
-            AvatarPath = user.AvatarPath!
+            AvatarPath = user.AvatarPath!,
+            Name = user.Name,
+            Surname1 = user.Surname1,
+            Surname2 = user.Surname2
         });
-        return getUsersDto;
+        return getFollowDto;
     }
 
     // metodo para obtener un usuario por su id, para mostrar su perfil
