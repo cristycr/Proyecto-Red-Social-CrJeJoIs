@@ -53,12 +53,12 @@ export class AuthService {
     return nickname && nickname.length > 0 ? nickname : 'Usuario';
   });
 
-  readonly profileImage = computed(() => {
-    const avatarPath = this.decodedPayload()?.AvatarPath?.trim();
-    return avatarPath && avatarPath.length > 0
-      ? avatarPath
-      : '/assets/images/avatar-default.png';
-  });
+  private readonly profileImageSignal = signal<string>('/assets/images/avatar-default.png');
+  readonly profileImage = this.profileImageSignal.asReadonly();
+
+  setProfileImagePath(path: string | null): void {
+    this.profileImageSignal.set(path?.trim() || '/assets/images/avatar-default.png');
+  }
 
   readonly biography = computed(() =>
     this.decodedPayload()?.biography?.trim() || ''

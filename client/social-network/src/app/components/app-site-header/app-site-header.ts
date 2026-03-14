@@ -2,6 +2,7 @@ import {
   Component,
   ElementRef,
   HostListener,
+  OnInit,
   ViewChild,
   computed,
   inject,
@@ -18,7 +19,7 @@ import { AppHeaderSearch } from '../app-header-search/app-header-search';
   templateUrl: './app-site-header.html',
   styleUrl: './app-site-header.css',
 })
-export class AppSiteHeader {
+export class AppSiteHeader implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly apiService = inject(ApiService);
   private readonly router = inject(Router);
@@ -32,6 +33,15 @@ export class AppSiteHeader {
   protected readonly currentUserAvatar = computed(() =>
     this.buildAvatarUrl(this.authService.profileImage())
   );
+
+  ngOnInit(): void {
+    const userId = this.authService.currentUserId();
+    if (!userId) return;
+
+    void this.apiService.getUserProfileById(userId).then((profile) => {
+      this.authService.setProfileImagePath(profile?.avatarPath ?? null);
+    }).catch(() => {});
+  }
 
   protected toggleProfileMenu(event: MouseEvent): void {
     event.stopPropagation();

@@ -300,6 +300,7 @@ export class ProfileEdit implements OnInit {
         try {
             const result = await this.api.uploadAvatar(file);
             this.avatarUrl.set(this.buildAvatarUrl(result.avatarUrl));
+                    this.auth.setProfileImagePath(result.avatarUrl);
         } catch (err: any) {
             this.avatarActionError.set(
                 this.extractBackendError(err, 'No se pudo cambiar la foto de perfil.')
@@ -320,6 +321,7 @@ export class ProfileEdit implements OnInit {
         try {
             await this.api.deleteAvatar();
             this.avatarUrl.set('/assets/images/avatar-default.png');
+                    this.auth.setProfileImagePath(null);
         } catch (err: any) {
             this.avatarActionError.set(
                 this.extractBackendError(err, 'No se pudo eliminar la foto de perfil.')
