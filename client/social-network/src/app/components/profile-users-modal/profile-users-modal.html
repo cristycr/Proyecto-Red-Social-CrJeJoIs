@@ -1,0 +1,31 @@
+@if (open()) {
+  <div class="modal-overlay" (click)="onBackdropClick($event)">
+    <div class="followers-modal" role="dialog" aria-modal="true" [attr.aria-label]="title() + ' del perfil'">
+      <div class="followers-modal-header">
+        <h3>{{ title() }}</h3>
+        <button type="button" class="followers-close-btn" aria-label="Cerrar modal" (click)="close.emit()">
+          ✕
+        </button>
+      </div>
+
+      @if (loading()) {
+        <p class="followers-status">{{ loadingMessage() }}</p>
+      } @else if (errorMessage()) {
+        <p class="followers-error">{{ errorMessage() }}</p>
+      } @else if (users().length === 0) {
+        <p class="followers-status">{{ emptyMessage() }}</p>
+      } @else {
+        <ul class="followers-list">
+          @for (user of users(); track user.id) {
+            <li class="follower-item">
+              <a class="follower-link" [routerLink]="['/profile', user.id]" (click)="onUserClick()">
+                <img [src]="user.avatarUrl" [alt]="'Avatar de ' + user.nickname" class="follower-avatar" />
+                <span class="follower-nickname">{{ user.nickname }}</span>
+              </a>
+            </li>
+          }
+        </ul>
+      }
+    </div>
+  </div>
+}

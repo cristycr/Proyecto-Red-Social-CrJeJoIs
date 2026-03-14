@@ -1,9 +1,6 @@
 import {
     Component,
-    ElementRef,
-    HostListener,
     OnInit,
-    ViewChild,
     inject,
     signal,
 } from '@angular/core';
@@ -20,10 +17,11 @@ import { AuthService } from '../../services/auth';
 import { PutPasswordDto } from '../../models/put-password-dto';
 import { PutUserDto } from '../../models/put-user-dto';
 import { ToastService } from '../../services/toast';
+import { ProfileAvatarPanel } from '../../components/profile-avatar-panel/profile-avatar-panel';
 
 @Component({
     selector: 'app-profile-edit',
-    imports: [ReactiveFormsModule, RouterLink],
+    imports: [ReactiveFormsModule, RouterLink, ProfileAvatarPanel],
     templateUrl: './profile-edit.html',
     styleUrl: './profile-edit.css',
 })
@@ -33,16 +31,11 @@ export class ProfileEdit implements OnInit {
     private readonly auth = inject(AuthService);
     private readonly toast = inject(ToastService);
 
-    @ViewChild('avatarInput') private avatarInput?: ElementRef<HTMLInputElement>;
-    @ViewChild('avatarMenuContainer')
-    private avatarMenuContainer?: ElementRef<HTMLDivElement>;
-
     protected readonly loading = signal(true);
     protected readonly submitLoading = signal(false);
     protected readonly errorMessage = signal('');
     protected readonly avatarUrl = signal('/assets/images/avatar-default.png');
     protected readonly hasPrivateData = signal(false);
-    protected readonly avatarMenuOpen = signal(false);
     protected readonly avatarActionLoading = signal(false);
     protected readonly avatarActionError = signal('');
     protected readonly checkingEmail = signal(false);
@@ -300,30 +293,7 @@ export class ProfileEdit implements OnInit {
         }
     }
 
-    protected toggleAvatarMenu(event: MouseEvent): void {
-        event.stopPropagation();
-
-        if (this.avatarActionLoading()) {
-            return;
-        }
-
-        this.avatarMenuOpen.update((isOpen) => !isOpen);
-    }
-
-    protected triggerAvatarInput(event: MouseEvent): void {
-        event.stopPropagation();
-        this.avatarMenuOpen.set(false);
-        this.avatarInput?.nativeElement.click();
-    }
-
-    protected async onAvatarSelected(event: Event): Promise<void> {
-        const input = event.target as HTMLInputElement;
-
-        if (!input.files || input.files.length === 0) {
-            return;
-        }
-
-        const file = input.files[0];
+    protected async onAvatarFileSelected(file: File): Promise<void> {
         this.avatarActionLoading.set(true);
         this.avatarActionError.set('');
 
@@ -336,15 +306,10 @@ export class ProfileEdit implements OnInit {
             );
         } finally {
             this.avatarActionLoading.set(false);
-            this.avatarMenuOpen.set(false);
-            input.value = '';
         }
     }
 
-    protected async removeAvatar(event: MouseEvent): Promise<void> {
-        event.stopPropagation();
-        this.avatarMenuOpen.set(false);
-
+    protected async onAvatarRemoveRequested(): Promise<void> {
         if (this.avatarActionLoading()) {
             return;
         }
@@ -361,25 +326,6 @@ export class ProfileEdit implements OnInit {
             );
         } finally {
             this.avatarActionLoading.set(false);
-        }
-    }
-
-    @HostListener('document:click', ['$event'])
-    protected onDocumentClick(event: MouseEvent): void {
-        if (!this.avatarMenuOpen()) {
-            return;
-        }
-
-        const container = this.avatarMenuContainer?.nativeElement;
-        const target = event.target as Node | null;
-
-        if (!container || !target) {
-            this.avatarMenuOpen.set(false);
-            return;
-        }
-
-        if (!container.contains(target)) {
-            this.avatarMenuOpen.set(false);
         }
     }
 

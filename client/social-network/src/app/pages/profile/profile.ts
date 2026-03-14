@@ -1,11 +1,14 @@
 import { Component, DestroyRef, computed, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AuthService } from '../../services/auth';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CreatePostBtn } from '../../components/create-post-btn/create-post-btn';
 import { ApiService } from '../../services/api';
 import { GetUserDto } from '../../models/get-user-dto';
 import { Post } from '../../models/post';
+import { ProfileSidebarCard } from '../../components/profile-sidebar-card/profile-sidebar-card';
+import { ProfilePostsSection } from '../../components/profile-posts-section/profile-posts-section';
+import { ProfileUsersModal } from '../../components/profile-users-modal/profile-users-modal';
 
 type UserListItem = {
   id: number;
@@ -15,7 +18,12 @@ type UserListItem = {
 
 @Component({
   selector: 'app-profile',
-  imports: [CreatePostBtn, RouterModule],
+  imports: [
+    CreatePostBtn,
+    ProfileSidebarCard,
+    ProfilePostsSection,
+    ProfileUsersModal,
+  ],
   templateUrl: './profile.html',
   styleUrl: './profile.css',
 })
@@ -69,6 +77,12 @@ export class Profile implements OnInit {
 
     return posts.slice(startIndex, startIndex + perPage);
   });
+  protected readonly canDeletePostFn = (post: Post): boolean =>
+    this.canDeletePost(post);
+  protected readonly isDeletingPostFn = (postId: number): boolean =>
+    this.isDeletingPost(postId);
+  protected readonly formatPostDateFn = (dateValue: Date | string): string =>
+    this.formatPostDate(dateValue);
 
   private profileUserId: number | null = null;
 
@@ -299,15 +313,8 @@ export class Profile implements OnInit {
     }
   }
 
-  protected onPostsPerPageInput(event: Event): void {
-    const target = event.target as HTMLInputElement;
-    const selectedValue = Number(target.value);
-
-    if (Number.isNaN(selectedValue) || selectedValue <= 0) {
-      return;
-    }
-
-    this.postsPerPage.set(Math.floor(selectedValue));
+  protected onPostsPerPageSelected(selectedValue: number): void {
+    this.postsPerPage.set(selectedValue);
     this.currentPostsPage.set(1);
   }
 
@@ -418,12 +425,6 @@ export class Profile implements OnInit {
       hour12: false,
       timeZone: 'UTC',
     });
-  }
-
-  onUsersModalBackdropClick(event: MouseEvent): void {
-    if (event.target === event.currentTarget) {
-      this.closeUsersModal();
-    }
   }
 
   private setPostDeleting(postId: number, isDeleting: boolean): void {
