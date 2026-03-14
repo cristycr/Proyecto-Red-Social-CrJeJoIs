@@ -30,7 +30,10 @@ public class UsersController : ControllerBase {
         IEnumerable<GetUserDto> getUsersDto = users.Select(user => new GetUserDto {
             Id = user.Id,
             Nickname = user.Nickname,
-            AvatarPath = user.AvatarPath!
+            AvatarPath = user.AvatarPath!,
+            Name = user.Name,
+            Surname1 = user.Surname1,
+            Surname2 = user.Surname2
         });
         return getUsersDto;
     }
@@ -55,10 +58,10 @@ public class UsersController : ControllerBase {
 
     // Get de los usuarios seguidos y seguidores de un usuario
     [HttpGet("Followeds")]
-    public async Task<IEnumerable<GetFollowDto>> GetFollowedUsers(long userId) {
-        ICollection<GetFollowDto> users = await _unitOfWork.UserRepository.GetFollowedUsersAsync(userId);
+    public async Task<IEnumerable<GetUserDto>> GetFollowedUsers(long userId) {
+        ICollection<GetUserDto> users = await _unitOfWork.UserRepository.GetFollowedUsersAsync(userId);
 
-        IEnumerable<GetFollowDto> getFollowDto = users.Select(user => new GetFollowDto {
+        IEnumerable<GetUserDto> getFollowDto = users.Select(user => new GetUserDto {
             Id = user.Id,
             Nickname = user.Nickname,
             AvatarPath = user.AvatarPath!,
@@ -70,11 +73,11 @@ public class UsersController : ControllerBase {
     }
 
     [HttpGet("Followers")]
-    public async Task<IEnumerable<GetFollowDto>> GetFollowerUsers(long userId) {
+    public async Task<IEnumerable<GetUserDto>> GetFollowerUsers(long userId) {
         // long userId = long.Parse(User.FindFirst("id").Value);
-        ICollection<GetFollowDto> users = await _unitOfWork.UserRepository.GetFollowerUsersAsync(userId);
+        ICollection<GetUserDto> users = await _unitOfWork.UserRepository.GetFollowerUsersAsync(userId);
 
-        IEnumerable<GetFollowDto> getFollowDto = users.Select(user => new GetFollowDto {
+        IEnumerable<GetUserDto> getFollowDto = users.Select(user => new GetUserDto {
             Id = user.Id,
             Nickname = user.Nickname,
             AvatarPath = user.AvatarPath!,
