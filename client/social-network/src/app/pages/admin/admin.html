@@ -1,1 +1,142 @@
-<p>admin works!</p>
+<section class="admin-panel">
+	<header class="admin-header">
+		<p class="admin-tag">Panel de administracion</p>
+		<h1>Gestion de usuarios</h1>
+		<p class="admin-subtitle">
+			Plantilla visual temporal. Aqui se podrá gestionar usuarios en cuanto esten aplicados los endpoints.
+		</p>
+
+		<div class="admin-kpis">
+			<article class="kpi-card">
+				<span class="kpi-number">{{ totalUsers() }}</span>
+				<span class="kpi-label">Usuarios totales</span>
+			</article>
+
+			<article class="kpi-card">
+				<span class="kpi-number">{{ totalAdmins() }}</span>
+				<span class="kpi-label">Con rol admin</span>
+			</article>
+
+			<article class="kpi-card">
+				<span class="kpi-number">{{ totalStandardUsers() }}</span>
+				<span class="kpi-label">Con rol user</span>
+			</article>
+		</div>
+	</header>
+
+	@if (actionMessage()) {
+		<p class="admin-feedback">{{ actionMessage() }}</p>
+	}
+
+	@if (users().length === 0) {
+		<div class="admin-empty-state">
+			<h2>No hay usuarios para mostrar</h2>
+			<p>Cuando lleguen datos reales desde backend apareceran aqui.</p>
+		</div>
+	} @else {
+		<ul class="users-list">
+			@for (user of users(); track user.id) {
+				<li class="user-card">
+					<div class="user-card-main">
+						<img
+							[src]="user.avatarPath ? user.avatarPath : '/assets/images/avatar-default.png'"
+							[alt]="'Avatar de ' + user.nickname"
+							class="user-avatar"
+						>
+
+						<div class="user-data">
+							<h2>{{ user.nickname }}</h2>
+							<p>{{ user.email }}</p>
+						</div>
+					</div>
+
+					<div class="user-actions">
+						<div class="role-control">
+							<label [attr.for]="'role-select-' + user.id">Rol</label>
+							<select
+								[id]="'role-select-' + user.id"
+								[value]="user.role"
+								(change)="onRoleChange(user.id, $event)"
+							>
+								<option value="user">user</option>
+								<option value="admin">admin</option>
+							</select>
+						</div>
+
+						<button
+							type="button"
+							class="delete-user-btn"
+							(click)="openDeleteModal(user)"
+						>
+							Borrar usuario
+						</button>
+					</div>
+				</li>
+			}
+		</ul>
+	}
+</section>
+
+@if (selectedUserForDeletion(); as userToDelete) {
+	<div class="modal-overlay" (click)="onModalOverlayClick($event)">
+		<section
+			class="delete-modal"
+			role="dialog"
+			aria-modal="true"
+			[attr.aria-labelledby]="'delete-title-' + userToDelete.id"
+		>
+			<header class="delete-modal-header">
+				<h3 [id]="'delete-title-' + userToDelete.id">Confirmar borrado de usuario</h3>
+
+				<button
+					type="button"
+					class="close-modal-btn"
+					aria-label="Cerrar modal"
+					(click)="closeDeleteModal()"
+				>
+					x
+				</button>
+			</header>
+
+			<p class="delete-description">
+				Estas a punto de borrar a <strong>{{ userToDelete.nickname }}</strong>.
+			</p>
+
+			<p class="delete-description">
+				Para confirmar, escribe exactamente su nickname.
+			</p>
+
+			<label class="delete-label" [attr.for]="'confirm-delete-' + userToDelete.id">
+				Nickname de confirmacion
+			</label>
+			<input
+				[id]="'confirm-delete-' + userToDelete.id"
+				type="text"
+				class="delete-input"
+				[value]="deleteNicknameInput()"
+				(input)="onDeleteNicknameInput($event)"
+				[attr.placeholder]="userToDelete.nickname"
+				autocomplete="off"
+			/>
+
+			@if (deleteNicknameInput().length > 0 && !canConfirmDeletion()) {
+				<p class="delete-warning">El nickname no coincide.</p>
+			}
+
+			<footer class="delete-actions">
+				<button type="button" class="action-btn secondary-btn" (click)="closeDeleteModal()">
+					Cancelar
+				</button>
+
+				<button
+					type="button"
+					class="action-btn danger-btn"
+					[disabled]="!canConfirmDeletion()"
+					(click)="confirmDeleteUser()"
+				>
+					Confirmar borrado
+				</button>
+			</footer>
+		</section>
+	</div>
+}
