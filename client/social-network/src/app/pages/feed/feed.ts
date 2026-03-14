@@ -1,4 +1,5 @@
-import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild, computed, inject, signal, } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { InfiniteScrollDirective } from 'ngx-infinite-scroll';
 import { Post } from '../../models/post';
 import { ApiService } from '../../services/api';
 import { DatePipe } from '@angular/common';
@@ -8,11 +9,11 @@ import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-feed',
-  imports: [CreatePostBtn, RouterModule, DatePipe],
+  imports: [CreatePostBtn, RouterModule, DatePipe, InfiniteScrollDirective],
   templateUrl: './feed.html',
   styleUrl: './feed.css',
 })
-export class Feed implements OnInit, AfterViewInit, OnDestroy {
+export class Feed implements OnInit {
 
   private readonly postsBatchSize = 10;
 
@@ -23,10 +24,7 @@ export class Feed implements OnInit, AfterViewInit, OnDestroy {
     () => this.posts().length < this.allPosts().length
   );
 
-  @ViewChild('scrollAnchor') private scrollAnchor?: ElementRef<HTMLDivElement>;
-
   private readonly allPosts = signal<Post[]>([]);
-  private intersectionObserver?: IntersectionObserver;
 
 
   private apiService = inject(ApiService);
@@ -61,39 +59,11 @@ export class Feed implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  ngAfterViewInit(): void {
-    if (typeof window === 'undefined' || !('IntersectionObserver' in window)) {
-      return;
-    }
-
-    this.intersectionObserver = new IntersectionObserver(
-      (entries) => {
-        const anchorVisible = entries.some((entry) => entry.isIntersecting);
-
-        if (anchorVisible) {
-          this.loadNextPostsBatch();
-        }
-      },
-      {
-        root: null,
-        rootMargin: '200px 0px',
-      }
-    );
-
-    if (this.scrollAnchor?.nativeElement) {
-      this.intersectionObserver.observe(this.scrollAnchor.nativeElement);
-    }
-  }
-
-  ngOnDestroy(): void {
-    this.intersectionObserver?.disconnect();
-  }
-
   protected buildAvatarUrl(avatarPath: string | null): string {
     return this.apiService.buildAvatarUrl(avatarPath);
   }
 
-  private loadNextPostsBatch(): void {
+  protected loadNextPostsBatch(): void {
     if (!this.hasMorePosts()) {
       return;
     }
