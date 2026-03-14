@@ -56,14 +56,27 @@
 }
 
 .followers-search-wrap {
+  position: relative;
   margin-bottom: 10px;
+}
+
+.followers-search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  opacity: 0.66;
+  pointer-events: none;
+  object-fit: contain;
 }
 
 .followers-search-input {
   width: 100%;
   border: 1px solid var(--secondary-color-transparent-border);
   border-radius: 8px;
-  padding: 9px 12px;
+  padding: 9px 12px 9px 36px;
   font: inherit;
   color: var(--primary-color);
   background: #fff;

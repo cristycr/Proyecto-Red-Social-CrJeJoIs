@@ -9,6 +9,19 @@
   margin: 0;
 }
 
+.header-search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  filter: brightness(0) invert(1);
+  opacity: 0.72;
+  pointer-events: none;
+  object-fit: contain;
+}
+
 .header-search-input {
   width: 100%;
   box-sizing: border-box;
@@ -16,7 +29,7 @@
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.08);
   color: var(--text-color);
-  padding: 11px 16px;
+  padding: 11px 16px 11px 40px;
   font-size: 0.95rem;
   outline: none;
   transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
