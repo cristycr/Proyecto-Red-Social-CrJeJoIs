@@ -7,7 +7,7 @@
         <div class="post">
             <div class="post-header">
                 <a class="user-link" [routerLink]="['/profile', post.userId]">
-                    <img [src]="post.avatarPath ? post.avatarPath : '/assets/images/avatar-default.png'" alt="Avatar" class="avatar">
+                    <img [src]="buildAvatarUrl(post.avatarPath)" alt="Avatar" class="avatar">
                     <span class="nickname">{{post.nickname}}</span>
                 </a>
             </div>

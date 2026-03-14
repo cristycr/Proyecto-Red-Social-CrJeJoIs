@@ -95,28 +95,7 @@ export class App {
   }
 
   protected buildAvatarUrl(avatarPath: string | null): string {
-    const cleanAvatarPath = avatarPath?.trim();
-
-    if (!cleanAvatarPath) {
-      return '/assets/images/avatar-default.png';
-    }
-
-    if (
-      cleanAvatarPath.startsWith('http://') ||
-      cleanAvatarPath.startsWith('https://')
-    ) {
-      return cleanAvatarPath;
-    }
-
-    if (cleanAvatarPath.startsWith('/uploads/')) {
-      return `https://localhost:7185${cleanAvatarPath}`;
-    }
-
-    if (cleanAvatarPath.startsWith('uploads/')) {
-      return `https://localhost:7185/${cleanAvatarPath}`;
-    }
-
-    return `https://localhost:7185/uploads/${cleanAvatarPath}`;
+    return this.apiService.buildAvatarUrl(avatarPath);
   }
 
   @HostListener('document:click', ['$event'])

@@ -89,6 +89,10 @@ export class Feed implements OnInit, AfterViewInit, OnDestroy {
     this.intersectionObserver?.disconnect();
   }
 
+  protected buildAvatarUrl(avatarPath: string | null): string {
+    return this.apiService.buildAvatarUrl(avatarPath);
+  }
+
   private loadNextPostsBatch(): void {
     if (!this.hasMorePosts()) {
       return;

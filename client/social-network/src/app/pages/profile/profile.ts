@@ -456,13 +456,7 @@ export class Profile implements OnInit {
   }
 
   private buildAvatarUrl(avatarPath: string | null): string {
-    const cleanAvatarPath = avatarPath?.trim();
-
-    if (!cleanAvatarPath) {
-      return '/assets/images/avatar-default.png';
-    }
-
-    return `https://localhost:7185/uploads/${cleanAvatarPath}`;
+    return this.api.buildAvatarUrl(avatarPath);
   }
 
   logout() {

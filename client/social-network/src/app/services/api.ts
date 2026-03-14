@@ -7,6 +7,8 @@ import { FollowingDto } from '../models/following-dto';
 import { GetUserProfileExtendDto } from '../models/get-user-profile-extend-dto';
 import { PutPasswordDto } from '../models/put-password-dto';
 import { PutUserDto } from '../models/put-user-dto';
+import { GetAdminDto } from '../models/get-admin-dto';
+import { PutUserRoleDto } from '../models/put-user-role-dto';
 
 @Injectable({
   providedIn: 'root',
@@ -15,8 +17,27 @@ export class ApiService {
 
   jwt: string | null = null;
 
-  private readonly BASE_URL = 'https://localhost:7185/api/';
+  private readonly API_ORIGIN = 'https://localhost:7185';
+  private readonly BASE_URL = `${this.API_ORIGIN}/api/`;
   private readonly http = inject(HttpClient);
+
+  buildAvatarUrl(avatarPath: string | null | undefined): string {
+    const cleanAvatarPath = avatarPath?.trim();
+
+    if (!cleanAvatarPath) {
+      return '/assets/images/avatar-default.png';
+    }
+
+    if (cleanAvatarPath.startsWith('/assets/')) {
+      return cleanAvatarPath;
+    }
+
+    const normalizedFileName = cleanAvatarPath
+      .replace(/^https?:\/\/localhost:7185\/uploads\//i, '')
+      .replace(/^\/?uploads\//i, '');
+
+    return `${this.API_ORIGIN}/uploads/${normalizedFileName}`;
+  }
 
   // Método para hacer peticiones POST a la API
   async post<T>(path: string, body: any): Promise<T> {
@@ -69,6 +90,21 @@ export class ApiService {
   // Método para obtener todos los usuarios
   async getAllUsers(): Promise<GetUserDto[]> {
     return await this.get<GetUserDto[]>('users');
+  }
+
+  // Método para obtener todos los usuarios en el panel admin
+  async getAdminUsers(): Promise<GetAdminDto[]> {
+    return await this.get<GetAdminDto[]>('admin');
+  }
+
+  // Método para actualizar el rol de un usuario desde el panel admin
+  async updateUserRole(userId: number, dto: PutUserRoleDto): Promise<PutUserRoleDto> {
+    return await this.put<PutUserRoleDto>(`admin/${userId}Role`, dto);
+  }
+
+  // Método para eliminar un usuario desde el panel admin
+  async deleteUserByAdmin(userId: number): Promise<void> {
+    await this.delete(`admin/${userId}`);
   }
 
   // Comprueba si existe un usuario con el nickname dado

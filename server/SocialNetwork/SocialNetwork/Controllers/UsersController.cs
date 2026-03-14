@@ -35,6 +35,7 @@ public class UsersController : ControllerBase {
         return getUsersDto;
     }
 
+    [Authorize]
     [HttpGet("all")]
     public async Task<GetUserProfileExtendDto> GetProfileUsers(long userId) {
         User? user = await _unitOfWork.UserRepository.GetByIdAsync(userId);
@@ -97,8 +98,8 @@ public class UsersController : ControllerBase {
     }
 
     // PUT
-    [HttpPut]
     [Authorize]
+    [HttpPut]
     public async Task<IActionResult> UpdateUser(int id, [FromBody] PutUserDto dto) {
 
         User? user = await _unitOfWork.UserRepository.GetByIdAsync(id);
@@ -124,8 +125,8 @@ public class UsersController : ControllerBase {
         return Ok(dto);
     }
 
+    [Authorize]
     [HttpPut("Password")]
-    //[Authorize]
     public async Task<IActionResult> UpdatePassword(int id, [FromBody] PutPasswordDto dto) {
 
         User? user = await _unitOfWork.UserRepository.GetByIdAsync(id);

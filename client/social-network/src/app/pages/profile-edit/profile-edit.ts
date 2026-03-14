@@ -542,28 +542,6 @@ export class ProfileEdit implements OnInit {
     }
 
     private buildAvatarUrl(avatarPath: string | null | undefined): string {
-        const cleanAvatarPath = avatarPath?.trim();
-
-        if (!cleanAvatarPath) {
-            return '/assets/images/avatar-default.png';
-        }
-
-        if (
-            cleanAvatarPath.startsWith('http://') ||
-            cleanAvatarPath.startsWith('https://') ||
-            cleanAvatarPath.startsWith('/assets/')
-        ) {
-            return cleanAvatarPath;
-        }
-
-        if (cleanAvatarPath.startsWith('/uploads/')) {
-            return `https://localhost:7185${cleanAvatarPath}`;
-        }
-
-        if (cleanAvatarPath.startsWith('uploads/')) {
-            return `https://localhost:7185/${cleanAvatarPath}`;
-        }
-
-        return `https://localhost:7185/uploads/${cleanAvatarPath}`;
+        return this.api.buildAvatarUrl(avatarPath);
     }
 }

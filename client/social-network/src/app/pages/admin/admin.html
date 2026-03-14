@@ -3,7 +3,7 @@
 		<p class="admin-tag">Panel de administracion</p>
 		<h1>Gestion de usuarios</h1>
 		<p class="admin-subtitle">
-			Plantilla visual temporal. Aqui se podrá gestionar usuarios en cuanto esten aplicados los endpoints.
+			Gestiona roles y elimina usuarios desde el panel admin.
 		</p>
 
 		<div class="admin-kpis">
@@ -28,10 +28,23 @@
 		<p class="admin-feedback">{{ actionMessage() }}</p>
 	}
 
-	@if (users().length === 0) {
+	@if (loadingUsers()) {
+		<div class="admin-empty-state admin-state-loading">
+			<h2>Cargando usuarios...</h2>
+			<p>Estamos consultando el listado de usuarios del sistema.</p>
+		</div>
+	} @else if (loadError()) {
+		<div class="admin-empty-state admin-state-error">
+			<h2>No se pudieron cargar los usuarios</h2>
+			<p>{{ loadError() }}</p>
+			<button type="button" class="retry-btn" (click)="reloadUsers()">
+				Reintentar
+			</button>
+		</div>
+	} @else if (users().length === 0) {
 		<div class="admin-empty-state">
 			<h2>No hay usuarios para mostrar</h2>
-			<p>Cuando lleguen datos reales desde backend apareceran aqui.</p>
+			<p>El backend ha devuelto una lista vacia.</p>
 		</div>
 	} @else {
 		<ul class="users-list">
@@ -39,7 +52,7 @@
 				<li class="user-card">
 					<div class="user-card-main">
 						<img
-							[src]="user.avatarPath ? user.avatarPath : '/assets/images/avatar-default.png'"
+							[src]="user.avatarUrl"
 							[alt]="'Avatar de ' + user.nickname"
 							class="user-avatar"
 						>
@@ -56,19 +69,25 @@
 							<select
 								[id]="'role-select-' + user.id"
 								[value]="user.role"
+								[disabled]="isRoleUpdating(user.id) || isDeletingUser(user.id)"
 								(change)="onRoleChange(user.id, $event)"
 							>
 								<option value="user">user</option>
 								<option value="admin">admin</option>
 							</select>
+
+							@if (isRoleUpdating(user.id)) {
+								<p class="role-updating">Guardando...</p>
+							}
 						</div>
 
 						<button
 							type="button"
 							class="delete-user-btn"
+							[disabled]="isDeletingUser(user.id)"
 							(click)="openDeleteModal(user)"
 						>
-							Borrar usuario
+							{{ isDeletingUser(user.id) ? 'Borrando...' : 'Borrar usuario' }}
 						</button>
 					</div>
 				</li>
@@ -92,6 +111,7 @@
 					type="button"
 					class="close-modal-btn"
 					aria-label="Cerrar modal"
+					[disabled]="isDeletingUser(userToDelete.id)"
 					(click)="closeDeleteModal()"
 				>
 					x
@@ -114,6 +134,7 @@
 				type="text"
 				class="delete-input"
 				[value]="deleteNicknameInput()"
+				[disabled]="isDeletingUser(userToDelete.id)"
 				(input)="onDeleteNicknameInput($event)"
 				[attr.placeholder]="userToDelete.nickname"
 				autocomplete="off"
@@ -124,17 +145,22 @@
 			}
 
 			<footer class="delete-actions">
-				<button type="button" class="action-btn secondary-btn" (click)="closeDeleteModal()">
+				<button
+					type="button"
+					class="action-btn secondary-btn"
+					[disabled]="isDeletingUser(userToDelete.id)"
+					(click)="closeDeleteModal()"
+				>
 					Cancelar
 				</button>
 
 				<button
 					type="button"
 					class="action-btn danger-btn"
-					[disabled]="!canConfirmDeletion()"
+					[disabled]="!canConfirmDeletion() || isDeletingUser(userToDelete.id)"
 					(click)="confirmDeleteUser()"
 				>
-					Confirmar borrado
+					{{ isDeletingUser(userToDelete.id) ? 'Borrando...' : 'Confirmar borrado' }}
 				</button>
 			</footer>
 		</section>
