@@ -127,19 +127,36 @@ header nav ul {
   background: var(--secondary-color-transparent-light);
 }
 
-.header-user-dropdown a {
+.header-user-dropdown a,
+.header-user-dropdown button {
   display: block;
+  width: 100%;
+  box-sizing: border-box;
   padding: 10px 12px;
   border-radius: 9px;
   color: var(--text-main);
   text-decoration: none;
   font-weight: 600;
   font-size: 0.9rem;
+  text-align: left;
+  border: none;
+  background: transparent;
+  cursor: pointer;
   transition: background-color 0.2s;
 }
 
-.header-user-dropdown a:hover {
+.header-user-dropdown a:hover,
+.header-user-dropdown button:hover {
   background: var(--surface-highlight);
+}
+
+.header-user-logout-btn {
+  color: var(--alert-color);
+}
+
+.header-user-dropdown .header-user-logout-btn:hover {
+  background: #b42318;
+  color: #fff;
 }
 
 header a {

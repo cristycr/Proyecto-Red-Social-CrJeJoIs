@@ -7,7 +7,7 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { RouterLinkWithHref } from '@angular/router';
+import { Router, RouterLinkWithHref } from '@angular/router';
 import { ApiService } from '../../services/api';
 import { AuthService } from '../../services/auth';
 import { AppHeaderSearch } from '../app-header-search/app-header-search';
@@ -21,6 +21,7 @@ import { AppHeaderSearch } from '../app-header-search/app-header-search';
 export class AppSiteHeader {
   private readonly authService = inject(AuthService);
   private readonly apiService = inject(ApiService);
+  private readonly router = inject(Router);
 
   @ViewChild('profileMenuContainer') private profileMenuContainer?: ElementRef<HTMLLIElement>;
 
@@ -43,6 +44,13 @@ export class AppSiteHeader {
 
   protected buildAvatarUrl(avatarPath: string | null): string {
     return this.apiService.buildAvatarUrl(avatarPath);
+  }
+
+  protected logout(): void {
+    this.closeProfileMenu();
+    this.authService.jwt = null;
+    localStorage.removeItem('jwt');
+    void this.router.navigate(['/landing']);
   }
 
   @HostListener('document:click', ['$event'])
