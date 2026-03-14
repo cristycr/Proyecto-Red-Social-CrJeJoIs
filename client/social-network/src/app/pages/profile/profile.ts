@@ -470,46 +470,4 @@ export class Profile implements OnInit {
     localStorage.removeItem('jwt');
     this.router.navigate(['/landing']);
   }
-
-  // Avatar
-  triggerAvatarInput() {
-    document.getElementById('avatarInput')?.click();
-  }
-
-  async onAvatarSelected(event: Event) {
-    const input = event.target as HTMLInputElement;
-    if (!input.files || input.files.length === 0) return;
-
-    const file = input.files[0];
-
-    try {
-      const result = await this.api.uploadAvatar(file);
-      // Usar la URL completa devuelta por el backend
-      //La siguiente línea sería lo suyo arreglarla
-      this.profileImage.set(
-        result.avatarUrl
-          ? `https://localhost:7185${result.avatarUrl}`
-          : '/assets/images/avatar-default.png'
-      );
-
-      if (this.profileUserId) {
-        await this.loadProfile(this.profileUserId);
-      }
-    } catch (err) {
-      console.error('Error subiendo avatar:', err);
-    }
-  }
-
-  async removeAvatar() {
-    try {
-      await this.api.deleteAvatar();
-      this.profileImage.set('/assets/images/avatar-default.png');
-
-      if (this.profileUserId) {
-        await this.loadProfile(this.profileUserId);
-      }
-    } catch (err) {
-      console.error('Error eliminando avatar:', err);
-    }
-  }
 }

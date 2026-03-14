@@ -72,6 +72,28 @@
   </div>
 </header>
 
+<div class="toast-container" aria-live="polite" aria-atomic="true">
+  @for (toast of toasts(); track toast.id) {
+    <article
+      class="toast"
+      [class.toast-success]="toast.type === 'success'"
+      [class.toast-error]="toast.type === 'error'"
+      [class.toast-info]="toast.type === 'info'"
+      role="status"
+    >
+      <span>{{ toast.message }}</span>
+      <button
+        type="button"
+        class="toast-close"
+        aria-label="Cerrar notificacion"
+        (click)="dismissToast(toast.id)"
+      >
+        x
+      </button>
+    </article>
+  }
+</div>
+
 <main>
   <router-outlet></router-outlet>
 </main>

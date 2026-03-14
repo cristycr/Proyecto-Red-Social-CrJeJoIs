@@ -12,6 +12,7 @@ public class PostRepository : BaseRepository<Post, long> {
     public async Task<ICollection<Post>> GetPostsByUserIdAsync(long userId) {
         return await GetQueryable()
             .Where(post => post.UserId == userId)
+            .OrderByDescending(post => post.CreationDate)
             .ToArrayAsync();
     }
 

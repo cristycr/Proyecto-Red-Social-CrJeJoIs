@@ -1,155 +1,141 @@
 <div class="container">
 	@if (loading()) {
-		<p>Cargando perfil...</p>
+		<p class="profile-status">Cargando perfil...</p>
 	} @else {
 		@if (errorMessage()) {
-			<p>{{ errorMessage() }}</p>
+			<p class="profile-error">{{ errorMessage() }}</p>
 		}
 
-		<div class="profile-header">
-			<img [src]="profileImage()" alt="Avatar" class="avatar">
-			<span class="nickname">{{ nickname() }}</span>
-		</div>
+		<div class="profile-layout">
+			<aside class="profile-sidebar">
+				<img [src]="profileImage()" alt="Avatar" class="avatar">
 
-		<div class="biography">
-			@if (biography()) {
-				<p>{{ biography() }}</p>
-			}
-		</div>
+				<h1 class="nickname">{{ nickname() }}</h1>
 
-		<div class="profile-stats">
-			<div
-				class="stat clickable-stat"
-				role="button"
-				tabindex="0"
-				(click)="openFollowersModal()"
-				(keydown.enter)="openFollowersModal()"
-				(keydown.space)="openFollowersModal(); $event.preventDefault()"
-			>
-				<span class="stat-number">{{ followers() }}</span>
-				<span class="stat-label">Seguidores</span>
-			</div>
-			<div
-				class="stat clickable-stat"
-				role="button"
-				tabindex="0"
-				(click)="openFollowedsModal()"
-				(keydown.enter)="openFollowedsModal()"
-				(keydown.space)="openFollowedsModal(); $event.preventDefault()"
-			>
-				<span class="stat-number">{{ followeds() }}</span>
-				<span class="stat-label">Seguidos</span>
-			</div>
-		</div>
+				@if (biography()) {
+					<p class="biography">{{ biography() }}</p>
+				}
 
-		@if (!isOwnProfile()) {
-			<div class="follow-actions">
-				<button
-					type="button"
-					class="follow-btn"
-					(click)="onFollowButtonClick()"
-					[disabled]="followActionLoading()"
-				>
-					@if (followActionLoading()) {
-						Actualizando...
+				<div class="profile-connections" aria-label="Seguidores y seguidos">
+					<img src="assets/icons/usuarios.svg" alt="" aria-hidden="true" class="connections-icon">
+
+					<button type="button" class="connection-link" (click)="openFollowersModal()">
+						<strong>{{ followers() }}</strong> seguidores
+					</button>
+
+					<span class="connections-separator" aria-hidden="true">·</span>
+
+					<button type="button" class="connection-link" (click)="openFollowedsModal()">
+						<strong>{{ followeds() }}</strong> seguidos
+					</button>
+				</div>
+
+				@if (isOwnProfile()) {
+					<button type="button" class="edit-profile-btn" [routerLink]="['/profile/edit']">Editar perfil</button>
+					<button type="button" class="profile-action-btn logout-btn" (click)="logout()">Cerrar sesión</button>
+				} @else {
+					<div class="follow-actions">
+						<button
+							type="button"
+							class="follow-btn"
+							(click)="onFollowButtonClick()"
+							[disabled]="followActionLoading()"
+						>
+							@if (followActionLoading()) {
+								Actualizando...
+							} @else {
+								{{ isFollowingProfile() ? 'Dejar de seguir' : 'Seguir' }}
+							}
+						</button>
+
+						@if (followActionError()) {
+							<p class="follow-error">{{ followActionError() }}</p>
+						}
+					</div>
+				}
+			</aside>
+
+			<section class="profile-content">
+				<section class="posts-section">
+					<h2>Publicaciones</h2>
+
+					@if (postsLoading()) {
+						<p class="posts-status">Cargando publicaciones...</p>
+					} @else if (postsErrorMessage()) {
+						<p class="posts-error">{{ postsErrorMessage() }}</p>
+					} @else if (userPosts().length === 0) {
+						<p class="posts-status">Este usuario aun no tiene publicaciones.</p>
 					} @else {
-						{{ isFollowingProfile() ? 'Dejar de seguir' : 'Seguir' }}
+						@if (postDeleteError()) {
+							<p class="posts-error posts-action-error">{{ postDeleteError() }}</p>
+						}
+
+						<span class="posts-page-current posts-page-current-top">
+							Pagina {{ currentPostsPage() }} / {{ totalPostsPages() }}
+						</span>
+
+						<div class="posts-list">
+							@for (post of paginatedUserPosts(); track $index) {
+								<article class="profile-post">
+									<div class="profile-post-header">
+										<h3>{{ post.title || 'Sin titulo' }}</h3>
+
+										@if (canDeletePost(post)) {
+											<button
+												type="button"
+												class="delete-post-btn"
+												(click)="onDeletePost(post)"
+												[disabled]="isDeletingPost(post.id)"
+												[attr.aria-label]="'Eliminar publicación ' + (post.title || '')"
+											>
+												<img src="assets/icons/trash.svg" alt="" aria-hidden="true" class="delete-post-icon">
+											</button>
+										}
+									</div>
+									<p>{{ post.description }}</p>
+									<span class="profile-post-date">{{ formatPostDate(post.creationDate) }}</span>
+								</article>
+							}
+						</div>
+
+						<div class="posts-pagination">
+							<button
+								type="button"
+								class="posts-page-btn"
+								(click)="goToPreviousPostsPage()"
+								[disabled]="currentPostsPage() === 1"
+							>
+								Anterior
+							</button>
+
+							<span class="posts-page-current">Pagina {{ currentPostsPage() }} / {{ totalPostsPages() }}</span>
+
+							<button
+								type="button"
+								class="posts-page-btn"
+								(click)="goToNextPostsPage()"
+								[disabled]="currentPostsPage() === totalPostsPages()"
+							>
+								Siguiente
+							</button>
+						</div>
+
+						<div class="posts-toolbar">
+							<label for="postsPerPage">Publicaciones por pagina:</label>
+							<input
+								id="postsPerPage"
+								type="number"
+								min="1"
+								step="1"
+								class="posts-per-page-input"
+								[value]="postsPerPage()"
+								(input)="onPostsPerPageInput($event)"
+							/>
+						</div>
 					}
-				</button>
-
-				@if (followActionError()) {
-					<p class="follow-error">{{ followActionError() }}</p>
-				}
-			</div>
-		}
-
-		@if (isOwnProfile()) {
-			<button type="button" class="profile-action-btn logout-btn" (click)="logout()">Cerrar sesión</button>
-			<div class="avatar-actions">
-					<input type="file" id="avatarInput" (change)="onAvatarSelected($event)" hidden />
-					<button type="button" class="profile-action-btn" (click)="triggerAvatarInput()">Cambiar avatar</button>
-					<button type="button" class="profile-action-btn profile-action-btn-danger" (click)="removeAvatar()">Eliminar avatar</button>
-			</div>
-		}
-
-		<section class="posts-section">
-			<h2>Publicaciones</h2>
-
-			@if (postsLoading()) {
-				<p class="posts-status">Cargando publicaciones...</p>
-			} @else if (postsErrorMessage()) {
-				<p class="posts-error">{{ postsErrorMessage() }}</p>
-			} @else if (userPosts().length === 0) {
-				<p class="posts-status">Este usuario aun no tiene publicaciones.</p>
-			} @else {
-				@if (postDeleteError()) {
-					<p class="posts-error posts-action-error">{{ postDeleteError() }}</p>
-				}
-
-				<span class="posts-page-current posts-page-current-top">
-					Pagina {{ currentPostsPage() }} / {{ totalPostsPages() }}
-				</span>
-
-				<div class="posts-list">
-					@for (post of paginatedUserPosts(); track post.id) {
-						<article class="profile-post">
-							<div class="profile-post-header">
-								<h3>{{ post.title || 'Sin titulo' }}</h3>
-
-								@if (canDeletePost(post)) {
-									<button
-										type="button"
-										class="delete-post-btn"
-										(click)="onDeletePost(post)"
-										[disabled]="isDeletingPost(post.id)"
-										[attr.aria-label]="'Eliminar publicación ' + (post.title || '')"
-									>
-										<img src="assets/icons/trash.svg" alt="" aria-hidden="true" class="delete-post-icon">
-									</button>
-								}
-							</div>
-							<p>{{ post.description }}</p>
-							<span class="profile-post-date">{{ formatPostDate(post.creationDate) }}</span>
-						</article>
-					}
-				</div>
-
-				<div class="posts-pagination">
-					<button
-						type="button"
-						class="posts-page-btn"
-						(click)="goToPreviousPostsPage()"
-						[disabled]="currentPostsPage() === 1"
-					>
-						Anterior
-					</button>
-
-					<span class="posts-page-current">Pagina {{ currentPostsPage() }} / {{ totalPostsPages() }}</span>
-
-					<button
-						type="button"
-						class="posts-page-btn"
-						(click)="goToNextPostsPage()"
-						[disabled]="currentPostsPage() === totalPostsPages()"
-					>
-						Siguiente
-					</button>
-				</div>
-
-				<div class="posts-toolbar">
-					<label for="postsPerPage">Publicaciones por pagina:</label>
-					<input
-						id="postsPerPage"
-						type="number"
-						min="1"
-						step="1"
-						class="posts-per-page-input"
-						[value]="postsPerPage()"
-						(input)="onPostsPerPageInput($event)"
-					/>
-				</div>
-			}
-		</section>
+				</section>
+			</section>
+		</div>
 	}
 </div>
 

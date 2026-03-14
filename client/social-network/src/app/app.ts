@@ -11,6 +11,7 @@ import { RouterOutlet, RouterLinkWithHref } from '@angular/router';
 import { AuthService } from './services/auth';
 import { ApiService } from './services/api';
 import { GetUserDto } from './models/get-user-dto';
+import { ToastService } from './services/toast';
 
 @Component({
   selector: 'app-root',
@@ -22,6 +23,7 @@ import { GetUserDto } from './models/get-user-dto';
 export class App {
   private readonly authService = inject(AuthService);
   private readonly apiService = inject(ApiService);
+  private readonly toastService = inject(ToastService);
 
   private usersRequested = false;
 
@@ -35,6 +37,7 @@ export class App {
   protected readonly usersLoadError = signal('');
   protected readonly searchOpen = signal(false);
   protected readonly allUsers = signal<GetUserDto[]>([]);
+  protected readonly toasts = this.toastService.toasts;
   protected readonly filteredUsers = computed(() => {
     const query = this.searchQuery().trim().toLowerCase();
 
@@ -80,6 +83,10 @@ export class App {
 
   protected closeSearch(): void {
     this.searchOpen.set(false);
+  }
+
+  protected dismissToast(id: number): void {
+    this.toastService.dismiss(id);
   }
 
   protected retryUsersSearchLoad(): void {
