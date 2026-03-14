@@ -21,14 +21,14 @@ public class UserRepository : BaseRepository<User, long> {
 
 
     // Método para obtener los usuarios seguidos por un usuario específico
-    public async Task<ICollection<GetFollowDto>> GetFollowedUsersAsync(long userId) {
+    public async Task<ICollection<GetUserDto>> GetFollowedUsersAsync(long userId) {
         return await _dbContext.Following
             .Where(f => f.FollowerId == userId)
             .Join(
                 _dbContext.User,
                 f => f.FollowedId,
                 u => u.Id,
-                (f, u) => new GetFollowDto {
+                (f, u) => new GetUserDto {
                     Id = u.Id,
                     Nickname = u.Nickname!,
                     AvatarPath = u.AvatarPath!,
@@ -42,14 +42,14 @@ public class UserRepository : BaseRepository<User, long> {
     }
 
     // Metodo para obtener los usuarios que siguen a un usuario específico
-    public async Task<ICollection<GetFollowDto>> GetFollowerUsersAsync(long userId) {
+    public async Task<ICollection<GetUserDto>> GetFollowerUsersAsync(long userId) {
         return await _dbContext.Following
             .Where(f => f.FollowedId == userId)
             .Join(
                 _dbContext.User,
                 f => f.FollowerId,
                 u => u.Id,
-                (f, u) => new GetFollowDto {
+                (f, u) => new GetUserDto {
                     Id = u.Id,
                     Nickname = u.Nickname!,
                     AvatarPath = u.AvatarPath!,
