@@ -25,6 +25,15 @@
   margin-bottom: 10px;
 }
 
+.posts-top-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
 .posts-list {
   display: flex;
   flex-direction: column;
@@ -48,6 +57,43 @@
   border: 1px solid var(--border-soft);
   background: #fff;
   color: var(--primary-color);
+}
+
+.posts-order-btn {
+  margin-top: 0;
+  padding: 8px 12px;
+  border: 1px solid var(--secondary-color-transparent-border);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--primary-color);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.posts-order-btn:hover {
+  background: var(--surface-highlight);
+  border-color: var(--secondary-color);
+}
+
+.posts-order-btn.is-active {
+  background: var(--secondary-color);
+  border-color: var(--secondary-color);
+  color: #fff;
+}
+
+.posts-order-icon {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+}
+
+.posts-order-btn.is-active .posts-order-icon {
+  filter: brightness(0) invert(1);
 }
 
 .profile-post {
@@ -191,7 +237,7 @@
 .posts-page-current-top {
   display: block;
   text-align: left;
-  margin-bottom: 10px;
+  margin-bottom: 0;
 }
 
 .posts-page-btn {
@@ -214,6 +260,10 @@
 }
 
 @media (max-width: 640px) {
+  .posts-top-toolbar {
+    justify-content: center;
+  }
+
   .posts-page-current-top {
     text-align: center;
   }

@@ -65,6 +65,7 @@ export class Profile implements OnInit {
   protected readonly deletePostConfirmationMessage =
     '¿Seguro que quieres eliminar esta publicación? Esta acción no se puede deshacer.';
   protected readonly deletingPostIds = signal<number[]>([]);
+  protected readonly reversePostsOrder = signal(false);
   protected readonly postsPerPage = signal(10);
   protected readonly currentPostsPage = signal(1);
   protected readonly totalPostsPages = computed(() => {
@@ -77,8 +78,13 @@ export class Profile implements OnInit {
 
     return Math.ceil(totalPosts / perPage);
   });
-  protected readonly paginatedUserPosts = computed(() => {
+  protected readonly orderedUserPosts = computed(() => {
     const posts = this.userPosts();
+
+    return this.reversePostsOrder() ? [...posts].reverse() : posts;
+  });
+  protected readonly paginatedUserPosts = computed(() => {
+    const posts = this.orderedUserPosts();
     const perPage = this.postsPerPage();
     const startIndex = (this.currentPostsPage() - 1) * perPage;
 
@@ -226,6 +232,7 @@ export class Profile implements OnInit {
     this.deletePostModalOpen.set(false);
     this.postPendingDeletion.set(null);
     this.deletingPostIds.set([]);
+    this.reversePostsOrder.set(false);
     this.userPosts.set([]);
     this.currentPostsPage.set(1);
 
@@ -365,6 +372,12 @@ export class Profile implements OnInit {
   protected onPostsPerPageSelected(selectedValue: number): void {
     this.postsPerPage.set(selectedValue);
     this.currentPostsPage.set(1);
+  }
+
+  protected togglePostsOrder(): void {
+    this.reversePostsOrder.update((isReversed) => !isReversed);
+    this.currentPostsPage.set(1);
+    this.scrollToTop();
   }
 
   protected goToPreviousPostsPage(): void {

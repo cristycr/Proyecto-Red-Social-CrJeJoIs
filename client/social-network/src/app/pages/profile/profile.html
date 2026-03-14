@@ -32,6 +32,7 @@
 					[posts]="paginatedUserPosts()"
 					[currentPage]="currentPostsPage()"
 					[totalPages]="totalPostsPages()"
+					[isReverseOrder]="reversePostsOrder()"
 					[postsPerPage]="postsPerPage()"
 					[canDeletePost]="canDeletePostFn"
 					[isDeletingPost]="isDeletingPostFn"
@@ -40,6 +41,7 @@
 					(previousPage)="goToPreviousPostsPage()"
 					(nextPage)="goToNextPostsPage()"
 					(pageSelected)="goToPostsPage($event)"
+					(toggleReverseOrder)="togglePostsOrder()"
 					(postsPerPageChange)="onPostsPerPageSelected($event)"
 				></app-profile-posts-section>
 			</section>

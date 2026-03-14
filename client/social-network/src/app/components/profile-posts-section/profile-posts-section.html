@@ -12,9 +12,23 @@
       <p class="posts-error posts-action-error">{{ actionError() }}</p>
     }
 
-    <span class="posts-page-current posts-page-current-top">
-      Pagina {{ currentPage() }} / {{ totalPages() }}
-    </span>
+    <div class="posts-top-toolbar">
+      <span class="posts-page-current posts-page-current-top">
+        Pagina {{ currentPage() }} / {{ totalPages() }}
+      </span>
+
+      <button
+        type="button"
+        class="posts-order-btn"
+        [class.is-active]="isReverseOrder()"
+        [attr.aria-pressed]="isReverseOrder()"
+        [attr.aria-label]="isReverseOrder() ? 'Mostrar publicaciones de mas antigua a mas nueva' : 'Mostrar publicaciones de mas nueva a mas antigua'"
+        (click)="toggleReverseOrder.emit()"
+      >
+        <img src="assets/icons/ordenar-alt.svg" alt="" aria-hidden="true" class="posts-order-icon" />
+        <span>Ordenar por fecha</span>
+      </button>
+    </div>
 
     <div class="posts-list">
       @for (post of posts(); track post.id) {

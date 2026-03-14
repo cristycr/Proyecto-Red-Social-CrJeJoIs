@@ -25,6 +25,7 @@ export class ProfilePostsSection {
   readonly posts = input<Post[]>([]);
   readonly currentPage = input(1);
   readonly totalPages = input(1);
+  readonly isReverseOrder = input(false);
   readonly postsPerPage = input(10);
   readonly canDeletePost = input<(post: Post) => boolean>(() => false);
   readonly isDeletingPost = input<(postId: number) => boolean>(() => false);
@@ -34,6 +35,7 @@ export class ProfilePostsSection {
   readonly previousPage = output<void>();
   readonly nextPage = output<void>();
   readonly pageSelected = output<number>();
+  readonly toggleReverseOrder = output<void>();
   readonly postsPerPageChange = output<number>();
   protected readonly paginationItems = computed(() =>
     this.buildPaginationItems(this.currentPage(), this.totalPages())
