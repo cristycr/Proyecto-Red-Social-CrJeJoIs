@@ -47,122 +47,22 @@
 			<p>El backend ha devuelto una lista vacia.</p>
 		</div>
 	} @else {
-		<ul class="users-list">
-			@for (user of users(); track user.id) {
-				<li class="user-card">
-					<div class="user-card-main">
-						<img
-							[src]="user.avatarUrl"
-							[alt]="'Avatar de ' + user.nickname"
-							class="user-avatar"
-						>
-
-						<div class="user-data">
-							<h2>{{ user.nickname }}</h2>
-							<p>{{ user.email }}</p>
-						</div>
-					</div>
-
-					<div class="user-actions">
-						<div class="role-control">
-							<label [attr.for]="'role-select-' + user.id">Rol</label>
-							<select
-								[id]="'role-select-' + user.id"
-								[value]="user.role"
-								[disabled]="isRoleUpdating(user.id) || isDeletingUser(user.id)"
-								(change)="onRoleChange(user.id, $event)"
-							>
-								<option value="user">user</option>
-								<option value="admin">admin</option>
-							</select>
-
-							@if (isRoleUpdating(user.id)) {
-								<p class="role-updating">Guardando...</p>
-							}
-						</div>
-
-						<button
-							type="button"
-							class="delete-user-btn"
-							[disabled]="isDeletingUser(user.id)"
-							(click)="openDeleteModal(user)"
-						>
-							{{ isDeletingUser(user.id) ? 'Borrando...' : 'Borrar usuario' }}
-						</button>
-					</div>
-				</li>
-			}
-		</ul>
+		<app-admin-users-list
+			[users]="users()"
+			[isRoleUpdating]="isRoleUpdatingFn"
+			[isDeletingUser]="isDeletingUserFn"
+			(roleChange)="onRoleChange($event)"
+			(deleteUser)="openDeleteModal($event)"
+		></app-admin-users-list>
 	}
 </section>
 
-@if (selectedUserForDeletion(); as userToDelete) {
-	<div class="modal-overlay" (click)="onModalOverlayClick($event)">
-		<section
-			class="delete-modal"
-			role="dialog"
-			aria-modal="true"
-			[attr.aria-labelledby]="'delete-title-' + userToDelete.id"
-		>
-			<header class="delete-modal-header">
-				<h3 [id]="'delete-title-' + userToDelete.id">Confirmar borrado de usuario</h3>
-
-				<button
-					type="button"
-					class="close-modal-btn"
-					aria-label="Cerrar modal"
-					[disabled]="isDeletingUser(userToDelete.id)"
-					(click)="closeDeleteModal()"
-				>
-					x
-				</button>
-			</header>
-
-			<p class="delete-description">
-				Estas a punto de borrar a <strong>{{ userToDelete.nickname }}</strong>.
-			</p>
-
-			<p class="delete-description">
-				Para confirmar, escribe exactamente su nickname.
-			</p>
-
-			<label class="delete-label" [attr.for]="'confirm-delete-' + userToDelete.id">
-				Nickname de confirmacion
-			</label>
-			<input
-				[id]="'confirm-delete-' + userToDelete.id"
-				type="text"
-				class="delete-input"
-				[value]="deleteNicknameInput()"
-				[disabled]="isDeletingUser(userToDelete.id)"
-				(input)="onDeleteNicknameInput($event)"
-				[attr.placeholder]="userToDelete.nickname"
-				autocomplete="off"
-			/>
-
-			@if (deleteNicknameInput().length > 0 && !canConfirmDeletion()) {
-				<p class="delete-warning">El nickname no coincide.</p>
-			}
-
-			<footer class="delete-actions">
-				<button
-					type="button"
-					class="action-btn secondary-btn"
-					[disabled]="isDeletingUser(userToDelete.id)"
-					(click)="closeDeleteModal()"
-				>
-					Cancelar
-				</button>
-
-				<button
-					type="button"
-					class="action-btn danger-btn"
-					[disabled]="!canConfirmDeletion() || isDeletingUser(userToDelete.id)"
-					(click)="confirmDeleteUser()"
-				>
-					{{ isDeletingUser(userToDelete.id) ? 'Borrando...' : 'Confirmar borrado' }}
-				</button>
-			</footer>
-		</section>
-	</div>
-}
+<app-admin-delete-user-modal
+	[user]="selectedUserForDeletion()"
+	[deleteNicknameInput]="deleteNicknameInput()"
+	[canConfirmDeletion]="canConfirmDeletion()"
+	[deletingUser]="deletingSelectedUser()"
+	(deleteNicknameInputChange)="onDeleteNicknameInput($event)"
+	(close)="closeDeleteModal()"
+	(confirm)="confirmDeleteUser()"
+></app-admin-delete-user-modal>

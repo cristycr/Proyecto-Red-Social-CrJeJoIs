@@ -2,18 +2,13 @@ import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { UserRole } from '../../models/get-admin-dto';
 import { PutUserRoleDto } from '../../models/put-user-role-dto';
 import { ApiService } from '../../services/api';
-
-type AdminUserRow = {
-  id: number;
-  nickname: string;
-  email: string;
-  avatarUrl: string;
-  role: UserRole;
-};
+import { AdminUsersList } from '../../components/admin-users-list/admin-users-list';
+import { AdminDeleteUserModal } from '../../components/admin-delete-user-modal/admin-delete-user-modal';
+import { AdminUserRow } from '../../models/admin-user-row';
 
 @Component({
   selector: 'app-admin',
-  imports: [],
+  imports: [AdminUsersList, AdminDeleteUserModal],
   templateUrl: './admin.html',
   styleUrl: './admin.css',
 })
@@ -29,6 +24,10 @@ export class Admin implements OnInit {
   protected readonly actionMessage = signal('');
   protected readonly updatingRoleIds = signal<number[]>([]);
   protected readonly deletingUserId = signal<number | null>(null);
+  protected readonly isRoleUpdatingFn = (userId: number): boolean =>
+    this.isRoleUpdating(userId);
+  protected readonly isDeletingUserFn = (userId: number): boolean =>
+    this.isDeletingUser(userId);
 
   protected readonly totalUsers = computed(() => this.users().length);
   protected readonly totalAdmins = computed(
@@ -47,6 +46,15 @@ export class Admin implements OnInit {
 
     return this.deleteNicknameInput().trim() === selectedUser.nickname;
   });
+  protected readonly deletingSelectedUser = computed(() => {
+    const selectedUser = this.selectedUserForDeletion();
+
+    if (!selectedUser) {
+      return false;
+    }
+
+    return this.isDeletingUser(selectedUser.id);
+  });
 
   ngOnInit(): void {
     void this.loadUsers();
@@ -64,18 +72,19 @@ export class Admin implements OnInit {
     return this.deletingUserId() === userId;
   }
 
-  protected async onRoleChange(userId: number, event: Event): Promise<void> {
-    const target = event.target as HTMLSelectElement | null;
+  protected async onRoleChange(event: {
+    userId: number;
+    role: UserRole;
+  }): Promise<void> {
+    const { userId, role: selectedRole } = event;
 
-    if (!target || this.isRoleUpdating(userId) || this.isDeletingUser(userId)) {
+    if (this.isRoleUpdating(userId) || this.isDeletingUser(userId)) {
       return;
     }
 
-    const selectedRole = this.normalizeRole(target.value);
     const currentUser = this.users().find((user) => user.id === userId);
 
     if (!currentUser || currentUser.role === selectedRole) {
-      target.value = currentUser?.role ?? 'user';
       return;
     }
 
@@ -103,7 +112,6 @@ export class Admin implements OnInit {
         `Rol actualizado: ${currentUser.nickname} ahora es ${selectedRole}.`
       );
     } catch (err: any) {
-      target.value = currentUser.role;
       this.actionMessage.set(
         this.extractBackendError(err, 'No se pudo actualizar el rol del usuario.')
       );
@@ -130,9 +138,8 @@ export class Admin implements OnInit {
     this.deleteNicknameInput.set('');
   }
 
-  protected onDeleteNicknameInput(event: Event): void {
-    const target = event.target as HTMLInputElement | null;
-    this.deleteNicknameInput.set(target?.value ?? '');
+  protected onDeleteNicknameInput(value: string): void {
+    this.deleteNicknameInput.set(value);
   }
 
   protected async confirmDeleteUser(): Promise<void> {
@@ -163,12 +170,6 @@ export class Admin implements OnInit {
       );
     } finally {
       this.deletingUserId.set(null);
-    }
-  }
-
-  protected onModalOverlayClick(event: MouseEvent): void {
-    if (event.target === event.currentTarget) {
-      this.closeDeleteModal();
     }
   }
 

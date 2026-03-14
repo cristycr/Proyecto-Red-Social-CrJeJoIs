@@ -1,21 +1,31 @@
 import { Component, DestroyRef, computed, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AuthService } from '../../services/auth';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CreatePostBtn } from '../../components/create-post-btn/create-post-btn';
 import { ApiService } from '../../services/api';
 import { GetUserDto } from '../../models/get-user-dto';
 import { Post } from '../../models/post';
+import { ProfileSidebarCard } from '../../components/profile-sidebar-card/profile-sidebar-card';
+import { ProfilePostsSection } from '../../components/profile-posts-section/profile-posts-section';
+import { ProfileUsersModal } from '../../components/profile-users-modal/profile-users-modal';
+import { ToastService } from '../../services/toast';
 
 type UserListItem = {
   id: number;
   nickname: string;
   avatarUrl: string;
+  fullName: string;
 };
 
 @Component({
   selector: 'app-profile',
-  imports: [CreatePostBtn, RouterModule],
+  imports: [
+    CreatePostBtn,
+    ProfileSidebarCard,
+    ProfilePostsSection,
+    ProfileUsersModal,
+  ],
   templateUrl: './profile.html',
   styleUrl: './profile.css',
 })
@@ -24,6 +34,7 @@ export class Profile implements OnInit {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly api = inject(ApiService);
+  private readonly toast = inject(ToastService);
   private readonly destroyRef = inject(DestroyRef);
 
   protected readonly nickname = signal('Usuario');
@@ -37,6 +48,7 @@ export class Profile implements OnInit {
   protected readonly followActionError = signal('');
   protected readonly loading = signal(true);
   protected readonly errorMessage = signal('');
+  protected readonly isAuthenticated = this.auth.isAuthenticated;
   protected readonly usersModalOpen = signal(false);
   protected readonly usersModalLoading = signal(false);
   protected readonly usersModalError = signal('');
@@ -48,7 +60,12 @@ export class Profile implements OnInit {
   protected readonly postsLoading = signal(true);
   protected readonly postsErrorMessage = signal('');
   protected readonly postDeleteError = signal('');
+  protected readonly deletePostModalOpen = signal(false);
+  protected readonly postPendingDeletion = signal<Post | null>(null);
+  protected readonly deletePostConfirmationMessage =
+    '¿Seguro que quieres eliminar esta publicación? Esta acción no se puede deshacer.';
   protected readonly deletingPostIds = signal<number[]>([]);
+  protected readonly reversePostsOrder = signal(false);
   protected readonly postsPerPage = signal(10);
   protected readonly currentPostsPage = signal(1);
   protected readonly totalPostsPages = computed(() => {
@@ -61,13 +78,24 @@ export class Profile implements OnInit {
 
     return Math.ceil(totalPosts / perPage);
   });
-  protected readonly paginatedUserPosts = computed(() => {
+  protected readonly orderedUserPosts = computed(() => {
     const posts = this.userPosts();
+
+    return this.reversePostsOrder() ? [...posts].reverse() : posts;
+  });
+  protected readonly paginatedUserPosts = computed(() => {
+    const posts = this.orderedUserPosts();
     const perPage = this.postsPerPage();
     const startIndex = (this.currentPostsPage() - 1) * perPage;
 
     return posts.slice(startIndex, startIndex + perPage);
   });
+  protected readonly canDeletePostFn = (post: Post): boolean =>
+    this.canDeletePost(post);
+  protected readonly isDeletingPostFn = (postId: number): boolean =>
+    this.isDeletingPost(postId);
+  protected readonly formatPostDateFn = (dateValue: Date | string): string =>
+    this.formatPostDate(dateValue);
 
   private profileUserId: number | null = null;
 
@@ -201,7 +229,10 @@ export class Profile implements OnInit {
     this.postsLoading.set(true);
     this.postsErrorMessage.set('');
     this.postDeleteError.set('');
+    this.deletePostModalOpen.set(false);
+    this.postPendingDeletion.set(null);
     this.deletingPostIds.set([]);
+    this.reversePostsOrder.set(false);
     this.userPosts.set([]);
     this.currentPostsPage.set(1);
 
@@ -255,11 +286,13 @@ export class Profile implements OnInit {
     return this.deletingPostIds().includes(postId);
   }
 
-  protected async onDeletePost(post: Post): Promise<void> {
+  protected onDeletePost(post: Post): void {
     this.postDeleteError.set('');
 
     if (!this.canDeletePost(post)) {
-      this.postDeleteError.set('No tienes permisos para eliminar esta publicación.');
+      const message = 'No tienes permisos para eliminar esta publicación.';
+      this.postDeleteError.set(message);
+      this.toast.showError(message);
       return;
     }
 
@@ -267,14 +300,46 @@ export class Profile implements OnInit {
       return;
     }
 
-    const shouldDelete = window.confirm(
-      '¿Seguro que quieres eliminar esta publicación? Esta acción no se puede deshacer.'
-    );
+    this.postPendingDeletion.set(post);
+    this.deletePostModalOpen.set(true);
+  }
 
-    if (!shouldDelete) {
+  protected onDeletePostModalBackdropClick(event: MouseEvent): void {
+    if (event.target === event.currentTarget) {
+      this.closeDeletePostModal();
+    }
+  }
+
+  protected closeDeletePostModal(): void {
+    this.deletePostModalOpen.set(false);
+    this.postPendingDeletion.set(null);
+  }
+
+  protected async confirmDeletePost(): Promise<void> {
+    const post = this.postPendingDeletion();
+
+    if (!post) {
+      this.closeDeletePostModal();
       return;
     }
 
+    this.closeDeletePostModal();
+
+    if (!this.canDeletePost(post)) {
+      const message = 'No tienes permisos para eliminar esta publicación.';
+      this.postDeleteError.set(message);
+      this.toast.showError(message);
+      return;
+    }
+
+    if (this.isDeletingPost(post.id)) {
+      return;
+    }
+
+    await this.deletePost(post);
+  }
+
+  private async deletePost(post: Post): Promise<void> {
     this.setPostDeleting(post.id, true);
 
     try {
@@ -289,25 +354,30 @@ export class Profile implements OnInit {
       if (this.currentPostsPage() > maxAvailablePage) {
         this.currentPostsPage.set(maxAvailablePage);
       }
+
+      this.toast.showSuccess('Publicación eliminada con éxito.');
     } catch (err: any) {
-      this.postDeleteError.set(
-        this.extractBackendError(err, 'No se pudo eliminar la publicación.')
+      const message = this.extractBackendError(
+        err,
+        'No se pudo eliminar la publicación.'
       );
+
+      this.postDeleteError.set(message);
+      this.toast.showError(message);
     } finally {
       this.setPostDeleting(post.id, false);
     }
   }
 
-  protected onPostsPerPageInput(event: Event): void {
-    const target = event.target as HTMLInputElement;
-    const selectedValue = Number(target.value);
-
-    if (Number.isNaN(selectedValue) || selectedValue <= 0) {
-      return;
-    }
-
-    this.postsPerPage.set(Math.floor(selectedValue));
+  protected onPostsPerPageSelected(selectedValue: number): void {
+    this.postsPerPage.set(selectedValue);
     this.currentPostsPage.set(1);
+  }
+
+  protected togglePostsOrder(): void {
+    this.reversePostsOrder.update((isReversed) => !isReversed);
+    this.currentPostsPage.set(1);
+    this.scrollToTop();
   }
 
   protected goToPreviousPostsPage(): void {
@@ -316,6 +386,7 @@ export class Profile implements OnInit {
     }
 
     this.currentPostsPage.update((page) => page - 1);
+    this.scrollToTop();
   }
 
   protected goToNextPostsPage(): void {
@@ -326,6 +397,22 @@ export class Profile implements OnInit {
     }
 
     this.currentPostsPage.update((page) => page + 1);
+    this.scrollToTop();
+  }
+
+  protected goToPostsPage(page: number): void {
+    const targetPage = Math.floor(page);
+    const totalPages = this.totalPostsPages();
+
+    if (
+      targetPage < 1 ||
+      targetPage > totalPages ||
+      targetPage === this.currentPostsPage()
+    ) {
+      return;
+    }
+
+    this.currentPostsPage.set(targetPage);
     this.scrollToTop();
   }
 
@@ -388,6 +475,7 @@ export class Profile implements OnInit {
           id: user.id,
           nickname: user.nickname,
           avatarUrl: this.buildAvatarUrl(user.avatarPath),
+          fullName: this.buildUserFullName(user),
         }))
       );
     } catch {
@@ -419,12 +507,6 @@ export class Profile implements OnInit {
     });
   }
 
-  onUsersModalBackdropClick(event: MouseEvent): void {
-    if (event.target === event.currentTarget) {
-      this.closeUsersModal();
-    }
-  }
-
   private setPostDeleting(postId: number, isDeleting: boolean): void {
     this.deletingPostIds.update((postIds) => {
       if (isDeleting) {
@@ -453,6 +535,13 @@ export class Profile implements OnInit {
       err?.message ||
       fallbackMessage
     );
+  }
+
+  private buildUserFullName(user: GetUserDto): string {
+    return [user.name, user.surname1, user.surname2]
+      .map((part) => part?.trim() ?? '')
+      .filter((part) => part.length > 0)
+      .join(' ');
   }
 
   private buildAvatarUrl(avatarPath: string | null): string {

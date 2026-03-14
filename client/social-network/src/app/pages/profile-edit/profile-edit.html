@@ -66,64 +66,15 @@
 					<p class="field-hint">{{ biographyLength }} / 280 caracteres</p>
 				</div>
 
-				<aside class="profile-avatar-panel">
-					<h2>Foto de perfil</h2>
-					<div class="profile-avatar-shell" #avatarMenuContainer>
-						<img [src]="avatarUrl()" alt="Avatar del perfil" class="profile-avatar-preview" />
-						<input #avatarInput type="file" accept="image/*" (change)="onAvatarSelected($event)" hidden />
-
-						<button
-							type="button"
-							class="avatar-edit-trigger"
-							(click)="toggleAvatarMenu($event)"
-							[attr.aria-expanded]="avatarMenuOpen()"
-							aria-haspopup="menu"
-							[disabled]="avatarActionLoading()"
-						>
-							<img src="assets/icons/lapiz.svg" alt="" aria-hidden="true" class="avatar-edit-icon" />
-							Editar
-						</button>
-
-						@if (avatarMenuOpen()) {
-							<div class="avatar-dropdown" role="menu" aria-label="Opciones de foto de perfil">
-								<button
-									type="button"
-									class="avatar-dropdown-item"
-									(click)="triggerAvatarInput($event)"
-									[disabled]="avatarActionLoading()"
-								>
-									Cambiar foto...
-								</button>
-								<button
-									type="button"
-									class="avatar-dropdown-item avatar-dropdown-item-danger"
-									(click)="removeAvatar($event)"
-									[disabled]="avatarActionLoading()"
-								>
-									Eliminar foto
-								</button>
-							</div>
-						}
-					</div>
-					<p class="avatar-nickname">{{ profileForm.controls.nickname.value || 'Usuario' }}</p>
-					<p class="avatar-note">
-						Puedes cambiar o eliminar la foto usando el botón 'Editar' sobre el avatar.
-					</p>
-
-					@if (avatarActionLoading()) {
-						<p class="avatar-note avatar-note-muted">Actualizando foto...</p>
-					}
-
-					@if (avatarActionError()) {
-						<p class="avatar-note avatar-note-error">{{ avatarActionError() }}</p>
-					}
-
-					@if (!hasPrivateData()) {
-						<p class="avatar-note avatar-note-muted">
-							Aun no hay nombre, apellidos ni email cargados desde backend.
-						</p>
-					}
-				</aside>
+				<app-profile-avatar-panel
+					[avatarUrl]="avatarUrl()"
+					[nickname]="profileForm.controls.nickname.value || 'Usuario'"
+					[actionLoading]="avatarActionLoading()"
+					[actionError]="avatarActionError()"
+					[hasPrivateData]="hasPrivateData()"
+					(avatarSelected)="onAvatarFileSelected($event)"
+					(removeAvatarRequested)="onAvatarRemoveRequested()"
+				></app-profile-avatar-panel>
 			</div>
 
 			<div class="profile-edit-actions">

@@ -7,166 +7,76 @@
 		}
 
 		<div class="profile-layout">
-			<aside class="profile-sidebar">
-				<img [src]="profileImage()" alt="Avatar" class="avatar">
-
-				<h1 class="nickname">{{ nickname() }}</h1>
-
-				@if (biography()) {
-					<p class="biography">{{ biography() }}</p>
-				}
-
-				<div class="profile-connections" aria-label="Seguidores y seguidos">
-					<img src="assets/icons/usuarios.svg" alt="" aria-hidden="true" class="connections-icon">
-
-					<button type="button" class="connection-link" (click)="openFollowersModal()">
-						<strong>{{ followers() }}</strong> seguidores
-					</button>
-
-					<span class="connections-separator" aria-hidden="true">·</span>
-
-					<button type="button" class="connection-link" (click)="openFollowedsModal()">
-						<strong>{{ followeds() }}</strong> seguidos
-					</button>
-				</div>
-
-				@if (isOwnProfile()) {
-					<button type="button" class="edit-profile-btn" [routerLink]="['/profile/edit']">Editar perfil</button>
-					<button type="button" class="profile-action-btn logout-btn" (click)="logout()">Cerrar sesión</button>
-				} @else {
-					<div class="follow-actions">
-						<button
-							type="button"
-							class="follow-btn"
-							(click)="onFollowButtonClick()"
-							[disabled]="followActionLoading()"
-						>
-							@if (followActionLoading()) {
-								Actualizando...
-							} @else {
-								{{ isFollowingProfile() ? 'Dejar de seguir' : 'Seguir' }}
-							}
-						</button>
-
-						@if (followActionError()) {
-							<p class="follow-error">{{ followActionError() }}</p>
-						}
-					</div>
-				}
-			</aside>
+			<app-profile-sidebar-card
+				[profileImage]="profileImage()"
+				[nickname]="nickname()"
+				[biography]="biography()"
+				[followers]="followers()"
+				[followeds]="followeds()"
+				[isOwnProfile]="isOwnProfile()"
+				[isFollowingProfile]="isFollowingProfile()"
+				[followActionLoading]="followActionLoading()"
+				[followActionError]="followActionError()"
+				(openFollowers)="openFollowersModal()"
+				(openFolloweds)="openFollowedsModal()"
+				(followAction)="onFollowButtonClick()"
+				(logout)="logout()"
+			></app-profile-sidebar-card>
 
 			<section class="profile-content">
-				<section class="posts-section">
-					<h2>Publicaciones</h2>
-
-					@if (postsLoading()) {
-						<p class="posts-status">Cargando publicaciones...</p>
-					} @else if (postsErrorMessage()) {
-						<p class="posts-error">{{ postsErrorMessage() }}</p>
-					} @else if (userPosts().length === 0) {
-						<p class="posts-status">Este usuario aun no tiene publicaciones.</p>
-					} @else {
-						@if (postDeleteError()) {
-							<p class="posts-error posts-action-error">{{ postDeleteError() }}</p>
-						}
-
-						<span class="posts-page-current posts-page-current-top">
-							Pagina {{ currentPostsPage() }} / {{ totalPostsPages() }}
-						</span>
-
-						<div class="posts-list">
-							@for (post of paginatedUserPosts(); track $index) {
-								<article class="profile-post">
-									<div class="profile-post-header">
-										<h3>{{ post.title || 'Sin titulo' }}</h3>
-
-										@if (canDeletePost(post)) {
-											<button
-												type="button"
-												class="delete-post-btn"
-												(click)="onDeletePost(post)"
-												[disabled]="isDeletingPost(post.id)"
-												[attr.aria-label]="'Eliminar publicación ' + (post.title || '')"
-											>
-												<img src="assets/icons/trash.svg" alt="" aria-hidden="true" class="delete-post-icon">
-											</button>
-										}
-									</div>
-									<p>{{ post.description }}</p>
-									<span class="profile-post-date">{{ formatPostDate(post.creationDate) }}</span>
-								</article>
-							}
-						</div>
-
-						<div class="posts-pagination">
-							<button
-								type="button"
-								class="posts-page-btn"
-								(click)="goToPreviousPostsPage()"
-								[disabled]="currentPostsPage() === 1"
-							>
-								Anterior
-							</button>
-
-							<span class="posts-page-current">Pagina {{ currentPostsPage() }} / {{ totalPostsPages() }}</span>
-
-							<button
-								type="button"
-								class="posts-page-btn"
-								(click)="goToNextPostsPage()"
-								[disabled]="currentPostsPage() === totalPostsPages()"
-							>
-								Siguiente
-							</button>
-						</div>
-
-						<div class="posts-toolbar">
-							<label for="postsPerPage">Publicaciones por pagina:</label>
-							<input
-								id="postsPerPage"
-								type="number"
-								min="1"
-								step="1"
-								class="posts-per-page-input"
-								[value]="postsPerPage()"
-								(input)="onPostsPerPageInput($event)"
-							/>
-						</div>
-					}
-				</section>
+				<app-profile-posts-section
+					[loading]="postsLoading()"
+					[errorMessage]="postsErrorMessage()"
+					[allPostsCount]="userPosts().length"
+					[actionError]="postDeleteError()"
+					[posts]="paginatedUserPosts()"
+					[currentPage]="currentPostsPage()"
+					[totalPages]="totalPostsPages()"
+					[isReverseOrder]="reversePostsOrder()"
+					[postsPerPage]="postsPerPage()"
+					[canDeletePost]="canDeletePostFn"
+					[isDeletingPost]="isDeletingPostFn"
+					[formatPostDate]="formatPostDateFn"
+					(deletePost)="onDeletePost($event)"
+					(previousPage)="goToPreviousPostsPage()"
+					(nextPage)="goToNextPostsPage()"
+					(pageSelected)="goToPostsPage($event)"
+					(toggleReverseOrder)="togglePostsOrder()"
+					(postsPerPageChange)="onPostsPerPageSelected($event)"
+				></app-profile-posts-section>
 			</section>
 		</div>
 	}
 </div>
 
-@if (usersModalOpen()) {
-	<div class="modal-overlay" (click)="onUsersModalBackdropClick($event)">
-		<div class="followers-modal" role="dialog" aria-modal="true" [attr.aria-label]="usersModalTitle() + ' del perfil'">
-			<div class="followers-modal-header">
-				<h3>{{ usersModalTitle() }}</h3>
-				<button type="button" class="followers-close-btn" aria-label="Cerrar modal" (click)="closeUsersModal()">✕</button>
-			</div>
+<app-profile-users-modal
+	[open]="usersModalOpen()"
+	[title]="usersModalTitle()"
+	[loading]="usersModalLoading()"
+	[loadingMessage]="usersModalLoadingMessage()"
+	[errorMessage]="usersModalError()"
+	[emptyMessage]="usersModalEmptyMessage()"
+	[users]="modalUsers()"
+	(close)="closeUsersModal()"
+></app-profile-users-modal>
 
-			@if (usersModalLoading()) {
-				<p class="followers-status">{{ usersModalLoadingMessage() }}</p>
-			} @else if (usersModalError()) {
-				<p class="followers-error">{{ usersModalError() }}</p>
-			} @else if (modalUsers().length === 0) {
-				<p class="followers-status">{{ usersModalEmptyMessage() }}</p>
-			} @else {
-				<ul class="followers-list">
-					@for (user of modalUsers(); track user.id) {
-						<li class="follower-item">
-							<a class="follower-link" [routerLink]="['/profile', user.id]" (click)="closeUsersModal()">
-								<img [src]="user.avatarUrl" [alt]="'Avatar de ' + user.nickname" class="follower-avatar">
-								<span class="follower-nickname">{{ user.nickname }}</span>
-							</a>
-						</li>
-					}
-				</ul>
-			}
+@if (deletePostModalOpen()) {
+	<div class="delete-post-modal-overlay" (click)="onDeletePostModalBackdropClick($event)">
+		<div class="delete-post-modal" role="dialog" aria-modal="true" aria-label="Confirmar eliminacion">
+			<h3>Confirmar eliminacion</h3>
+			<p>{{ deletePostConfirmationMessage }}</p>
+			<div class="delete-post-modal-actions">
+				<button type="button" class="delete-post-cancel-btn" (click)="closeDeletePostModal()">
+					Cancelar
+				</button>
+				<button type="button" class="delete-post-confirm-btn" (click)="confirmDeletePost()">
+					Eliminar
+				</button>
+			</div>
 		</div>
 	</div>
 }
 
-<app-create-post-btn />
+@if (isAuthenticated()) {
+	<app-create-post-btn />
+}

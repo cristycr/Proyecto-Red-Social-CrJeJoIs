@@ -1,0 +1,42 @@
+<ul class="users-list">
+  @for (user of users(); track user.id) {
+    <li class="user-card">
+      <div class="user-card-main">
+        <img [src]="user.avatarUrl" [alt]="'Avatar de ' + user.nickname" class="user-avatar" />
+
+        <div class="user-data">
+          <h2>{{ user.nickname }}</h2>
+          <p>{{ user.email }}</p>
+        </div>
+      </div>
+
+      <div class="user-actions">
+        <div class="role-control">
+          <label [attr.for]="'role-select-' + user.id">Rol</label>
+          <select
+            [id]="'role-select-' + user.id"
+            [value]="user.role"
+            [disabled]="isRoleUpdating()(user.id) || isDeletingUser()(user.id)"
+            (change)="onRoleSelectChange(user.id, $event)"
+          >
+            <option value="user">user</option>
+            <option value="admin">admin</option>
+          </select>
+
+          @if (isRoleUpdating()(user.id)) {
+            <p class="role-updating">Guardando...</p>
+          }
+        </div>
+
+        <button
+          type="button"
+          class="delete-user-btn"
+          [disabled]="isDeletingUser()(user.id)"
+          (click)="deleteUser.emit(user)"
+        >
+          {{ isDeletingUser()(user.id) ? 'Borrando...' : 'Borrar usuario' }}
+        </button>
+      </div>
+    </li>
+  }
+</ul>

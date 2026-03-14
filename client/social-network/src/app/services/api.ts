@@ -89,7 +89,8 @@ export class ApiService {
 
   // Método para obtener todos los usuarios
   async getAllUsers(): Promise<GetUserDto[]> {
-    return await this.get<GetUserDto[]>('users');
+    const users = await this.get<unknown>('users');
+    return this.normalizeUsersDto(users);
   }
 
   // Método para obtener todos los usuarios en el panel admin
@@ -151,12 +152,48 @@ export class ApiService {
 
   // Obtiene la lista de usuarios que siguen a un usuario
   async getFollowedUsers(userId: number): Promise<GetUserDto[]> {
-    return await this.get<GetUserDto[]>(`users/Followeds?userId=${userId}`);
+    const users = await this.get<unknown>(`users/Followeds?userId=${userId}`);
+    return this.normalizeUsersDto(users);
   }
 
   // Obtiene la lista de seguidores de un usuario
   async getFollowerUsers(userId: number): Promise<GetUserDto[]> {
-    return await this.get<GetUserDto[]>(`users/Followers?userId=${userId}`);
+    const users = await this.get<unknown>(`users/Followers?userId=${userId}`);
+    return this.normalizeUsersDto(users);
+  }
+
+  private normalizeUsersDto(users: unknown): GetUserDto[] {
+    if (!Array.isArray(users)) {
+      return [];
+    }
+
+    return users
+      .map((user) => this.normalizeUserDto(user))
+      .filter((user) => user.id > 0 && user.nickname.length > 0);
+  }
+
+  private normalizeUserDto(user: unknown): GetUserDto {
+    const raw = (user as Record<string, unknown>) ?? {};
+    const parsedId = Number(raw['id'] ?? raw['Id'] ?? 0);
+    const nickname = this.normalizeString(raw['nickname'] ?? raw['Nickname']) ?? '';
+
+    return {
+      id: Number.isNaN(parsedId) ? 0 : parsedId,
+      nickname,
+      avatarPath: this.normalizeString(raw['avatarPath'] ?? raw['AvatarPath']),
+      name: this.normalizeString(raw['name'] ?? raw['Name']),
+      surname1: this.normalizeString(raw['surname1'] ?? raw['Surname1']),
+      surname2: this.normalizeString(raw['surname2'] ?? raw['Surname2']),
+    };
+  }
+
+  private normalizeString(value: unknown): string | null {
+    if (typeof value !== 'string') {
+      return null;
+    }
+
+    const trimmedValue = value.trim();
+    return trimmedValue.length > 0 ? trimmedValue : null;
   }
 
   async followUser(dto: FollowingDto): Promise<FollowingDto> {

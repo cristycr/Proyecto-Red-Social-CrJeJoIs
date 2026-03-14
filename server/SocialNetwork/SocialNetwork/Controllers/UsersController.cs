@@ -30,7 +30,10 @@ public class UsersController : ControllerBase {
         IEnumerable<GetUserDto> getUsersDto = users.Select(user => new GetUserDto {
             Id = user.Id,
             Nickname = user.Nickname,
-            AvatarPath = user.AvatarPath!
+            AvatarPath = user.AvatarPath!,
+            Name = user.Name,
+            Surname1 = user.Surname1,
+            Surname2 = user.Surname2
         });
         return getUsersDto;
     }
@@ -58,12 +61,15 @@ public class UsersController : ControllerBase {
     public async Task<IEnumerable<GetUserDto>> GetFollowedUsers(long userId) {
         ICollection<GetUserDto> users = await _unitOfWork.UserRepository.GetFollowedUsersAsync(userId);
 
-        IEnumerable<GetUserDto> getUsersDto = users.Select(user => new GetUserDto {
+        IEnumerable<GetUserDto> getFollowDto = users.Select(user => new GetUserDto {
             Id = user.Id,
             Nickname = user.Nickname,
-            AvatarPath = user.AvatarPath!
+            AvatarPath = user.AvatarPath!,
+            Name = user.Name,
+            Surname1 = user.Surname1,
+            Surname2 = user.Surname2
         });
-        return getUsersDto;
+        return getFollowDto;
     }
 
     [HttpGet("Followers")]
@@ -71,12 +77,15 @@ public class UsersController : ControllerBase {
         // long userId = long.Parse(User.FindFirst("id").Value);
         ICollection<GetUserDto> users = await _unitOfWork.UserRepository.GetFollowerUsersAsync(userId);
 
-        IEnumerable<GetUserDto> getUsersDto = users.Select(user => new GetUserDto {
+        IEnumerable<GetUserDto> getFollowDto = users.Select(user => new GetUserDto {
             Id = user.Id,
             Nickname = user.Nickname,
-            AvatarPath = user.AvatarPath!
+            AvatarPath = user.AvatarPath!,
+            Name = user.Name,
+            Surname1 = user.Surname1,
+            Surname2 = user.Surname2
         });
-        return getUsersDto;
+        return getFollowDto;
     }
 
     // metodo para obtener un usuario por su id, para mostrar su perfil

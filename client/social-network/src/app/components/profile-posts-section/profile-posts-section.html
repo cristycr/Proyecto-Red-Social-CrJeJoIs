@@ -1,0 +1,109 @@
+<section class="posts-section">
+  <h2>Publicaciones</h2>
+
+  @if (loading()) {
+    <p class="posts-status">Cargando publicaciones...</p>
+  } @else if (errorMessage()) {
+    <p class="posts-error">{{ errorMessage() }}</p>
+  } @else if (allPostsCount() === 0) {
+    <p class="posts-status">Este usuario aun no tiene publicaciones.</p>
+  } @else {
+    @if (actionError()) {
+      <p class="posts-error posts-action-error">{{ actionError() }}</p>
+    }
+
+    <div class="posts-top-toolbar">
+      <span class="posts-page-current posts-page-current-top">
+        Pagina {{ currentPage() }} / {{ totalPages() }}
+      </span>
+
+      <button
+        type="button"
+        class="posts-order-btn"
+        [class.is-active]="isReverseOrder()"
+        [attr.aria-pressed]="isReverseOrder()"
+        [attr.aria-label]="isReverseOrder() ? 'Mostrar publicaciones de mas antigua a mas nueva' : 'Mostrar publicaciones de mas nueva a mas antigua'"
+        (click)="toggleReverseOrder.emit()"
+      >
+        <img src="assets/icons/ordenar-alt.svg" alt="" aria-hidden="true" class="posts-order-icon" />
+        <span>Ordenar por fecha</span>
+      </button>
+    </div>
+
+    <div class="posts-list">
+      @for (post of posts(); track post.id) {
+        <article class="profile-post">
+          <div class="profile-post-header">
+            <h3>{{ post.title || 'Sin titulo' }}</h3>
+
+            @if (canDeletePost()(post)) {
+              <button
+                type="button"
+                class="delete-post-btn"
+                (click)="deletePost.emit(post)"
+                [disabled]="isDeletingPost()(post.id)"
+                [attr.aria-label]="'Eliminar publicación ' + (post.title || '')"
+              >
+                <img src="assets/icons/trash.svg" alt="" aria-hidden="true" class="delete-post-icon" />
+              </button>
+            }
+          </div>
+          <p>{{ post.description }}</p>
+          <span class="profile-post-date">{{ formatPostDate()(post.creationDate) }}</span>
+        </article>
+      }
+    </div>
+
+    <div class="posts-pagination">
+      <button
+        type="button"
+        class="posts-page-btn"
+        (click)="previousPage.emit()"
+        [disabled]="currentPage() === 1"
+      >
+        Anterior
+      </button>
+
+      <div class="posts-page-numbers" aria-label="Paginas disponibles">
+        @for (item of paginationItems(); track trackPaginationItem(item)) {
+          @if (item.kind === 'page') {
+            <button
+              type="button"
+              class="posts-page-number-btn"
+              [class.is-active]="item.page === currentPage()"
+              [disabled]="item.page === currentPage()"
+              [attr.aria-label]="'Ir a la pagina ' + item.page"
+              (click)="onPageClick(item.page)"
+            >
+              {{ item.page }}
+            </button>
+          } @else {
+            <span class="posts-page-ellipsis" aria-hidden="true">...</span>
+          }
+        }
+      </div>
+
+      <button
+        type="button"
+        class="posts-page-btn"
+        (click)="nextPage.emit()"
+        [disabled]="currentPage() === totalPages()"
+      >
+        Siguiente
+      </button>
+    </div>
+
+    <div class="posts-toolbar">
+      <label for="postsPerPage">Publicaciones por pagina:</label>
+      <input
+        id="postsPerPage"
+        type="number"
+        min="1"
+        step="1"
+        class="posts-per-page-input"
+        [value]="postsPerPage()"
+        (input)="onPostsPerPageInput($event)"
+      />
+    </div>
+  }
+</section>

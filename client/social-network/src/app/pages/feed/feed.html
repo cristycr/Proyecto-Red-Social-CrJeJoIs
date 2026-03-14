@@ -1,4 +1,10 @@
-@if (initialLoading()) {
+<div
+    infiniteScroll
+    [infiniteScrollDistance]="2"
+    [infiniteScrollThrottle]="150"
+    (scrolled)="loadNextPostsBatch()"
+>
+    @if (initialLoading()) {
     <p class="feed-state">Cargando publicaciones...</p>
 } @else if (loadingError()) {
     <p class="feed-state feed-state-error">{{ loadingError() }}</p>
@@ -24,16 +30,15 @@
             class="feed-empty-image"
         >
         <p class="feed-state feed-empty-text">
-            Vaya, parece que aqui no hay nada... Sigue a otros usuarios para enterarte de cosas interesantes.
+            Vaya, parece que aquí no hay nada... Sigue a otros usuarios para enterarte de cosas interesantes.
         </p>
     }
 
     @if (hasMorePosts()) {
-        <p class="feed-loading-more">Desplazate para cargar mas publicaciones...</p>
+        <p class="feed-loading-more">Cargando más publicaciones...</p>
     }
 }
-
-<div #scrollAnchor class="feed-scroll-anchor" aria-hidden="true"></div>
+</div>
 
 @if (isAuthenticated()) {
     <app-create-post-btn />

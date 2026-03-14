@@ -1,0 +1,135 @@
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(19, 32, 58, 0.36);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 130;
+}
+
+.delete-modal {
+  width: min(92vw, 560px);
+  border-radius: 14px;
+  border: 1px solid var(--border-soft);
+  background: #fff;
+  box-shadow: 0 18px 36px rgba(19, 32, 58, 0.24);
+  padding: 16px;
+}
+
+.delete-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.delete-modal-header h3 {
+  margin: 0;
+  color: var(--primary-color);
+  font-size: 1.16rem;
+}
+
+.close-modal-btn,
+.action-btn {
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s ease, background-color 0.2s ease, opacity 0.2s ease;
+}
+
+.close-modal-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: var(--surface-highlight);
+  color: var(--secondary-color-dark);
+  font-weight: 700;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.close-modal-btn:hover {
+  background: var(--secondary-color-transparent-medium);
+}
+
+.delete-description {
+  margin: 0 0 8px;
+  color: var(--text-main);
+  line-height: 1.5;
+}
+
+.delete-label {
+  display: block;
+  margin-top: 10px;
+  margin-bottom: 6px;
+  color: var(--text-main);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.delete-input {
+  width: 100%;
+  box-sizing: border-box;
+  border-radius: 10px;
+  border: 1px solid var(--border-soft);
+  padding: 10px 12px;
+  font-size: 0.95rem;
+  color: var(--text-main);
+  background: #fff;
+}
+
+.delete-input:focus {
+  outline: none;
+  border-color: var(--secondary-color);
+  box-shadow: 0 0 0 3px var(--secondary-color-transparent-light);
+}
+
+.delete-warning {
+  margin: 8px 0 0;
+  color: var(--alert-color);
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.delete-actions {
+  margin-top: 14px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.action-btn {
+  border-radius: 10px;
+  padding: 9px 14px;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.secondary-btn {
+  color: var(--primary-color);
+  background: #eef2f8;
+}
+
+.secondary-btn:hover {
+  background: #e3e9f2;
+}
+
+.danger-btn {
+  color: #fff;
+  background: #b42318;
+}
+
+.danger-btn:hover:not(:disabled) {
+  background: #9f2016;
+}
+
+.danger-btn:disabled,
+.action-btn:disabled,
+.close-modal-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}

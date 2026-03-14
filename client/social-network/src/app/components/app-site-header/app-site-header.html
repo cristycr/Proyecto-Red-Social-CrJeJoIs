@@ -1,0 +1,71 @@
+<header>
+  <div class="header-top">
+    <a routerLink="/landing" class="header-logo">TechIt!</a>
+
+    <nav>
+      <ul>
+        <li><a routerLink="/feed">Feed</a></li>
+        <li><a routerLink="/about">Nosotros</a></li>
+        @if (isAdmin()) {
+          <li><a routerLink="/admin">Panel admin</a></li>
+        }
+
+        @if (!isAuthenticated()) {
+          <li><a routerLink="/login">Iniciar sesión</a></li>
+          <li><a routerLink="/register">Registrarse</a></li>
+        } @else {
+          <li class="header-user-menu" #profileMenuContainer>
+            <button
+              type="button"
+              class="header-user-trigger"
+              [attr.aria-expanded]="profileMenuOpen()"
+              aria-haspopup="menu"
+              (click)="toggleProfileMenu($event)"
+            >
+              <span class="header-user-nickname">{{ currentUserNickname() }}</span>
+              <img
+                class="header-user-avatar"
+                [src]="currentUserAvatar()"
+                [alt]="'Avatar de ' + currentUserNickname()"
+              />
+              <span class="header-user-caret" aria-hidden="true">▾</span>
+            </button>
+
+            @if (profileMenuOpen()) {
+              <div class="header-user-dropdown" role="menu" aria-label="Opciones de perfil">
+                <div class="header-user-preview" aria-hidden="true">
+                  <img
+                    class="header-user-preview-avatar"
+                    [src]="currentUserAvatar()"
+                    [alt]="'Avatar de ' + currentUserNickname()"
+                  />
+                  <span>{{ currentUserNickname() }}</span>
+                </div>
+                <a routerLink="/profile" role="menuitem" (click)="closeProfileMenu()">
+                  <img src="assets/icons/usuario.svg" alt="" aria-hidden="true" width="14" height="14" />
+                  Perfil
+                </a>
+                <a routerLink="/profile/edit" role="menuitem" (click)="closeProfileMenu()">
+                  <img src="assets/icons/lapiz.svg" alt="" aria-hidden="true" width="14" height="14" />
+                  Editar perfil
+                </a>
+                <button
+                  type="button"
+                  role="menuitem"
+                  class="header-user-logout-btn"
+                  (click)="logout()"
+                >
+                  Cerrar sesión
+                </button>
+              </div>
+            }
+          </li>
+        }
+      </ul>
+    </nav>
+  </div>
+
+  <div class="header-bottom">
+    <app-header-search />
+  </div>
+</header>
