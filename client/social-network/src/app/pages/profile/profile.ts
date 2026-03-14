@@ -14,6 +14,7 @@ type UserListItem = {
   id: number;
   nickname: string;
   avatarUrl: string;
+  fullName: string;
 };
 
 @Component({
@@ -396,6 +397,7 @@ export class Profile implements OnInit {
           id: user.id,
           nickname: user.nickname,
           avatarUrl: this.buildAvatarUrl(user.avatarPath),
+          fullName: this.buildUserFullName(user),
         }))
       );
     } catch {
@@ -455,6 +457,13 @@ export class Profile implements OnInit {
       err?.message ||
       fallbackMessage
     );
+  }
+
+  private buildUserFullName(user: GetUserDto): string {
+    return [user.name, user.surname1, user.surname2]
+      .map((part) => part?.trim() ?? '')
+      .filter((part) => part.length > 0)
+      .join(' ');
   }
 
   private buildAvatarUrl(avatarPath: string | null): string {

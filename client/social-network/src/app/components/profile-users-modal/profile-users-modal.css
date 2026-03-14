@@ -55,11 +55,34 @@
   background: var(--secondary-color-transparent-medium);
 }
 
+.followers-search-wrap {
+  margin-bottom: 10px;
+}
+
+.followers-search-input {
+  width: 100%;
+  border: 1px solid var(--secondary-color-transparent-border);
+  border-radius: 8px;
+  padding: 9px 12px;
+  font: inherit;
+  color: var(--primary-color);
+  background: #fff;
+}
+
+.followers-search-input::placeholder {
+  color: var(--text-muted);
+}
+
+.followers-search-input:focus {
+  outline: 2px solid var(--secondary-color-transparent-medium);
+  outline-offset: 1px;
+}
+
 .followers-list {
   list-style: none;
   margin: 0;
   padding: 0;
-  max-height: calc(70vh - 80px);
+  max-height: calc(70vh - 130px);
   overflow-y: auto;
   display: flex;
   flex-direction: column;
@@ -84,6 +107,13 @@
   cursor: pointer;
 }
 
+.follower-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
 .follower-link:hover .follower-nickname {
   color: var(--secondary-color-dark);
 }
@@ -100,6 +130,12 @@
   font-weight: 600;
   color: var(--primary-color);
   transition: color 0.2s ease;
+}
+
+.follower-full-name {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.2;
 }
 
 .followers-status,
