@@ -14,9 +14,10 @@ import {
     ValidationErrors,
     Validators,
 } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { ApiService } from '../../services/api';
 import { AuthService } from '../../services/auth';
+import { PutPasswordDto } from '../../models/put-password-dto';
 import { PutUserDto } from '../../models/put-user-dto';
 import { ToastService } from '../../services/toast';
 
@@ -30,7 +31,6 @@ export class ProfileEdit implements OnInit {
     private readonly fb = inject(FormBuilder);
     private readonly api = inject(ApiService);
     private readonly auth = inject(AuthService);
-    private readonly router = inject(Router);
     private readonly toast = inject(ToastService);
 
     @ViewChild('avatarInput') private avatarInput?: ElementRef<HTMLInputElement>;
@@ -40,13 +40,14 @@ export class ProfileEdit implements OnInit {
     protected readonly loading = signal(true);
     protected readonly submitLoading = signal(false);
     protected readonly errorMessage = signal('');
-    protected readonly submitMessage = signal('');
     protected readonly avatarUrl = signal('/assets/images/avatar-default.png');
     protected readonly hasPrivateData = signal(false);
     protected readonly avatarMenuOpen = signal(false);
     protected readonly avatarActionLoading = signal(false);
     protected readonly avatarActionError = signal('');
     protected readonly checkingEmail = signal(false);
+    protected readonly passwordSubmitLoading = signal(false);
+    protected readonly passwordErrorMessage = signal('');
 
     private initialEmail = '';
 
@@ -59,14 +60,17 @@ export class ProfileEdit implements OnInit {
         return password === confirmPassword ? null : { passwordsMismatch: true };
     };
 
-    protected readonly profileForm = this.fb.group(
+    protected readonly profileForm = this.fb.group({
+        nickname: [{ value: '', disabled: true }],
+        email: ['', [Validators.required, Validators.email]],
+        name: ['', [Validators.required, Validators.minLength(2)]],
+        surname1: ['', [Validators.required, Validators.minLength(2)]],
+        surname2: [''],
+        biography: ['', [Validators.maxLength(280)]],
+    });
+
+    protected readonly passwordForm = this.fb.group(
         {
-            nickname: [{ value: '', disabled: true }],
-            email: ['', [Validators.required, Validators.email]],
-            name: ['', [Validators.required, Validators.minLength(2)]],
-            surname1: ['', [Validators.required, Validators.minLength(2)]],
-            surname2: [''],
-            biography: ['', [Validators.maxLength(280)]],
             password: ['', [Validators.required, Validators.minLength(6)]],
             confirmPassword: ['', [Validators.required]],
         },
@@ -80,8 +84,6 @@ export class ProfileEdit implements OnInit {
             surname1: 'Primer apellido',
             surname2: 'Segundo apellido',
             biography: 'Biografia',
-            password: 'Contrasena',
-            confirmPassword: 'Confirmar contrasena',
         };
 
         return labels[field] ?? field;
@@ -108,7 +110,7 @@ export class ProfileEdit implements OnInit {
         }
 
         if (control.errors['emailTaken']) {
-            return 'Este correo electronico ya existe en la base de datos.';
+            return 'Email ya en uso.';
         }
 
         if (control.errors['minlength']) {
@@ -124,13 +126,37 @@ export class ProfileEdit implements OnInit {
         return 'Campo invalido.';
     }
 
+    protected shouldShowPasswordControlError(field: 'password' | 'confirmPassword'): boolean {
+        const control = this.passwordForm.controls[field];
+        return Boolean(control.touched && control.invalid);
+    }
+
+    protected getPasswordFieldErrorMessage(field: 'password' | 'confirmPassword'): string {
+        const control = this.passwordForm.controls[field];
+
+        if (!control.errors) {
+            return '';
+        }
+
+        if (control.errors['required']) {
+            return `${this.getPasswordFieldLabel(field)} es obligatorio.`;
+        }
+
+        if (control.errors['minlength']) {
+            const min = control.errors['minlength'].requiredLength;
+            return `${this.getPasswordFieldLabel(field)} debe tener minimo ${min} caracteres.`;
+        }
+
+        return 'Campo invalido.';
+    }
+
     protected showPasswordMismatch(): boolean {
-        const confirmControl = this.profileForm.controls.confirmPassword;
+        const confirmControl = this.passwordForm.controls.confirmPassword;
 
         return (
             confirmControl.touched &&
             !confirmControl.hasError('required') &&
-            this.profileForm.hasError('passwordsMismatch')
+            this.passwordForm.hasError('passwordsMismatch')
         );
     }
 
@@ -165,7 +191,6 @@ export class ProfileEdit implements OnInit {
     }
 
     protected async onSubmit(): Promise<void> {
-        this.submitMessage.set('');
         this.errorMessage.set('');
 
         this.profileForm.markAllAsTouched();
@@ -185,12 +210,11 @@ export class ProfileEdit implements OnInit {
         const isEmailAvailable = await this.validateEmailUniqueness();
 
         if (!isEmailAvailable) {
-            this.errorMessage.set('El email introducido ya existe en la base de datos.');
+            this.errorMessage.set('Email ya en uso.');
             return;
         }
 
         const formValue = this.profileForm.getRawValue();
-        const password = formValue.password ?? '';
 
         const email = (formValue.email ?? '').trim();
         const name = (formValue.name ?? '').trim();
@@ -207,23 +231,16 @@ export class ProfileEdit implements OnInit {
             surname1,
             surname2: formValue.surname2?.trim() || null,
             biography: formValue.biography?.trim() || null,
-            password,
         };
 
         this.submitLoading.set(true);
 
         try {
             await this.api.updateUser(userId, dto);
-            this.submitMessage.set('Perfil actualizado correctamente.');
             this.hasPrivateData.set(true);
             this.initialEmail = email.toLowerCase();
-            this.profileForm.patchValue({
-                password: '',
-                confirmPassword: '',
-            });
 
             this.toast.showSuccess('Datos actualizados correctamente.');
-            await this.router.navigate(['/profile']);
         } catch (err: any) {
             const backendMessage = this.extractBackendError(
                 err,
@@ -233,12 +250,53 @@ export class ProfileEdit implements OnInit {
             if (this.looksLikeEmailTakenError(backendMessage)) {
                 this.setEmailTakenError();
                 this.profileForm.controls.email.markAsTouched();
-                this.errorMessage.set('El email introducido ya existe en la base de datos.');
+                this.errorMessage.set('Email ya en uso.');
             } else {
                 this.errorMessage.set(backendMessage);
             }
         } finally {
             this.submitLoading.set(false);
+        }
+    }
+
+    protected async onPasswordSubmit(): Promise<void> {
+        this.passwordErrorMessage.set('');
+
+        this.passwordForm.markAllAsTouched();
+
+        if (this.passwordForm.invalid) {
+            this.passwordErrorMessage.set('Revisa los campos de la nueva contrasena.');
+            return;
+        }
+
+        const userId = this.auth.currentUserId();
+
+        if (!userId) {
+            this.passwordErrorMessage.set('No se pudo identificar el usuario autenticado.');
+            return;
+        }
+
+        const password = this.passwordForm.controls.password.value ?? '';
+
+        if (!password) {
+            this.passwordErrorMessage.set('La nueva contrasena es obligatoria.');
+            return;
+        }
+
+        const dto: PutPasswordDto = { password };
+
+        this.passwordSubmitLoading.set(true);
+
+        try {
+            await this.api.updatePassword(userId, dto);
+            this.toast.showSuccess('Contrasena actualizada correctamente.');
+            this.passwordForm.reset();
+        } catch (err: any) {
+            this.passwordErrorMessage.set(
+                this.extractBackendError(err, 'No se pudo actualizar la contrasena.')
+            );
+        } finally {
+            this.passwordSubmitLoading.set(false);
         }
     }
 
@@ -328,7 +386,6 @@ export class ProfileEdit implements OnInit {
     private async loadCurrentUserData(): Promise<void> {
         this.loading.set(true);
         this.errorMessage.set('');
-        this.submitMessage.set('');
 
         const userId = this.auth.currentUserId();
 
@@ -372,8 +429,6 @@ export class ProfileEdit implements OnInit {
             surname1,
             surname2,
             biography: biographyFromExtended || biographyFromPublic || this.auth.biography(),
-            password: '',
-            confirmPassword: '',
         });
 
         this.hasPrivateData.set(Boolean(email || name || surname1 || surname2));
@@ -397,6 +452,15 @@ export class ProfileEdit implements OnInit {
 
     private toText(value: unknown): string {
         return typeof value === 'string' ? value.trim() : '';
+    }
+
+    private getPasswordFieldLabel(field: 'password' | 'confirmPassword'): string {
+        const labels: Record<'password' | 'confirmPassword', string> = {
+            password: 'Nueva contrasena',
+            confirmPassword: 'Repetir contrasena',
+        };
+
+        return labels[field];
     }
 
     private async validateEmailUniqueness(): Promise<boolean> {
@@ -449,11 +513,17 @@ export class ProfileEdit implements OnInit {
     }
 
     private looksLikeEmailTakenError(message: string): boolean {
-        const normalizedMessage = message.toLowerCase();
+        const normalizedMessage = message.trim().toLowerCase();
+
+        if (normalizedMessage === 'email') {
+            return true;
+        }
 
         return (
             normalizedMessage.includes('email') &&
             (
+                normalizedMessage.includes('uso') ||
+                normalizedMessage.includes('used') ||
                 normalizedMessage.includes('existe') ||
                 normalizedMessage.includes('exist') ||
                 normalizedMessage.includes('duplic')

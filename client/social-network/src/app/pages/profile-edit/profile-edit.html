@@ -2,7 +2,7 @@
 	<header class="profile-edit-header">
 		<h1>Editar perfil</h1>
 		<p>
-			Actualiza aqui la biografia, email, nombre y apellidos con los datos actuales de tu cuenta.
+			Actualiza aquí tu biografía, email, nombre y apellidos.
 		</p>
 	</header>
 
@@ -55,7 +55,7 @@
 						</div>
 					</div>
 
-					<label for="biography">Biografia</label>
+					<label for="biography">Biografía</label>
 					<textarea
 						id="biography"
 						formControlName="biography"
@@ -64,31 +64,6 @@
 					></textarea>
 
 					<p class="field-hint">{{ biographyLength }} / 280 caracteres</p>
-
-					<label for="password">Contraseña <span class="required">*</span> (obligatoria para guardar)</label>
-					<input
-						id="password"
-						type="password"
-						formControlName="password"
-						placeholder="Minimo 6 caracteres"
-					/>
-					@if (shouldShowControlError('password')) {
-						<p class="field-error">{{ getFieldErrorMessage('password') }}</p>
-					}
-
-					<label for="confirmPassword">Confirmar contraseña <span class="required">*</span></label>
-					<input
-						id="confirmPassword"
-						type="password"
-						formControlName="confirmPassword"
-						placeholder="Repite la contraseña"
-					/>
-					@if (shouldShowControlError('confirmPassword')) {
-						<p class="field-error">{{ getFieldErrorMessage('confirmPassword') }}</p>
-					}
-					@if (showPasswordMismatch()) {
-						<p class="field-error">Las contraseñas deben ser iguales.</p>
-					}
 				</div>
 
 				<aside class="profile-avatar-panel">
@@ -132,7 +107,7 @@
 					</div>
 					<p class="avatar-nickname">{{ profileForm.controls.nickname.value || 'Usuario' }}</p>
 					<p class="avatar-note">
-						Puedes cambiar o eliminar la foto usando el boton Editar sobre el avatar.
+						Puedes cambiar o eliminar la foto usando el botón 'Editar' sobre el avatar.
 					</p>
 
 					@if (avatarActionLoading()) {
@@ -153,21 +128,63 @@
 
 			<div class="profile-edit-actions">
 				<a routerLink="/profile" class="profile-btn profile-btn-secondary">Volver al perfil</a>
+				<button type="submit" class="profile-btn profile-btn-primary"
+					[disabled]="submitLoading() || avatarActionLoading() || checkingEmail() || passwordSubmitLoading()">
+						Actualizar perfil
+				</button>
+			</div>
+
+		</form>
+
+		<form class="profile-edit-form profile-password-form" [formGroup]="passwordForm" (ngSubmit)="onPasswordSubmit()">
+			<div class="profile-password-header">
+				<h2>Cambiar contrasena</h2>
+			</div>
+
+			<div class="profile-edit-fields profile-password-fields">
+				<label for="password">Nueva contraseña <span class="required">*</span></label>
+				<input
+					id="password"
+					type="password"
+					formControlName="password"
+					placeholder="Mínimo 6 caracteres"
+				/>
+				@if (shouldShowPasswordControlError('password')) {
+					<p class="field-error">{{ getPasswordFieldErrorMessage('password') }}</p>
+				}
+
+				<label for="confirmPassword">Repetir contraseña <span class="required">*</span></label>
+				<input
+					id="confirmPassword"
+					type="password"
+					formControlName="confirmPassword"
+					placeholder="Repite la nueva contraseña"
+				/>
+				@if (shouldShowPasswordControlError('confirmPassword')) {
+					<p class="field-error">{{ getPasswordFieldErrorMessage('confirmPassword') }}</p>
+				}
+
+				@if (showPasswordMismatch()) {
+					<p class="field-error">Las contraseñas deben ser iguales.</p>
+				}
+			</div>
+
+			<div class="profile-edit-actions">
 				<button
 					type="submit"
 					class="profile-btn profile-btn-primary"
-					[disabled]="submitLoading() || avatarActionLoading() || checkingEmail()"
+					[disabled]="passwordSubmitLoading() || submitLoading() || avatarActionLoading()"
 				>
-					@if (submitLoading()) {
-						Actualizando...
+					@if (passwordSubmitLoading()) {
+						Guardando...
 					} @else {
-						Actualizar perfil
+						Cambiar contraseña
 					}
 				</button>
 			</div>
 
-			@if (submitMessage()) {
-				<p class="profile-edit-info">{{ submitMessage() }}</p>
+			@if (passwordErrorMessage()) {
+				<p class="profile-edit-error">{{ passwordErrorMessage() }}</p>
 			}
 		</form>
 	}

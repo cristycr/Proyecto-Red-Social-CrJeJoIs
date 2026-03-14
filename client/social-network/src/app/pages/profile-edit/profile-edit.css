@@ -43,6 +43,26 @@
 	gap: 18px;
 }
 
+.profile-password-form {
+	padding-top: 20px;
+	border-top: 1px dashed var(--secondary-color-transparent-border);
+}
+
+.profile-password-header h2 {
+	margin: 0;
+	font-size: 1.15rem;
+	color: var(--secondary-color-dark);
+}
+
+.profile-password-header p {
+	margin: 8px 0 0;
+	color: var(--text-muted);
+}
+
+.profile-password-fields {
+	max-width: 560px;
+}
+
 .profile-edit-grid {
 	display: grid;
 	grid-template-columns: minmax(0, 1.55fr) minmax(240px, 340px);

@@ -5,6 +5,7 @@ import { GetUserDto } from '../models/get-user-dto';
 import { Post } from '../models/post';
 import { FollowingDto } from '../models/following-dto';
 import { GetUserProfileExtendDto } from '../models/get-user-profile-extend-dto';
+import { PutPasswordDto } from '../models/put-password-dto';
 import { PutUserDto } from '../models/put-user-dto';
 
 @Injectable({
@@ -105,6 +106,11 @@ export class ApiService {
   // Actualiza los datos de perfil de un usuario
   async updateUser(userId: number, dto: PutUserDto): Promise<PutUserDto> {
     return await this.put<PutUserDto>(`users?id=${userId}`, dto);
+  }
+
+  // Actualiza la contraseña de un usuario
+  async updatePassword(userId: number, dto: PutPasswordDto): Promise<PutPasswordDto> {
+    return await this.put<PutPasswordDto>(`users/password?id=${userId}`, dto);
   }
 
   // Obtiene la lista de usuarios que siguen a un usuario

@@ -4,5 +4,4 @@ export interface PutUserDto {
   surname1: string;
   surname2: string | null;
   biography: string | null;
-  password: string;
 }
