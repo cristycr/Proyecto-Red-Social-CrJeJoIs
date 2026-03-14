@@ -110,6 +110,28 @@
   box-shadow: inset 4px 0 0 var(--secondary-color);
 }
 
+.header-search-meta {
+  min-width: 0;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.header-search-nickname {
+  color: var(--text-main);
+  font-weight: 600;
+}
+
+.header-search-full-name {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .header-search-avatar {
   width: 32px;
   height: 32px;

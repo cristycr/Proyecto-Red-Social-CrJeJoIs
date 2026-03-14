@@ -20,6 +20,7 @@ import { ApiService } from '../../services/api';
 export class AppHeaderSearch {
   private readonly apiService = inject(ApiService);
   private usersRequested = false;
+  private retriedUsersLoadWithExtendedFields = false;
 
   @ViewChild('userSearchContainer') private userSearchContainer?: ElementRef<HTMLDivElement>;
 
@@ -29,14 +30,14 @@ export class AppHeaderSearch {
   protected readonly searchOpen = signal(false);
   protected readonly allUsers = signal<GetUserDto[]>([]);
   protected readonly filteredUsers = computed(() => {
-    const query = this.searchQuery().trim().toLowerCase();
+    const query = this.normalizeSearchValue(this.searchQuery());
 
     if (!query) {
       return [];
     }
 
     return this.allUsers()
-      .filter((user) => user.nickname.toLowerCase().includes(query))
+      .filter((user) => this.buildNormalizedUserSearchText(user).includes(query))
       .slice(0, 10);
   });
   protected readonly showSearchDropdown = computed(() =>
@@ -55,7 +56,7 @@ export class AppHeaderSearch {
     }
 
     this.searchOpen.set(true);
-    await this.ensureUsersLoaded();
+    await this.ensureUsersLoadedWithExtendedFields();
   }
 
   protected async onSearchFocus(): Promise<void> {
@@ -63,7 +64,7 @@ export class AppHeaderSearch {
       this.searchOpen.set(true);
     }
 
-    await this.ensureUsersLoaded();
+    await this.ensureUsersLoadedWithExtendedFields();
   }
 
   protected onUserResultClick(): void {
@@ -77,11 +78,19 @@ export class AppHeaderSearch {
 
   protected retryUsersSearchLoad(): void {
     this.usersRequested = false;
+    this.retriedUsersLoadWithExtendedFields = false;
     void this.ensureUsersLoaded();
   }
 
   protected buildAvatarUrl(avatarPath: string | null): string {
     return this.apiService.buildAvatarUrl(avatarPath);
+  }
+
+  protected buildUserFullName(user: GetUserDto): string {
+    return [user.name, user.surname1, user.surname2]
+      .map((part) => part?.trim() ?? '')
+      .filter((part) => part.length > 0)
+      .join(' ');
   }
 
   @HostListener('document:click', ['$event'])
@@ -115,5 +124,53 @@ export class AppHeaderSearch {
     } finally {
       this.usersLoading.set(false);
     }
+  }
+
+  private async ensureUsersLoadedWithExtendedFields(): Promise<void> {
+    await this.ensureUsersLoaded();
+
+    if (!this.shouldRetryUsersLoadWithExtendedFields()) {
+      return;
+    }
+
+    this.retriedUsersLoadWithExtendedFields = true;
+    this.usersRequested = false;
+    await this.ensureUsersLoaded();
+  }
+
+  private shouldRetryUsersLoadWithExtendedFields(): boolean {
+    if (this.retriedUsersLoadWithExtendedFields || this.usersLoading()) {
+      return false;
+    }
+
+    const users = this.allUsers();
+
+    if (users.length === 0) {
+      return false;
+    }
+
+    return users.every(
+      (user) =>
+        !user.name?.trim() &&
+        !user.surname1?.trim() &&
+        !user.surname2?.trim()
+    );
+  }
+
+  private buildNormalizedUserSearchText(user: GetUserDto): string {
+    return this.normalizeSearchValue(
+      [user.nickname, user.name, user.surname1, user.surname2]
+        .map((part) => part?.trim() ?? '')
+        .filter((part) => part.length > 0)
+        .join(' ')
+    );
+  }
+
+  private normalizeSearchValue(value: string): string {
+    return value
+      .trim()
+      .toLocaleLowerCase('es-ES')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '');
   }
 }

@@ -24,7 +24,7 @@
           </button>
         </div>
       } @else if (filteredUsers().length === 0) {
-        <p class="header-search-state">No hay usuarios con ese nombre.</p>
+        <p class="header-search-state">No hay usuarios que coincidan con la busqueda.</p>
       } @else {
         @for (user of filteredUsers(); track user.id) {
           <a class="header-search-result" [routerLink]="['/profile', user.id]" (click)="onUserResultClick()">
@@ -33,7 +33,12 @@
               [src]="buildAvatarUrl(user.avatarPath)"
               [alt]="'Avatar de ' + user.nickname"
             />
-            <span>{{ user.nickname }}</span>
+            <span class="header-search-meta">
+              <span class="header-search-nickname">{{ user.nickname }}</span>
+              @if (buildUserFullName(user)) {
+                <span class="header-search-full-name">{{ buildUserFullName(user) }}</span>
+              }
+            </span>
           </a>
         }
       }
