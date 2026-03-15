@@ -15,6 +15,13 @@ public class FileService : IFileService
         if (file == null || file.Length == 0)
             throw new ArgumentException("No se ha enviado ningún fichero.");
 
+        // Validación de formato
+        var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
+        var fileExtension = Path.GetExtension(file.FileName).ToLowerInvariant();
+
+        if (!allowedExtensions.Contains(fileExtension))
+            throw new ArgumentException("Formato de archivo no permitido. Solo se permiten: jpg, jpeg, png, gif.");
+
         // Carpeta uploads dentro de wwwroot
         string uploadsFolder = Path.Combine(_env.WebRootPath, "uploads");
 
@@ -22,7 +29,7 @@ public class FileService : IFileService
             Directory.CreateDirectory(uploadsFolder);
 
         // Generar un nombre único para el archivo
-        string fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
+        string fileName = $"{Guid.NewGuid()}{fileExtension}";
         string filePath = Path.Combine(uploadsFolder, fileName);
 
         // Guardar el archivo
