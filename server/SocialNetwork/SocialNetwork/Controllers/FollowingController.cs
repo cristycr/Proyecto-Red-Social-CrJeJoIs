@@ -3,37 +3,49 @@ using Microsoft.AspNetCore.Mvc;
 using SocialNetwork.Models.Database;
 using SocialNetwork.Models.Database.Entities;
 using SocialNetwork.Models.Dtos.Following;
-using SocialNetwork.Models.Dtos.Posts;
+using System.Text.Json;
 
-namespace SocialNetwork.Controllers {
+namespace SocialNetwork.Controllers
+{
     [Route("api/[controller]")]
     [ApiController]
-    public class FollowingController : ControllerBase {
+    public class FollowingController : ControllerBase
+    {
         private readonly UnitOfWork _unitOfWork;
+        private readonly WebSocketManager _webSocketManager;
 
         // INYECCIÓN DE DEPENDENCIAS
-        public FollowingController(UnitOfWork unitOfWork) {
+        public FollowingController(UnitOfWork unitOfWork, WebSocketManager webSocketManager)
+        {
             _unitOfWork = unitOfWork;
+            _webSocketManager = webSocketManager;
         }
 
         // PETICIÓN DE SEGUIDOS (GET)
         [HttpGet]
-        public async Task<IEnumerable<FollowingDto>> GetAllFollowing() {
+        public async Task<IEnumerable<FollowingDto>> GetAllFollowing()
+        {
             ICollection<Following> following = await _unitOfWork.FollowingRepository.GetAllAsync();
 
-            IEnumerable<FollowingDto> getFollowingDtos = following.Select(following => new FollowingDto {
-                FollowerId = following.FollowerId,
-                FollowedId = following.FollowedId
+            IEnumerable<FollowingDto> getFollowingDtos = following.Select(f => new FollowingDto
+            {
+                FollowerId = f.FollowerId,
+                FollowedId = f.FollowedId
             });
+
             return getFollowingDtos;
         }
 
         // SEGUIR A UN USUARIO (POST)
         [Authorize]
         [HttpPost]
-        public async Task<ActionResult<FollowingDto>> AddPost([FromBody] FollowingDto dto) {
+        public async Task<ActionResult<FollowingDto>> AddPost([FromBody] FollowingDto dto)
+        {
+            var followerNickname = User.Identity!.Name!;
+            var followerAvatar = User.FindFirst("AvatarPath")?.Value;
 
-            Following following = new Following {
+            Following following = new Following
+            {
                 FollowerId = dto.FollowerId,
                 FollowedId = dto.FollowedId
             };
@@ -41,19 +53,38 @@ namespace SocialNetwork.Controllers {
             await _unitOfWork.FollowingRepository.InsertAsync(following);
             bool success = await _unitOfWork.SaveAsync();
 
-            if (!success) {
-                return BadRequest(new { error = "No se pudo Seguir." });
+            if (!success)
+            {
+                return BadRequest(new { error = "No se pudo seguir." });
             }
+
+            await _webSocketManager.SendMessage(
+                dto.FollowedId.ToString(),
+                JsonSerializer.Serialize(new
+                {
+                    type = "new_follower",
+                    payload = new
+                    {
+                        followerId = dto.FollowerId,
+                        nickname = followerNickname,
+                        avatar = followerAvatar
+                    }
+                })
+            );
 
             return Ok(dto);
         }
 
-
         // DEJAR DE SEGUIR A UN USUARIO (DELETE)
         [Authorize]
         [HttpDelete]
-        public async Task<ActionResult> DeleteFollowing([FromBody] FollowingDto dto) {
-            Following following = new Following {
+        public async Task<ActionResult> DeleteFollowing([FromBody] FollowingDto dto)
+        {
+            var followerNickname = User.Identity!.Name!;
+            var followerAvatar = User.FindFirst("AvatarPath")?.Value;
+
+            Following following = new Following
+            {
                 FollowerId = dto.FollowerId,
                 FollowedId = dto.FollowedId
             };
@@ -61,9 +92,24 @@ namespace SocialNetwork.Controllers {
             await _unitOfWork.FollowingRepository.DeleteAsync(following);
             bool success = await _unitOfWork.SaveAsync();
 
-            if (!success) {
-                return BadRequest(new { error = "No se pudo borrar" });
+            if (!success)
+            {
+                return BadRequest(new { error = "No se pudo borrar." });
             }
+
+            await _webSocketManager.SendMessage(
+                dto.FollowedId.ToString(),
+                JsonSerializer.Serialize(new
+                {
+                    type = "lost_follower",
+                    payload = new
+                    {
+                        followerId = dto.FollowerId,
+                        nickname = followerNickname,
+                        avatar = followerAvatar
+                    }
+                })
+            );
 
             return Ok(dto);
         }
