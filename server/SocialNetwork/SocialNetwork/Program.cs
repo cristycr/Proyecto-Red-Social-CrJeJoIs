@@ -60,6 +60,8 @@ public class Program
                 };
             });
 
+        builder.Services.AddSingleton<WebSocketManager>();
+
         // Swagger
         builder.Services.AddSwaggerGen(options =>
         {
