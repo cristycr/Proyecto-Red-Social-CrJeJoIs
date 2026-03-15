@@ -1,58 +1,92 @@
-﻿using System.Collections.Concurrent;
-using System.Net.WebSockets;
+﻿using System.Net.WebSockets;
 using System.Text;
 
 public class WebSocketManager
 {
-    private readonly ConcurrentDictionary<string, List<WebSocket>> _connections = new();
+    // Un solo socket por usuario
+    private readonly Dictionary<string, WebSocket> _sockets = new();
 
+    // Añade una conexión para un usuario. Si ya existía, cierra el socket anterior antes de reemplazarlo.
     public void AddConnection(string userId, WebSocket socket)
     {
-        var sockets = _connections.GetOrAdd(userId, _ => new List<WebSocket>());
-
-        lock (sockets)
+        lock (_sockets)
         {
-            sockets.Add(socket);
+            if (_sockets.TryGetValue(userId, out var existingSocket))
+            {
+                if (existingSocket.State == WebSocketState.Open)
+                {
+                    // Cerramos la conexión anterior para evitar duplicados
+                    existingSocket.CloseAsync(
+                        WebSocketCloseStatus.NormalClosure,
+                        "Duplicated connection",
+                        CancellationToken.None
+                    ).Wait();
+                }
+                _sockets.Remove(userId);
+            }
+
+            _sockets[userId] = socket;
         }
     }
 
-    public async Task SendMessage(string userId, string message)
-    {
-        if (!_connections.TryGetValue(userId, out var sockets))
-            return;
-
-        var bytes = Encoding.UTF8.GetBytes(message);
-
-        List<WebSocket> closedSockets = new();
-
-        foreach (var socket in sockets)
-        {
-            if (socket.State == WebSocketState.Open)
-            {
-                await socket.SendAsync(
-                    bytes,
-                    WebSocketMessageType.Text,
-                    true,
-                    CancellationToken.None
-                );
-            }
-            else
-            {
-                closedSockets.Add(socket);
-            }
-        }
-
-        lock (sockets)
-        {
-            foreach (var closed in closedSockets)
-            {
-                sockets.Remove(closed);
-            }
-        }
-    }
-
+    // Elimina la conexión de un usuario
     public void RemoveConnection(string userId)
     {
-        _connections.TryRemove(userId, out _);
+        lock (_sockets)
+        {
+            if (_sockets.TryGetValue(userId, out var socket))
+            {
+                if (socket.State == WebSocketState.Open)
+                {
+                    socket.CloseAsync(
+                        WebSocketCloseStatus.NormalClosure,
+                        "User disconnected",
+                        CancellationToken.None
+                    ).Wait();
+                }
+                _sockets.Remove(userId);
+            }
+        }
+    }
+
+    // Envía un mensaje a un usuario específico (si está conectado)
+    public async Task SendMessage(string userId, string message)
+    {
+        WebSocket? socket;
+        lock (_sockets)
+        {
+            _sockets.TryGetValue(userId, out socket);
+        }
+
+        if (socket != null && socket.State == WebSocketState.Open)
+        {
+            var bytes = Encoding.UTF8.GetBytes(message);
+            await socket.SendAsync(
+                new ArraySegment<byte>(bytes),
+                WebSocketMessageType.Text,
+                true,
+                CancellationToken.None
+            );
+        }
+    }
+
+    // Cierra y limpia todas las conexiones (opcional para logout global)
+    public void RemoveAllConnections()
+    {
+        lock (_sockets)
+        {
+            foreach (var socket in _sockets.Values)
+            {
+                if (socket.State == WebSocketState.Open)
+                {
+                    socket.CloseAsync(
+                        WebSocketCloseStatus.NormalClosure,
+                        "Server shutdown",
+                        CancellationToken.None
+                    ).Wait();
+                }
+            }
+            _sockets.Clear();
+        }
     }
 }
