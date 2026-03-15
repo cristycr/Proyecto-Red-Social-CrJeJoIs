@@ -7,6 +7,7 @@ using SocialNetwork.Models.Database.Repositories;
 using SocialNetwork.Services;
 using SocialNetwork.Services.Auth;
 using Swashbuckle.AspNetCore.Filters;
+using System.Net.WebSockets;
 using System.Security.Claims;
 using System.Text;
 
@@ -112,7 +113,64 @@ public class Program
             RequestPath = "/uploads"
         });
 
+        // WebSockets
         app.UseWebSockets();
+        app.Map("/ws", async context =>
+        {
+            if (!context.WebSockets.IsWebSocketRequest)
+            {
+                context.Response.StatusCode = 400;
+                return;
+            }
+
+            var socket = await context.WebSockets.AcceptWebSocketAsync();
+
+            var userId = context.User.FindFirst("id")?.Value;
+            if (userId is null)
+            {
+                context.Response.StatusCode = 401;
+                return;
+            }
+
+            var wsManager = context.RequestServices.GetRequiredService<WebSocketManager>();
+            wsManager.AddConnection(userId, socket);
+
+            Console.WriteLine($"WebSocket conectado para usuario {userId}");
+
+            var buffer = new byte[1024];
+            try
+            {
+                while (socket.State == WebSocketState.Open)
+                {
+                    var result = await socket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+                    if (result.MessageType == WebSocketMessageType.Close)
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error WebSocket usuario {userId}: {ex.Message}");
+            }
+            finally
+            {
+                wsManager.RemoveConnection(userId);
+
+                // Cerrar solo si está abierto
+                if (socket.State == WebSocketState.Open)
+                {
+                    try
+                    {
+                        await socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closed", CancellationToken.None);
+                    }
+                    catch
+                    {
+                        // Ignorar errores si el socket ya se cerró o abortó
+                    }
+                }
+
+                Console.WriteLine($"WebSocket desconectado para usuario {userId}");
+            }
+        });
 
         app.UseAuthentication();     // middleware de autenticacion
         app.UseAuthorization();      // middleware de autorizacion
