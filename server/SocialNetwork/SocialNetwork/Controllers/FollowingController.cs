@@ -61,6 +61,7 @@ namespace SocialNetwork.Controllers
                 return BadRequest(new { error = "No se pudo seguir." });
             }
 
+            // Enviar WS al usuario seguido usando WebSocketManager
             await _webSocketManager.SendMessage(
                 dto.FollowedId.ToString(),
                 JsonSerializer.Serialize(new
@@ -103,6 +104,7 @@ namespace SocialNetwork.Controllers
                 return BadRequest(new { error = "No se pudo borrar." });
             }
 
+            // Enviar WS al usuario seguido usando WebSocketManager
             await _webSocketManager.SendMessage(
                 dto.FollowedId.ToString(),
                 JsonSerializer.Serialize(new
