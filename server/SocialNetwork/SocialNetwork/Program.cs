@@ -123,9 +123,9 @@ public class Program
                 return;
             }
 
-            var socket = await context.WebSockets.AcceptWebSocketAsync();
-
+            // Autenticación del usuario
             var userId = context.User.FindFirst("id")?.Value;
+            var userNickname = context.User.FindFirst(ClaimTypes.Name)?.Value;
             if (userId is null)
             {
                 context.Response.StatusCode = 401;
@@ -133,9 +133,14 @@ public class Program
             }
 
             var wsManager = context.RequestServices.GetRequiredService<WebSocketManager>();
+
+            // Aceptar la nueva conexión
+            var socket = await context.WebSockets.AcceptWebSocketAsync();
+
+            // Agregar la conexión al manager, cerrando la anterior si existía
             wsManager.AddConnection(userId, socket);
 
-            Console.WriteLine($"WebSocket conectado para usuario {userId}");
+            Console.WriteLine($"WebSocket conectado para usuario {userId} {userNickname}");
 
             var buffer = new byte[1024];
             try
@@ -143,19 +148,22 @@ public class Program
                 while (socket.State == WebSocketState.Open)
                 {
                     var result = await socket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+
+                    // Si el cliente cierra el WS
                     if (result.MessageType == WebSocketMessageType.Close)
                         break;
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error WebSocket usuario {userId}: {ex.Message}");
+                Console.WriteLine($"Error WebSocket usuario {userId} {userNickname}: {ex.Message}");
             }
             finally
             {
+                // Remover conexión del manager
                 wsManager.RemoveConnection(userId);
 
-                // Cerrar solo si está abierto
+                // Cerrar socket si todavía está abierto
                 if (socket.State == WebSocketState.Open)
                 {
                     try
@@ -164,11 +172,11 @@ public class Program
                     }
                     catch
                     {
-                        // Ignorar errores si el socket ya se cerró o abortó
+                        // Ignorar errores si ya se cerró
                     }
                 }
 
-                Console.WriteLine($"WebSocket desconectado para usuario {userId}");
+                Console.WriteLine($"WebSocket desconectado para usuario {userId} {userNickname}");
             }
         });
 
