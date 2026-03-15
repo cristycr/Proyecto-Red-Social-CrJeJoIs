@@ -3,6 +3,7 @@ import { RouterLink, Router, ActivatedRoute } from "@angular/router";
 import { AuthRequest } from '../../models/auth-request';
 import { AuthService } from '../../services/auth';
 import { FormsModule } from '@angular/forms';
+import { SocketService } from '../../services/websocket.service';
 
 @Component({
   selector: 'app-login',
@@ -21,6 +22,7 @@ export class Login {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
+  private readonly socketService = inject(SocketService);
 
   // Método del submit del formulario de login
   async submit() {
@@ -41,6 +43,12 @@ export class Login {
 
       if (result === true) {
 
+        const jwt = this.authService.jwt;
+
+        if (jwt) {
+          this.socketService.connect(jwt);
+        }
+
         const redirectTo =
           this.route.snapshot.queryParams['redirectTo'] || '/feed';
 
@@ -56,13 +64,12 @@ export class Login {
         typeof err?.error === 'string'
           ? err.error
           : err?.error?.error ||
-            err?.error?.message ||
-            err?.message;
+          err?.error?.message ||
+          err?.message;
 
       this.errorMessage.set(
         backendError || 'Error de conexión con el servidor.'
       );
     }
   }
-
 }
