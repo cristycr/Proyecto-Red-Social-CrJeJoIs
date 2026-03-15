@@ -42,7 +42,10 @@ namespace SocialNetwork.Controllers
         public async Task<ActionResult<FollowingDto>> AddPost([FromBody] FollowingDto dto)
         {
             var followerNickname = User.Identity!.Name!;
-            var followerAvatar = User.FindFirst("AvatarPath")?.Value;
+            var followerAvatarFileName = User.FindFirst("AvatarPath")?.Value;
+            var followerAvatarUrl = string.IsNullOrEmpty(followerAvatarFileName)
+                ? null
+                : $"/uploads/{followerAvatarFileName}";
 
             Following following = new Following
             {
@@ -67,7 +70,7 @@ namespace SocialNetwork.Controllers
                     {
                         followerId = dto.FollowerId,
                         nickname = followerNickname,
-                        avatar = followerAvatar
+                        avatar = followerAvatarUrl
                     }
                 })
             );
@@ -81,7 +84,10 @@ namespace SocialNetwork.Controllers
         public async Task<ActionResult> DeleteFollowing([FromBody] FollowingDto dto)
         {
             var followerNickname = User.Identity!.Name!;
-            var followerAvatar = User.FindFirst("AvatarPath")?.Value;
+            var followerAvatarFileName = User.FindFirst("AvatarPath")?.Value;
+            var followerAvatarUrl = string.IsNullOrEmpty(followerAvatarFileName)
+                ? null
+                : $"/uploads/{followerAvatarFileName}";
 
             Following following = new Following
             {
@@ -106,7 +112,7 @@ namespace SocialNetwork.Controllers
                     {
                         followerId = dto.FollowerId,
                         nickname = followerNickname,
-                        avatar = followerAvatar
+                        avatar = followerAvatarUrl
                     }
                 })
             );

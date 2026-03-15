@@ -37,6 +37,7 @@ export class ToastService {
   }
 
   private show(type: ToastType, message: string, avatar?: string): void {
+    console.log('ToastService:', { type, message, avatar });
     const id = this.nextToastId++;
 
     this._toasts.update((currentToasts) => [

@@ -9,6 +9,9 @@
       [class.toast-info]="toast.type === 'info'"
       role="status"
     >
+      @if (toast.avatar) {
+        <img [src]="'https://localhost:7185' + toast.avatar" class="toast-avatar" alt="Avatar" />
+      }
       <span>{{ toast.message }}</span>
       <button
         type="button"

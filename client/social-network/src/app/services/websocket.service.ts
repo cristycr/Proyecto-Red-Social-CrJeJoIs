@@ -30,11 +30,15 @@ export class SocketService {
 
         if (message.type === "new_follower") {
           const { nickname, avatar } = message.payload;
+          console.log('Avatar URL', avatar);
+          console.log('Enviando a toast:', nickname, avatar);
           this.toast.showInfo(`${nickname} ha empezado a seguirte`, avatar);
         }
 
         if (message.type === "lost_follower") {
           const { nickname, avatar } = message.payload;
+          console.log('Avatar URL', avatar);
+          console.log('Enviando a toast:', nickname, avatar);
           this.toast.showInfo(`${nickname} ha dejado de seguirte`, avatar);
         }
       } catch (err) {
