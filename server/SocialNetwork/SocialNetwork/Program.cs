@@ -104,6 +104,7 @@ public class Program
         app.UseAuthentication();     // middleware de autenticacion
         app.UseAuthorization();      // middleware de autorizacion
         app.MapControllers();        // mapea los endpoints de los controladores
+        app.UseWebSockets();
 
         // Llamar al método antes de ejecutar la app
         await SeedDatabase(app.Services);
