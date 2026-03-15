@@ -40,23 +40,32 @@ public class Program
         builder.Services.AddAuthentication()
             .AddJwtBearer(options =>
             {
-                // Por seguridad guardamos la clave privada en variables de entorno
-                // La clave debe tener más de 256 bits
                 string? key = Environment.GetEnvironmentVariable("JWT_KEY");
 
                 if (key is null)
-                    throw new InvalidOperationException("La variable de entorno JWT_KEY no está definida.");
+                    throw new InvalidOperationException("JWT_KEY no definida.");
 
                 options.TokenValidationParameters = new TokenValidationParameters()
                 {
-                    // Si no nos importa que se valide el emisor del token, lo desactivamos
                     ValidateIssuer = false,
-                    // Si no nos importa que se valide para quién o
-                    // para qué propósito está destinado el token, lo desactivamos
                     ValidateAudience = false,
-                    // Indicamos la clave
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
-                    RoleClaimType = ClaimTypes.Role // para [Authorize(Roles="...")]
+                    RoleClaimType = ClaimTypes.Role
+                };
+
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        var accessToken = context.Request.Query["access_token"];
+
+                        if (!string.IsNullOrEmpty(accessToken))
+                        {
+                            context.Token = accessToken;
+                        }
+
+                        return Task.CompletedTask;
+                    }
                 };
             });
 
@@ -103,10 +112,12 @@ public class Program
             RequestPath = "/uploads"
         });
 
+        app.UseWebSockets();
+
         app.UseAuthentication();     // middleware de autenticacion
         app.UseAuthorization();      // middleware de autorizacion
+
         app.MapControllers();        // mapea los endpoints de los controladores
-        app.UseWebSockets();
 
         // Llamar al método antes de ejecutar la app
         await SeedDatabase(app.Services);
