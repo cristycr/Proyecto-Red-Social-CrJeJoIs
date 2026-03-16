@@ -6,6 +6,7 @@ export interface ToastMessage {
   id: number;
   type: ToastType;
   message: string;
+  avatar?: string;
 }
 
 @Injectable({
@@ -25,8 +26,8 @@ export class ToastService {
     this.show('error', message);
   }
 
-  showInfo(message: string): void {
-    this.show('info', message);
+  showInfo(message: string, avatar?: string): void {
+    this.show('info', message, avatar);
   }
 
   dismiss(id: number): void {
@@ -35,7 +36,8 @@ export class ToastService {
     );
   }
 
-  private show(type: ToastType, message: string): void {
+  private show(type: ToastType, message: string, avatar?: string): void {
+    console.log('ToastService:', { type, message, avatar });
     const id = this.nextToastId++;
 
     this._toasts.update((currentToasts) => [
@@ -44,6 +46,7 @@ export class ToastService {
         id,
         type,
         message,
+        avatar
       },
     ]);
   }

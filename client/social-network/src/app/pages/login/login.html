@@ -1,10 +1,13 @@
 <div class="big-container">
-    @if (errorMessage()) {
-    <div class="error-global">
-        {{ errorMessage() }}
-    </div>
-    }
-    <form (submit)="submit()">
+    <form [formGroup]="loginForm" (ngSubmit)="submit()">
+
+        <!-- Mensaje de error global -->
+        @if (errorMessage()) {
+        <div class="error-global">
+            {{ errorMessage() }}
+        </div>
+        }
+
         <div class="container">
             <div class="container-header">
                 <h1>¡Hola de nuevo!</h1>
@@ -13,26 +16,44 @@
 
             <div class="div-form">
 
+                @for (field of ['nickname','password']; track field) {
                 <div class="div-input">
-                    <span>Nombre de usuario <span class="required">*</span></span>
-                    <input type="text" [(ngModel)]="nickname" [ngModelOptions]="{standalone: true}">
-                </div>
+                    <span>
+                        {{ getLabel(field) }}
+                        @if (isRequired(field)) {
+                        <span class="required"> *</span>
+                        }
+                    </span>
 
-                <div class="div-input">
-                    <span>Contraseña <span class="required">*</span></span>
-                    <input type="password" [(ngModel)]="password" [ngModelOptions]="{standalone: true}">
+                    <input [type]="field === 'password' ? 'password' : 'text'" [formControlName]="field"
+                        [placeholder]="getLabel(field)"
+                        [autocomplete]="field === 'password' ? 'current-password' : 'off'">
 
-                    <div class="div-checkbox">
-                        <input type="checkbox" [(ngModel)]="rememberMeChecked" [ngModelOptions]="{standalone: true}">
-                        <span class="small-text">Mantener la sesión iniciada</span>
+                    <!-- Error Angular -->
+                    @if (loginForm.get(field)?.touched && loginForm.get(field)?.invalid) {
+                    <div class="error">
+                        {{ getAngularError(field) }}
                     </div>
+                    }
+
+                </div>
+                }
+
+                <!-- Checkbox recordar sesión -->
+                <div class="div-checkbox">
+                    <label class="checkbox-label">
+                        <input type="checkbox" [formControlName]="'rememberMe'">
+                        <span class="small-text">Mantener la sesión iniciada</span>
+                    </label>
                 </div>
 
+                <!-- Botón -->
                 <div class="div-input">
-                    <button type="submit" class="btn">Iniciar sesión</button>
+                    <button type="submit" class="btn">
+                        Iniciar sesión
+                    </button>
                     <span class="small-text">
-                        ¿No tienes cuenta?
-                        <a routerLink="/register">Registrarse</a>
+                        ¿No tienes cuenta? <a routerLink="/register">Registrarse</a>
                     </span>
                 </div>
 

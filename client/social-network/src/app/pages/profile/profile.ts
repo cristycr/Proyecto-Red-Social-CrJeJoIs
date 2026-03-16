@@ -10,6 +10,7 @@ import { ProfileSidebarCard } from '../../components/profile-sidebar-card/profil
 import { ProfilePostsSection } from '../../components/profile-posts-section/profile-posts-section';
 import { ProfileUsersModal } from '../../components/profile-users-modal/profile-users-modal';
 import { ToastService } from '../../services/toast';
+import { SocketService } from '../../services/websocket.service';
 
 type UserListItem = {
   id: number;
@@ -36,6 +37,7 @@ export class Profile implements OnInit {
   private readonly api = inject(ApiService);
   private readonly toast = inject(ToastService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly socketService = inject(SocketService);
 
   protected readonly nickname = signal('Usuario');
   protected readonly profileImage = signal('/assets/images/avatar-default.png');
@@ -551,6 +553,7 @@ export class Profile implements OnInit {
   logout() {
     this.auth.jwt = null;
     localStorage.removeItem('jwt');
+    this.socketService.disconnect();
     this.router.navigate(['/landing']);
   }
 }

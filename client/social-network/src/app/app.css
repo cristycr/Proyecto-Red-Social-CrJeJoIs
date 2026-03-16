@@ -78,6 +78,14 @@ main {
     animation: toast-enter 0.22s ease;
 }
 
+.toast-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 10px;
+}
+
 .toast span {
     line-height: 1.35;
     font-size: 0.9rem;
