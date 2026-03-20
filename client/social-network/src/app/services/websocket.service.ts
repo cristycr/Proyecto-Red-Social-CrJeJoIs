@@ -59,13 +59,16 @@ export class SocketService {
     this.jwt = jwt;
     this.shouldReconnect = true;
 
-    if (this.socket && this.socket.readyState === WebSocket.OPEN) return;
+    if (this.socket && this.socket.readyState !== WebSocket.CLOSED) return;
 
-    const isHttps = location.protocol === 'https:';
-    const protocol = isHttps ? 'wss' : 'ws';
-    const host = location.hostname;
-    const port = isHttps ? 7185 : 5195;
-    const wsUrl = `${protocol}://${host}:${port}/ws?access_token=${jwt}`;
+    if (this.socket) {
+      try {
+        this.socket.close();
+      } catch { }
+      this.socket = undefined;
+    }
+
+    const wsUrl = `wss://${location.hostname}:7185/ws?access_token=${jwt}`;
 
     console.log('Intentando conectar WS a', wsUrl);
 
