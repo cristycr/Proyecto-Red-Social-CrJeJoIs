@@ -1,0 +1,52 @@
+@if (open()) {
+  <div class="modal-overlay" (click)="onBackdropClick($event)">
+    <div class="followers-modal" role="dialog" aria-modal="true" [attr.aria-label]="title() + ' del perfil'">
+      <div class="followers-modal-header">
+        <h3>{{ title() }}</h3>
+        <button type="button" class="followers-close-btn" aria-label="Cerrar modal" (click)="onCloseClick()">
+          ✕
+        </button>
+      </div>
+
+      @if (loading()) {
+        <p class="followers-status">{{ loadingMessage() }}</p>
+      } @else if (errorMessage()) {
+        <p class="followers-error">{{ errorMessage() }}</p>
+      } @else if (users().length === 0) {
+        <p class="followers-status">{{ emptyMessage() }}</p>
+      } @else {
+        <div class="followers-search-wrap">
+          <img class="followers-search-icon" src="/assets/icons/busqueda.svg" alt="" aria-hidden="true" />
+          <input
+            type="text"
+            class="followers-search-input"
+            [value]="searchQuery()"
+            placeholder="Buscar por nickname, nombre o apellidos"
+            aria-label="Buscar usuario en la lista"
+            (input)="onSearchInput($event)"
+          />
+        </div>
+
+        @if (filteredUsers().length === 0) {
+          <p class="followers-status">No hay usuarios que coincidan con la busqueda.</p>
+        } @else {
+          <ul class="followers-list">
+            @for (user of filteredUsers(); track user.id) {
+              <li class="follower-item">
+                <a class="follower-link" [routerLink]="['/profile', user.id]" (click)="onUserClick()">
+                  <img [src]="user.avatarUrl" [alt]="'Avatar de ' + user.nickname" class="follower-avatar" />
+                  <span class="follower-meta">
+                    <span class="follower-nickname">{{ user.nickname }}</span>
+                    @if (user.fullName) {
+                      <span class="follower-full-name">{{ user.fullName }}</span>
+                    }
+                  </span>
+                </a>
+              </li>
+            }
+          </ul>
+        }
+      }
+    </div>
+  </div>
+}

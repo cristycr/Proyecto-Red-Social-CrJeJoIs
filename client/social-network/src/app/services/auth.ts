@@ -1,4 +1,4 @@
-import { computed, Injectable, signal } from '@angular/core';
+import { computed, inject, Injectable, signal } from '@angular/core';
 import { jwtDecode } from 'jwt-decode';
 import { AuthRequest } from '../models/auth-request';
 import { AuthResponse } from '../models/auth-response';
@@ -9,16 +9,17 @@ type JwtPayload = {
   id?: string | number;
   role?: string;
   unique_name?: string;
-  AvatarPath?: string | null;
-  biography?: string | null;
-  FollowerCount?: string | number;
-  FollowedCount?: string | number;
+  AvatarPath?: string;
+  biography?: string;
+  FollowerCount?: number | string;
+  FollowedCount?: number | string;
 };
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
+  private readonly api = inject(ApiService);
 
   private readonly jwtSignal = signal<string | null>(null);
 
@@ -52,12 +53,12 @@ export class AuthService {
     return nickname && nickname.length > 0 ? nickname : 'Usuario';
   });
 
-  readonly profileImage = computed(() => {
-    const avatarPath = this.decodedPayload()?.AvatarPath?.trim();
-    return avatarPath && avatarPath.length > 0
-      ? avatarPath
-      : '/assets/images/avatar-default.png';
-  });
+  private readonly profileImageSignal = signal<string>('/assets/images/avatar-default.png');
+  readonly profileImage = this.profileImageSignal.asReadonly();
+
+  setProfileImagePath(path: string | null): void {
+    this.profileImageSignal.set(path?.trim() || '/assets/images/avatar-default.png');
+  }
 
   readonly biography = computed(() =>
     this.decodedPayload()?.biography?.trim() || ''
@@ -84,13 +85,11 @@ export class AuthService {
     this.api.jwt = value;
   }
 
-  constructor(private api: ApiService) {
-
+  constructor() {
     const jwt = localStorage.getItem('jwt');
     if (jwt) {
       this.setJwt(jwt);
     }
-
   }
 
   setJwt(jwt: string): void {
@@ -101,11 +100,9 @@ export class AuthService {
     authData: AuthRequest,
     rememberMe: boolean = false
   ): Promise<boolean> {
-
     const response = await this.api.post<AuthResponse>('auth/login', authData);
 
     if (response?.accessToken) {
-
       this.jwt = response.accessToken;
 
       if (rememberMe) {

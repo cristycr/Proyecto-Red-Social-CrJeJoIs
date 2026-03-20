@@ -65,8 +65,16 @@ input[type="checkbox"] {
     accent-color: var(--secondary-color);
 }
 
-.btn {
+button.btn,
+input.btn {
     height: 35px;
+    border-radius: 10px;
+    padding: 0 14px;
+    appearance: none;
+    -webkit-appearance: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     transition: .3s;
     font-size: 16px;
     color: var(--text-color);
@@ -74,9 +82,17 @@ input[type="checkbox"] {
     border: solid 2px var(--secondary-color);
 }
 
-.btn:hover {
+button.btn:hover:not(:disabled),
+input.btn:hover {
     cursor: pointer;
     background-color: var(--secondary-color-hover);
+}
+
+button.btn:disabled,
+input.btn:disabled {
+    border-radius: 10px;
+    opacity: 0.65;
+    cursor: not-allowed;
 }
 
 .small-text {

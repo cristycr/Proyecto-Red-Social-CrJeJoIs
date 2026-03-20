@@ -1,25 +1,29 @@
-<!-- NAV de las páginas -->
-<header>
-  <!-- Logo -->
-  <a routerLink="/landing" class="header-logo">TechIt!</a>
-  <nav>
-    <ul>
-      <li><a routerLink="/feed">Feed</a></li>
+<app-site-header />
 
-      <li><a routerLink="/about">Nosotros</a></li>
-      @if (isAdmin()) {
-      <li><a routerLink="/admin">Panel admin</a></li>
+<div class="toast-container" aria-live="polite" aria-atomic="true">
+  @for (toast of toasts(); track toast.id) {
+    <article
+      class="toast"
+      [class.toast-success]="toast.type === 'success'"
+      [class.toast-error]="toast.type === 'error'"
+      [class.toast-info]="toast.type === 'info'"
+      role="status"
+    >
+      @if (toast.avatar) {
+        <img [src]="'https://localhost:7185' + toast.avatar" class="toast-avatar" alt="Avatar" />
       }
-      @if (!isAuthenticated()) {
-      <li><a routerLink="/login">Iniciar sesión</a></li>
-      <li><a routerLink="/register">Registrarse</a></li>
-      } @else {
-      <li><a routerLink="/profile">Perfil</a></li>
-      }
-
-    </ul>
-  </nav>
-</header>
+      <span>{{ toast.message }}</span>
+      <button
+        type="button"
+        class="toast-close"
+        aria-label="Cerrar notificacion"
+        (click)="dismissToast(toast.id)"
+      >
+        x
+      </button>
+    </article>
+  }
+</div>
 
 <main>
   <router-outlet></router-outlet>

@@ -1,35 +1,82 @@
 <div class="container">
 	@if (loading()) {
-		<p>Cargando perfil...</p>
+		<p class="profile-status">Cargando perfil...</p>
 	} @else {
 		@if (errorMessage()) {
-			<p>{{ errorMessage() }}</p>
+			<p class="profile-error">{{ errorMessage() }}</p>
 		}
 
-	<div class="profile-header">
-		<img [src]="profileImage()" alt="Avatar" class="avatar">
-        <div class="biography">
-			<span class="nickname">{{ nickname() }}</span>
-			@if (biography()) {
-				<p>{{ biography() }}</p>
-			}
-        </div>
-	</div>
-	<div class="profile-stats">
-		<div class="stat">
-			<span class="stat-number">{{ followers() }}</span>
-			<span class="stat-label">Seguidores</span>
+		<div class="profile-layout">
+			<app-profile-sidebar-card
+				[profileImage]="profileImage()"
+				[nickname]="nickname()"
+				[biography]="biography()"
+				[followers]="followers()"
+				[followeds]="followeds()"
+				[isOwnProfile]="isOwnProfile()"
+				[isFollowingProfile]="isFollowingProfile()"
+				[followActionLoading]="followActionLoading()"
+				[followActionError]="followActionError()"
+				(openFollowers)="openFollowersModal()"
+				(openFolloweds)="openFollowedsModal()"
+				(followAction)="onFollowButtonClick()"
+				(logout)="logout()"
+			></app-profile-sidebar-card>
+
+			<section class="profile-content">
+				<app-profile-posts-section
+					[loading]="postsLoading()"
+					[errorMessage]="postsErrorMessage()"
+					[allPostsCount]="userPosts().length"
+					[actionError]="postDeleteError()"
+					[posts]="paginatedUserPosts()"
+					[currentPage]="currentPostsPage()"
+					[totalPages]="totalPostsPages()"
+					[isReverseOrder]="reversePostsOrder()"
+					[postsPerPage]="postsPerPage()"
+					[canDeletePost]="canDeletePostFn"
+					[isDeletingPost]="isDeletingPostFn"
+					[formatPostDate]="formatPostDateFn"
+					(deletePost)="onDeletePost($event)"
+					(previousPage)="goToPreviousPostsPage()"
+					(nextPage)="goToNextPostsPage()"
+					(pageSelected)="goToPostsPage($event)"
+					(toggleReverseOrder)="togglePostsOrder()"
+					(postsPerPageChange)="onPostsPerPageSelected($event)"
+				></app-profile-posts-section>
+			</section>
 		</div>
-		<div class="stat">
-			<span class="stat-number">{{ followeds() }}</span>
-			<span class="stat-label">Seguidos</span>
-		</div>
-	</div>
-    <!--Mostrar las publicaciones del usuario-->
-	@if (isOwnProfile()) {
-		<button class="logout" (click)="logout()">Cerrar sesión</button>
-	}
 	}
 </div>
 
-<app-create-post-btn />
+<app-profile-users-modal
+	[open]="usersModalOpen()"
+	[title]="usersModalTitle()"
+	[loading]="usersModalLoading()"
+	[loadingMessage]="usersModalLoadingMessage()"
+	[errorMessage]="usersModalError()"
+	[emptyMessage]="usersModalEmptyMessage()"
+	[users]="modalUsers()"
+	(close)="closeUsersModal()"
+></app-profile-users-modal>
+
+@if (deletePostModalOpen()) {
+	<div class="delete-post-modal-overlay" (click)="onDeletePostModalBackdropClick($event)">
+		<div class="delete-post-modal" role="dialog" aria-modal="true" aria-label="Confirmar eliminacion">
+			<h3>Confirmar eliminacion</h3>
+			<p>{{ deletePostConfirmationMessage }}</p>
+			<div class="delete-post-modal-actions">
+				<button type="button" class="delete-post-cancel-btn" (click)="closeDeletePostModal()">
+					Cancelar
+				</button>
+				<button type="button" class="delete-post-confirm-btn" (click)="confirmDeletePost()">
+					Eliminar
+				</button>
+			</div>
+		</div>
+	</div>
+}
+
+@if (isAuthenticated()) {
+	<app-create-post-btn />
+}

@@ -1,17 +1,36 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, signal, OnInit, OnDestroy } from '@angular/core';
 import { RouterOutlet, RouterLinkWithHref } from '@angular/router';
-import { AuthService } from './services/auth';
+import { ToastService } from './services/toast';
+import { SocketService } from './services/websocket.service';
+import { AppSiteHeader } from './components/app-site-header/app-site-header';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, RouterLinkWithHref],
+  standalone: true,
+  imports: [RouterOutlet, RouterLinkWithHref, AppSiteHeader],
   templateUrl: './app.html',
-  styleUrl: './app.css'
+  styleUrls: ['./app.css'],
 })
+export class App implements OnInit, OnDestroy {
 
-export class App {
-  private readonly authService = inject(AuthService);
+  private readonly toastService = inject(ToastService);
+  private readonly socketService = inject(SocketService);
+
   protected readonly title = signal('social-network');
-  protected readonly isAuthenticated = this.authService.isAuthenticated;
-  protected readonly isAdmin = this.authService.isAdmin;
+  protected readonly toasts = this.toastService.toasts;
+
+  protected dismissToast(id: number): void {
+    this.toastService.dismiss(id);
+  }
+
+  ngOnInit(): void {
+    const jwt = localStorage.getItem("jwt");
+    if (jwt) {
+      this.socketService.connect(jwt);
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.socketService.disconnect();
+  }
 }

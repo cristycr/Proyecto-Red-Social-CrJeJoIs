@@ -31,7 +31,10 @@ public class UserRepository : BaseRepository<User, long> {
                 (f, u) => new GetUserDto {
                     Id = u.Id,
                     Nickname = u.Nickname!,
-                    AvatarPath = u.AvatarPath!
+                    AvatarPath = u.AvatarPath!,
+                    Name = u.Name,
+                    Surname1 = u.Surname1,
+                    Surname2 = u.Surname2
                 }
             )
             .AsNoTracking()
@@ -49,7 +52,10 @@ public class UserRepository : BaseRepository<User, long> {
                 (f, u) => new GetUserDto {
                     Id = u.Id,
                     Nickname = u.Nickname!,
-                    AvatarPath = u.AvatarPath!
+                    AvatarPath = u.AvatarPath!,
+                    Name = u.Name,
+                    Surname1 = u.Surname1,
+                    Surname2 = u.Surname2
                 }
             )
             .AsNoTracking()

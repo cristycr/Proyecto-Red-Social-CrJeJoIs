@@ -1,17 +1,17 @@
 .big-container {
     align-items: center;
-    height: 434px;
     justify-content: center;
     width: 784px;
     background-color: var(--primary-color);
     margin: 60px auto;
     border-radius: 10px;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+    height: fit-content;
 }
 
 form {
     padding: 32px;
-    height: 370px;
+    height: fit-content;
 }
 
 .container {
@@ -65,8 +65,16 @@ input[type="checkbox"] {
     accent-color: var(--secondary-color);
 }
 
-.btn {
+button.btn,
+input.btn {
     height: 35px;
+    border-radius: 10px;
+    padding: 0 14px;
+    appearance: none;
+    -webkit-appearance: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     transition: .3s;
     font-size: 16px;
     color: var(--text-color);
@@ -74,7 +82,8 @@ input[type="checkbox"] {
     border: solid 2px var(--secondary-color);
 }
 
-.btn:hover {
+button.btn:hover,
+input.btn:hover {
     cursor: pointer;
     background-color: var(--secondary-color-hover);
 }
@@ -117,4 +126,19 @@ span a:hover {
     margin-top: 12px;
     position: relative;
     top: 12px;
+}
+
+.div-checkbox {
+  margin-bottom: 15px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+  margin: 0;
 }

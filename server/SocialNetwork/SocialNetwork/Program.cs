@@ -1,11 +1,13 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using SocialNetwork.Models.Database;
 using SocialNetwork.Models.Database.Repositories;
+using SocialNetwork.Services;
 using SocialNetwork.Services.Auth;
-using SocialNetwork.Services.Internal;
 using Swashbuckle.AspNetCore.Filters;
+using System.Net.WebSockets;
 using System.Security.Claims;
 using System.Text;
 
@@ -29,9 +31,8 @@ public class Program
         // DbContext
         builder.Services.AddScoped<SocialNetworkContext>();
 
-        // Internal Services
-        builder.Services.AddScoped<DataLoader>();
-
+        // Gestión Avatar
+        builder.Services.AddScoped<IFileService, FileService>();
 
         // Auth & JWT
         builder.Services.AddScoped<TokenService>();
@@ -40,25 +41,36 @@ public class Program
         builder.Services.AddAuthentication()
             .AddJwtBearer(options =>
             {
-                // Por seguridad guardamos la clave privada en variables de entorno
-                // La clave debe tener más de 256 bits
                 string? key = Environment.GetEnvironmentVariable("JWT_KEY");
 
                 if (key is null)
-                    throw new InvalidOperationException("La variable de entorno JWT_KEY no está definida.");
+                    throw new InvalidOperationException("JWT_KEY no definida.");
 
                 options.TokenValidationParameters = new TokenValidationParameters()
                 {
-                    // Si no nos importa que se valide el emisor del token, lo desactivamos
                     ValidateIssuer = false,
-                    // Si no nos importa que se valide para quién o
-                    // para qué propósito está destinado el token, lo desactivamos
                     ValidateAudience = false,
-                    // Indicamos la clave
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
-                    RoleClaimType = ClaimTypes.Role // para [Authorize(Roles="...")]
+                    RoleClaimType = ClaimTypes.Role
+                };
+
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        var accessToken = context.Request.Query["access_token"];
+
+                        if (!string.IsNullOrEmpty(accessToken))
+                        {
+                            context.Token = accessToken;
+                        }
+
+                        return Task.CompletedTask;
+                    }
                 };
             });
+
+        builder.Services.AddSingleton<WebSocketManager>();
 
         // Swagger
         builder.Services.AddSwaggerGen(options =>
@@ -88,9 +100,89 @@ public class Program
         }
 
         app.UseHttpsRedirection();   // redirige HTTP a HTTPS
-        app.UseStaticFiles();        // permite servir archivos desde wwwroot
+        var uploadsPath = Path.Combine(builder.Environment.ContentRootPath, "wwwroot", "uploads");
+
+        if (!Directory.Exists(uploadsPath))
+        {
+            Directory.CreateDirectory(uploadsPath);
+        }
+
+        app.UseStaticFiles(new StaticFileOptions // permite servir archivos desde wwwroot y uploads
+        {
+            FileProvider = new PhysicalFileProvider(uploadsPath),
+            RequestPath = "/uploads"
+        });
+
+        // WebSockets
+        app.UseWebSockets();
+        app.Map("/ws", async context =>
+        {
+            if (!context.WebSockets.IsWebSocketRequest)
+            {
+                context.Response.StatusCode = 400;
+                return;
+            }
+
+            // Autenticación del usuario
+            var userId = context.User.FindFirst("id")?.Value;
+            var userNickname = context.User.FindFirst(ClaimTypes.Name)?.Value;
+            if (userId is null)
+            {
+                context.Response.StatusCode = 401;
+                return;
+            }
+
+            var wsManager = context.RequestServices.GetRequiredService<WebSocketManager>();
+
+            // Aceptar la nueva conexión
+            var socket = await context.WebSockets.AcceptWebSocketAsync();
+
+            // Agregar la conexión al manager, cerrando la anterior si existía
+            wsManager.AddConnection(userId, socket);
+
+            Console.WriteLine($"WebSocket conectado para usuario {userId} {userNickname}");
+
+            var buffer = new byte[1024];
+            try
+            {
+                while (socket.State == WebSocketState.Open)
+                {
+                    var result = await socket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+
+                    // Si el cliente cierra el WS
+                    if (result.MessageType == WebSocketMessageType.Close)
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error WebSocket usuario {userId} {userNickname}: {ex.Message}");
+            }
+            finally
+            {
+                // Remover conexión del manager
+                wsManager.RemoveConnection(userId);
+
+                // Cerrar socket si todavía está abierto
+                if (socket.State == WebSocketState.Open)
+                {
+                    try
+                    {
+                        await socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closed", CancellationToken.None);
+                    }
+                    catch
+                    {
+                        // Ignorar errores si ya se cerró
+                    }
+                }
+
+                Console.WriteLine($"WebSocket desconectado para usuario {userId} {userNickname}");
+            }
+        });
+
         app.UseAuthentication();     // middleware de autenticacion
         app.UseAuthorization();      // middleware de autorizacion
+
         app.MapControllers();        // mapea los endpoints de los controladores
 
         // Llamar al método antes de ejecutar la app
@@ -105,12 +197,9 @@ public class Program
         using IServiceScope scope = serviceProvider.CreateScope();
 
         var dbContext = scope.ServiceProvider.GetRequiredService<SocialNetworkContext>();
-        var dataLoader = scope.ServiceProvider.GetRequiredService<DataLoader>();
 
         if (dbContext.Database.EnsureCreated())  // Esto crea la DB si no existe
         {
-            await dataLoader.LoadAllDataAsync();
-
             Seeder seeder = new Seeder(dbContext);
             await seeder.SeedAsync();
         }

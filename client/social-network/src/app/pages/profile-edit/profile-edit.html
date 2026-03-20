@@ -1,0 +1,142 @@
+<section class="profile-edit-container">
+	<header class="profile-edit-header">
+		<h1>Editar perfil</h1>
+		<p>
+			Actualiza aquí tu biografía, email, nombre y apellidos.
+		</p>
+	</header>
+
+	@if (loading()) {
+		<p class="profile-edit-status">Cargando datos del perfil...</p>
+	} @else {
+		@if (errorMessage()) {
+			<p class="profile-edit-error">{{ errorMessage() }}</p>
+		}
+
+		<form class="profile-edit-form" [formGroup]="profileForm" (ngSubmit)="onSubmit()">
+			<div class="profile-edit-grid">
+				<div class="profile-edit-fields">
+					<label for="nickname">Nickname</label>
+					<input id="nickname" type="text" formControlName="nickname" readonly />
+
+					<label for="email">Email <span class="required">*</span></label>
+					<input
+						id="email"
+						type="email"
+						formControlName="email"
+						placeholder="Tu email"
+						(blur)="onEmailBlur()"
+						(input)="clearEmailTakenError()"
+					/>
+					@if (shouldShowControlError('email')) {
+						<p class="field-error">{{ getFieldErrorMessage('email') }}</p>
+					}
+					@if (checkingEmail()) {
+						<p class="field-status">Comprobando si el email ya existe...</p>
+					}
+
+					<label for="name">Nombre <span class="required">*</span></label>
+					<input id="name" type="text" formControlName="name" placeholder="Tu nombre" />
+					@if (shouldShowControlError('name')) {
+						<p class="field-error">{{ getFieldErrorMessage('name') }}</p>
+					}
+
+					<div class="surnames-grid">
+						<div>
+							<label for="surname1">Primer apellido <span class="required">*</span></label>
+							<input id="surname1" type="text" formControlName="surname1" placeholder="Primer apellido" />
+							@if (shouldShowControlError('surname1')) {
+								<p class="field-error">{{ getFieldErrorMessage('surname1') }}</p>
+							}
+						</div>
+						<div>
+							<label for="surname2">Segundo apellido</label>
+							<input id="surname2" type="text" formControlName="surname2" placeholder="Segundo apellido" />
+						</div>
+					</div>
+
+					<label for="biography">Biografía</label>
+					<textarea
+						id="biography"
+						formControlName="biography"
+						rows="5"
+						placeholder="Cuéntanos un poco sobre ti"
+					></textarea>
+
+					<p class="field-hint">{{ biographyLength }} / 280 caracteres</p>
+				</div>
+
+				<app-profile-avatar-panel
+					[avatarUrl]="avatarUrl()"
+					[nickname]="profileForm.controls.nickname.value || 'Usuario'"
+					[actionLoading]="avatarActionLoading()"
+					[actionError]="avatarActionError()"
+					[hasPrivateData]="hasPrivateData()"
+					(avatarSelected)="onAvatarFileSelected($event)"
+					(removeAvatarRequested)="onAvatarRemoveRequested()"
+				></app-profile-avatar-panel>
+			</div>
+
+			<div class="profile-edit-actions">
+				<a routerLink="/profile" class="profile-btn profile-btn-secondary">Volver al perfil</a>
+				<button type="submit" class="profile-btn profile-btn-primary"
+					[disabled]="submitLoading() || avatarActionLoading() || checkingEmail() || passwordSubmitLoading()">
+						Actualizar perfil
+				</button>
+			</div>
+
+		</form>
+
+		<form class="profile-edit-form profile-password-form" [formGroup]="passwordForm" (ngSubmit)="onPasswordSubmit()">
+			<div class="profile-password-header">
+				<h2>Cambiar contraseña</h2>
+			</div>
+
+			<div class="profile-edit-fields profile-password-fields">
+				<label for="password">Nueva contraseña <span class="required">*</span></label>
+				<input
+					id="password"
+					type="password"
+					formControlName="password"
+					placeholder="Mínimo 6 caracteres"
+				/>
+				@if (shouldShowPasswordControlError('password')) {
+					<p class="field-error">{{ getPasswordFieldErrorMessage('password') }}</p>
+				}
+
+				<label for="confirmPassword">Repetir contraseña <span class="required">*</span></label>
+				<input
+					id="confirmPassword"
+					type="password"
+					formControlName="confirmPassword"
+					placeholder="Repite la nueva contraseña"
+				/>
+				@if (shouldShowPasswordControlError('confirmPassword')) {
+					<p class="field-error">{{ getPasswordFieldErrorMessage('confirmPassword') }}</p>
+				}
+
+				@if (showPasswordMismatch()) {
+					<p class="field-error">Las contraseñas deben ser iguales.</p>
+				}
+			</div>
+
+			<div class="profile-edit-actions">
+				<button
+					type="submit"
+					class="profile-btn profile-btn-primary"
+					[disabled]="passwordSubmitLoading() || submitLoading() || avatarActionLoading()"
+				>
+					@if (passwordSubmitLoading()) {
+						Guardando...
+					} @else {
+						Cambiar contraseña
+					}
+				</button>
+			</div>
+
+			@if (passwordErrorMessage()) {
+				<p class="profile-edit-error">{{ passwordErrorMessage() }}</p>
+			}
+		</form>
+	}
+</section>

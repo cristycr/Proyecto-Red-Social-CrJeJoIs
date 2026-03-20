@@ -1,16 +1,44 @@
-@for (post of posts(); track $index) {
-    <div class="post">
-        <div class="post-header">
-            <a class="user-link" [routerLink]="['/profile', post.userId]">
-                <img [src]="post.avatarPath ? post.avatarPath : '/assets/images/avatar-default.png'" alt="Avatar" class="avatar">
-                <span class="nickname">{{post.nickname}}</span>
-            </a>
+<div
+    infiniteScroll
+    [infiniteScrollDistance]="2"
+    [infiniteScrollThrottle]="150"
+    (scrolled)="loadNextPostsBatch()"
+>
+    @if (initialLoading()) {
+    <p class="feed-state">Cargando publicaciones...</p>
+} @else if (loadingError()) {
+    <p class="feed-state feed-state-error">{{ loadingError() }}</p>
+} @else {
+    @for (post of posts(); track post.id) {
+        <div class="post">
+            <div class="post-header">
+                <a class="user-link" [routerLink]="['/profile', post.userId]">
+                    <img [src]="buildAvatarUrl(post.avatarPath)" alt="Avatar" class="avatar">
+                    <span class="nickname">{{post.nickname}}</span>
+                </a>
+            </div>
+            <h3>{{post.title}}</h3>
+            <p>{{post.description}}</p>
+            <span>{{post.creationDate | date: 'dd/MM/yyyy HH:mm':'UTC'}}</span>
         </div>
-        <h3>{{post.title}}</h3>
-        <p>{{post.description}}</p>
-        <span>{{post.creationDate | date: 'dd/MM/yyyy HH:mm':'UTC'}}</span>
-    </div>
+    }
+
+    @if (posts().length === 0) {
+        <img
+            src="/assets/images/carpincho.png"
+            alt="Carpincho relajado"
+            class="feed-empty-image"
+        >
+        <p class="feed-state feed-empty-text">
+            Vaya, parece que aquí no hay nada... Sigue a otros usuarios para enterarte de cosas interesantes.
+        </p>
+    }
+
+    @if (hasMorePosts()) {
+        <p class="feed-loading-more">Cargando más publicaciones...</p>
+    }
 }
+</div>
 
 @if (isAuthenticated()) {
     <app-create-post-btn />

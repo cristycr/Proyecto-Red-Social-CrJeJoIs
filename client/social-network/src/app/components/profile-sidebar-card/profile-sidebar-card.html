@@ -1,0 +1,51 @@
+<aside class="profile-sidebar">
+  <img [src]="profileImage()" alt="Avatar" class="avatar" />
+
+  <h1 class="nickname">{{ nickname() }}</h1>
+
+  @if (biography()) {
+    <p class="biography">{{ biography() }}</p>
+  }
+
+  <div class="profile-connections" aria-label="Seguidores y seguidos">
+    <img src="assets/icons/usuarios.svg" alt="" aria-hidden="true" class="connections-icon" />
+
+    <button type="button" class="connection-link" (click)="openFollowers.emit()">
+      <strong>{{ followers() }}</strong> seguidores
+    </button>
+
+    <span class="connections-separator" aria-hidden="true">·</span>
+
+    <button type="button" class="connection-link" (click)="openFolloweds.emit()">
+      <strong>{{ followeds() }}</strong> seguidos
+    </button>
+  </div>
+
+  @if (isOwnProfile()) {
+    <button type="button" class="edit-profile-btn" [routerLink]="['/profile/edit']">
+      Editar perfil
+    </button>
+    <button type="button" class="profile-action-btn logout-btn" (click)="logout.emit()">
+      Cerrar sesión
+    </button>
+  } @else {
+    <div class="follow-actions">
+      <button
+        type="button"
+        class="follow-btn"
+        (click)="followAction.emit()"
+        [disabled]="followActionLoading()"
+      >
+        @if (followActionLoading()) {
+          Actualizando...
+        } @else {
+          {{ isFollowingProfile() ? 'Dejar de seguir' : 'Seguir' }}
+        }
+      </button>
+
+      @if (followActionError()) {
+        <p class="follow-error">{{ followActionError() }}</p>
+      }
+    </div>
+  }
+</aside>

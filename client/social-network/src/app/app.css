@@ -1,51 +1,175 @@
-/* Header logo style (igual que footer-logo) */
-.header-logo {
-    color: var(--text-color);
-    font-size: 1.6rem;
-    font-weight: bold;
-    text-decoration: none;
-    letter-spacing: 3px;
+/*  60% primary: deep navy
+    30% secondary: warm light surfaces
+    10% action: intense orange-red */
+:host {
+    --color-primary-900: #0f1c33;
+    --color-primary-800: #1a2a4c;
+    --color-primary-600: #334f80;
+
+    --color-secondary-100: #fff8ef;
+    --color-secondary-200: #f8ead6;
+    --color-secondary-300: #f0ddc1;
+
+    --color-action-500: #ff5a1f;
+    --color-action-600: #db4312;
+    --color-action-100: #ffe0d2;
+
+    /* Backward-compatible aliases for current components */
+    --primary-color-light: #7685a1;
+    --primary-color: var(--color-primary-800);
+    --primary-color-hover: var(--color-primary-900);
+    --secondary-color: var(--color-action-500);
+    --secondary-color-hover: var(--color-action-600);
+    --secondary-color-light: #ffb296;
+    --secondary-color-dark: #c53a0e;
+    --secondary-color-transparent-light: rgba(255, 90, 31, 0.16);
+    --secondary-color-transparent-medium: rgba(255, 90, 31, 0.28);
+    --secondary-color-transparent-border: rgba(255, 90, 31, 0.5);
+    --secondary-color-transparent-shadow: rgba(19, 32, 58, 0.22);
+    --text-color: #f8fafc;
+    --alert-color: #b42318;
+    --bg-dark-gradient-start: var(--color-primary-900);
+    --bg-dark-gradient-end: var(--color-primary-800);
+
+    --surface-page: var(--color-secondary-100);
+    --surface-panel: #ffffff;
+    --surface-muted: var(--color-secondary-200);
+    --surface-highlight: #fff1ea;
+    --border-soft: #d8deea;
+    --text-main: #1f2937;
+    --text-muted: #5e697c;
+
+    display: block;
+    min-height: 100%;
 }
 
-header {
-    background: linear-gradient(135deg, var(--bg-dark-gradient-start) 0%, var(--bg-dark-gradient-end) 100%);
-    padding: 24px;
+main {
+    min-height: calc(100vh - 210px);
+    padding: 26px 0 40px;
+    background:
+        radial-gradient(circle at 8% 0%, rgba(255, 90, 31, 0.2) 0%, rgba(255, 90, 31, 0) 44%),
+        radial-gradient(circle at 100% 12%, rgba(255, 90, 31, 0.12) 0%, rgba(255, 90, 31, 0) 28%),
+        linear-gradient(180deg, var(--surface-page) 0%, #fffdf9 100%);
+}
+
+.toast-container {
+    position: fixed;
+    top: 86px;
+    right: 18px;
+    z-index: 80;
     display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: none;
+}
+
+.toast {
+    min-width: 280px;
+    max-width: min(420px, calc(100vw - 28px));
+    border-radius: 12px;
+    border: 1px solid transparent;
+    box-shadow: 0 14px 26px rgba(19, 32, 58, 0.2);
+    display: flex;
+    align-items: flex-start;
     justify-content: space-between;
-    position: sticky;
-    z-index: 10;
-    top: 0;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    gap: 12px;
+    padding: 12px 12px 12px 14px;
+    pointer-events: auto;
+    animation: toast-enter 0.22s ease;
 }
 
-ul {
-    list-style: none;
-    display: flex;
-    flex-direction: row;
-    justify-content: right;
-    padding: 0 40px;
-    gap: 40px;
+.toast-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 10px;
 }
 
-header a {
-    text-decoration: none;
-    color: var(--text-color);
-    transition: color 0.2s, text-shadow 0.2s;
+.toast span {
+    line-height: 1.35;
+    font-size: 0.9rem;
+    font-weight: 600;
 }
 
-header a:hover {
-    color: var(--secondary-color-hover);
-    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+.toast-close {
+    border: none;
+    border-radius: 7px;
+    padding: 3px 7px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    line-height: 1;
+    transition: opacity 0.2s ease;
 }
 
-/* Footer style */
+.toast-close:hover {
+    opacity: 0.8;
+}
+
+.toast-success {
+    background: #edf9f1;
+    border-color: #9fd4b0;
+    color: #14532d;
+}
+
+.toast-success .toast-close {
+    background: #d5f1df;
+    color: #14532d;
+}
+
+.toast-error {
+    background: #fff1f1;
+    border-color: #f0b7b7;
+    color: #8b1c1c;
+}
+
+.toast-error .toast-close {
+    background: #ffdede;
+    color: #8b1c1c;
+}
+
+.toast-info {
+    background: #eff6ff;
+    border-color: #b7ccf5;
+    color: #1e3a8a;
+}
+
+.toast-info .toast-close {
+    background: #dde9ff;
+    color: #1e3a8a;
+}
+
+@keyframes toast-enter {
+    from {
+        opacity: 0;
+        transform: translateY(-6px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@media (max-width: 640px) {
+    .toast-container {
+        top: 78px;
+        right: 8px;
+        left: 8px;
+    }
+
+    .toast {
+        min-width: 0;
+        width: 100%;
+    }
+}
+
 footer {
-    background: linear-gradient(135deg, var(--bg-dark-gradient-start) 0%, var(--bg-dark-gradient-end) 100%);
+    background: linear-gradient(120deg, var(--bg-dark-gradient-start) 0%, var(--bg-dark-gradient-end) 78%, #2a1f1a 100%);
     color: var(--text-color);
-    padding: 32px 0 0 0;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    border-top: 2px solid rgba(255, 255, 255, 0.1);
+    padding: 32px 0 0;
+    font-family: 'Ubuntu', sans-serif;
+    border-top: 1px solid rgba(255, 90, 31, 0.42);
 }
 
 footer .footer-content {
@@ -56,12 +180,13 @@ footer .footer-content {
     margin: 0 auto;
     padding: 0 32px;
     flex-wrap: wrap;
+    gap: 12px;
 }
 
 footer .footer-logo a {
     color: var(--text-color);
     font-size: 1.6rem;
-    font-weight: bold;
+    font-weight: 800;
     text-decoration: none;
     letter-spacing: 3px;
 }
@@ -73,18 +198,18 @@ footer .footer-social {
 
 footer .footer-social a img {
     filter: brightness(0) invert(1);
-    transition: 0.2s;
+    transition: transform 0.2s;
 }
 
 footer .footer-social a:hover img {
-    translate: 0 -3px;
+    transform: translateY(-3px);
 }
 
 footer .footer-bottom {
     text-align: center;
-    color: #b9bbbe;
+    color: rgba(248, 250, 252, 0.76);
     font-size: 0.95rem;
-    padding: 18px 0 8px 0;
-    border-top: 1px solid #36393f;
+    padding: 18px 0 8px;
+    border-top: 1px solid rgba(255, 90, 31, 0.28);
     margin-top: 24px;
 }
